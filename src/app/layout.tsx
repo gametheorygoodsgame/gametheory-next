@@ -1,4 +1,5 @@
 import '@mantine/core/styles.css';
+import './global.css'
 import React from 'react';
 import { MantineProvider } from '@mantine/core';
 import { theme } from '../../theme';
@@ -11,7 +12,11 @@ export const metadata = {
 export default function RootLayout({ children }: { children: any }) {
     return (
         <html lang="en-US">
-            <head />
+            <head>
+                <title>
+                    metadata.title
+                </title>
+            </head>
             <body>
                 <MantineProvider theme={theme}>{children}</MantineProvider>
             </body>
