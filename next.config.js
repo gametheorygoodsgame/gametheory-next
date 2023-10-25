@@ -1,9 +1,13 @@
-const nextConfig = {
-    webpack: (config) => {
-        config.experiments = { ...config.experiments, topLevelAwait: true };
-        return config;
-    },
-    output: 'standalone',
-};
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+    enabled: process.env.ANALYZE === 'true',
+});
 
-module.exports = nextConfig;
+module.exports = withBundleAnalyzer({
+    reactStrictMode: false,
+    eslint: {
+        ignoreDuringBuilds: true,
+    },
+    experimental: {
+        optimizePackageImports: ['@mantine/core', '@mantine/hooks'],
+    },
+});

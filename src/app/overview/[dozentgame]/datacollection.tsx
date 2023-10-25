@@ -1,10 +1,14 @@
-"use client"
+'use client';
 
-import React, { useState, useEffect } from "react";
-import { Badge, Stack } from "@mantine/core";
-import { IconCards } from "@tabler/icons-react";
+import React, { useState, useEffect } from 'react';
+import { Badge, Stack } from '@mantine/core';
+import { IconCards } from '@tabler/icons-react';
 
-export default function DataCollection({ gameId }) {
+interface DataCollectionProps {
+    gameId: string;
+}
+
+export default function DataCollection({ gameId }: DataCollectionProps) {
     const [dataCollection, setDataCollection] = useState([]);
     const icon = (<IconCards />);
 
@@ -18,7 +22,7 @@ export default function DataCollection({ gameId }) {
                 const data = await response.json();
                 setDataCollection(data);
             } catch (error) {
-                console.error("Error fetching data: ", error);
+                console.error('Error fetching data: ', error);
             }
         };
         fetchData();
@@ -35,7 +39,7 @@ export default function DataCollection({ gameId }) {
     type Item = {
         id: string;
         name: string;
-    }
+    };
 
     return (
         <>

@@ -1,32 +1,34 @@
-"use client"
+'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ActionIcon, Button, Container, Center, Stack, StackProps, Table, Text, NumberInput, Group, GroupProps, Modal, Space } from '@mantine/core';
+import { ActionIcon, Button, Container, Center, Stack, Table, Text, NumberInput, Group, Modal, Space } from '@mantine/core';
 import { useViewportSize, useDisclosure } from '@mantine/hooks';
 import { IconSquarePlus, IconTrash, IconClipboard, IconClipboardCheck, IconQrcode } from '@tabler/icons-react';
 import { QRCodeSVG } from 'qrcode.react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation'; // Import useRouter from the correct location
 import './noselect.css';
 
 export default function Overview() {
     const { height, width } = useViewportSize();
-    const [openedCreateModal, { open: openCreateModal, close: closeCreateModal }] = useDisclosure(false);
-    const [openedDeleteModal, { open: openDeleteModal, close: closeDeleteModal }] = useDisclosure(false);
+    const [openedCreateModal,
+        { open: openCreateModal, close: closeCreateModal }] = useDisclosure(false);
+    const [openedDeleteModal,
+        { open: openDeleteModal, close: closeDeleteModal }] = useDisclosure(false);
     const [openedQRModal, { open: openQRModal, close: closeQRModal }] = useDisclosure(false);
-    const [games, setGames] = useState([]);
+    const [games, setGames] = useState<Game[]>([]); // Add type for games
     const [numberOfGames, setNumberOfGames] = useState(0);
     const [numRounds, setNumRounds] = useState<number | string>(10);
     const { push } = useRouter();
     const [clipboardClicked, setClipboardClicked] = useState(false);
-    const [deleteGameID, setDeleteGameID] = useState(null);
-    const [clipboardGameID, setClipboardGameID] = useState(null);
-    const [qrGameID, setQRGameID] = useState(null);
+    const [deleteGameID, setDeleteGameID] = useState<string | null>(null); // Add type for deleteGameID
+    const [clipboardGameID, setClipboardGameID] = useState<string | null>(null); // Add type for clipboardGameID
+    const [qrGameID, setQRGameID] = useState<string | null>(null); // Add type for qrGameID
 
     const handleSubmit = async () => {
         await fetch('/api/games', {
             method: 'POST',
             body: JSON.stringify(numRounds),
-            headers: { 'Content-Type': 'application/json' }
+            headers: { 'Content-Type': 'application/json' },
         });
         closeCreateModal();
     };
@@ -35,49 +37,49 @@ export default function Overview() {
         await fetch('/api/games', {
             method: 'DELETE',
             body: JSON.stringify(deleteGameID),
-            headers: { 'Content-Type': 'application/json' }
+            headers: { 'Content-Type': 'application/json' },
         });
         closeDeleteModal();
         setDeleteGameID(null);
     };
 
-    const handleRowClick = (gameID, event) => {
-        if (event.target.classList.contains('mantine-icon')) {
+    const handleRowClick = (gameID: string, event: React.MouseEvent) => {
+        const element = event.target as HTMLElement;
+        if (element.classList.contains('mantine-icon')) {
             event.stopPropagation();
             return;
         }
         push(`/overview/${gameID}`);
     };
 
-    const handleDeleteButtonClick = (gameID) => {
+    const handleDeleteButtonClick = (gameID: string) => {
         openDeleteModal();
         setDeleteGameID(gameID);
     };
 
-    const handleQRButtonClick = (gameID) => {
+    const handleQRButtonClick = (gameID: string) => {
         openQRModal();
         setQRGameID(gameID);
     };
 
-    const handleClipboardButtonClick = (gameID) => {
-        navigator.clipboard.writeText(window.location.host + `/login/student/${gameID}`);
-        setClipboardClicked(true);
+    function handleClipboardButtonClick(event: React.MouseEvent<HTMLElement>, gameID: string) {
+        navigator.clipboard.writeText(`${window.location.host}/login/student/${gameID}`);
         setClipboardGameID(gameID);
         setTimeout(() => {
             setClipboardClicked(false);
             setClipboardGameID(null);
         }, 1000);
-    };
+    }
 
     async function fetchGameList() {
         try {
             const response = await fetch('/api/games');
             const data = await response.json();
-            const gameListInfo = data.gameListInfo;
+            const { gameListInfo } = data;
             setGames(gameListInfo.gameList);
             setNumberOfGames(gameListInfo.totalNumber);
         } catch (error) {
-            console.error("Error fetching data: ", error);
+            console.error('Error fetching data: ', error);
         }
     }
 
@@ -98,27 +100,27 @@ export default function Overview() {
             <td>{game.gameID}</td>
             <td>{game.playerNumber}</td>
             <td>{game.currentRound}/{game.numRounds}</td>
-            <td className='mantine-icon'>
-                <Group className='mantine-icon'>
-                    <ActionIcon color="red" className='mantine-icon'>
-                        <IconTrash className='mantine-icon' onClick={() => handleDeleteButtonClick(game.gameID)} />
+            <td className="mantine-icon">
+                <Group className="mantine-icon">
+                    <ActionIcon color="red" className="mantine-icon">
+                        <IconTrash className="mantine-icon" onClick={() => handleDeleteButtonClick(game.gameID)} />
                     </ActionIcon>
-                    <ActionIcon className='mantine-icon' onClick={() => handleClipboardButtonClick(game.gameID)}>
+                    <ActionIcon className="mantine-icon" onClick={(event) => handleClipboardButtonClick(event, game.gameID)}>
                         {clipboardClicked && game.gameID === clipboardGameID ? (
-                            <IconClipboardCheck color="green" className='mantine-icon' />
+                            <IconClipboardCheck color="green" className="mantine-icon" />
                         ) : (
-                            <IconClipboard className='mantine-icon' onClick={handleClipboardButtonClick} />
+                            <IconClipboard className="mantine-icon" />
                         )}
                     </ActionIcon>
-                    <ActionIcon className='mantine-icon'>
-                        <IconQrcode className='mantine-icon' onClick={() => handleQRButtonClick(game.gameID)} />
+                    <ActionIcon className="mantine-icon">
+                        <IconQrcode className="mantine-icon" onClick={() => handleQRButtonClick(game.gameID)} />
                     </ActionIcon>
                 </Group>
             </td>
         </tr>
     ));
 
-return (
+    return (
     <>
         <Modal opened={openedDeleteModal} onClose={closeDeleteModal} title="Löschen?">
             <Stack gap="xl">
@@ -132,11 +134,11 @@ return (
         <Modal opened={openedCreateModal} onClose={closeCreateModal} title="Neues Spiel">
             <Stack gap="xl">
                 <NumberInput
-                    type="text"
-                    min={1}
-                    label="Anzahl der Runden"
-                    value={numRounds}
-                    onChange={setNumRounds}
+                  type="text"
+                  min={1}
+                  label="Anzahl der Runden"
+                  value={numRounds}
+                  onChange={setNumRounds}
                 />
                 <Group align="right"><Button onClick={handleSubmit}>Starten</Button></Group>
             </Stack>
@@ -145,7 +147,7 @@ return (
             <Center>
                 <Stack gap="xl">
                     <Text>Scanne den Code zum Beitreten.</Text>
-                    <QRCodeSVG value={window.location.host + `/login/student/${qrGameID}`} size={500} />
+                    <QRCodeSVG value={`${window.location.host}/login/student/${qrGameID}`} size={500} />
                 </Stack>
             </Center>
             <Space h="lg" />
@@ -160,7 +162,7 @@ return (
                             <th>Spiel-ID</th>
                             <th>Anzahl der Spieler</th>
                             <th>Runden</th>
-                            <th></th>
+                            <th />
                         </tr>
                         </thead>
                         <tbody>{rows}</tbody>

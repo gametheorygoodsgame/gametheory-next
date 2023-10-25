@@ -1,7 +1,7 @@
-"use client"
+'use client';
 
-import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { MouseEvent, useState } from 'react';
 import Link from 'next/link';
 import { Button, Container, Center, Paper, Stack, TextInput, Text, Title } from '@mantine/core';
 import { IconExclamationCircle } from '@tabler/icons-react';
@@ -14,17 +14,17 @@ interface StudentLoginProps {
 export default function StudentLogin(props: StudentLoginProps) {
     const { gameIdIn } = props;
     const [userName, setUserName] = useState('');
-    const [gameId, setGameId] = useState(gameIdIn ? gameIdIn : '');
-    //const router = useRouter();
+    const [gameId, setGameId] = useState(gameIdIn || '');
+    const router = useRouter();
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
-        /*if (userName === '' || gameId === '') {
+        if (userName === '' || gameId === '') {
             notifications.show({
                 message: 'Bitte einen Wert eingeben!',
-                color: "red",
+                color: 'red',
                 title: 'Upps😵‍💫',
-                icon: <IconExclamationCircle size="1rem" />
+                icon: <IconExclamationCircle size="1rem" />,
             });
             return;
         }
@@ -41,9 +41,9 @@ export default function StudentLogin(props: StudentLoginProps) {
             const error = await response.json();
             notifications.show({
                 message: error.message,
-                color: "red",
+                color: 'red',
                 title: 'Upps😵',
-                icon: <IconExclamationCircle size="1rem" />
+                icon: <IconExclamationCircle size="1rem" />,
             });
         } else if (response.status === 200) {
             const playerID = await response.json();
@@ -56,46 +56,46 @@ export default function StudentLogin(props: StudentLoginProps) {
             const error = await response.json();
             notifications.show({
                 message: error.message,
-                color: "red",
+                color: 'red',
                 title: 'Upps😵',
-                icon: <IconExclamationCircle size="1rem" />
+                icon: <IconExclamationCircle size="1rem" />,
             });
         }
 
         setUserName('');
-        setGameId('');*/
+        setGameId('');
     };
 
     return (
         <Center bg="brand.7" style={{ height: '100%' }}>
             <Container size={800} my={40}>
                 <Title
-                    c="white"
-                    ta="center"
-                    style={{ fontFamily: 'Castellar, sans-serif', fontWeight: 800 }}
+                  c="white"
+                  ta="center"
+                  style={{ fontFamily: 'Castellar, sans-serif', fontWeight: 800 }}
                 >
                     Game Theory
                 </Title>
                 <Paper miw={300} withBorder shadow="md" p={20} mt={20} radius="md">
                     <Stack gap="sm">
                         <TextInput
-                            label="Benutzername"
-                            value={userName}
-                            onChange={(e) => setUserName(e.target.value.replace(/\s/g, ''))}
+                          label="Benutzername"
+                          value={userName}
+                          onChange={(e) => setUserName(e.target.value.replace(/\s/g, ''))}
                         />
                         <TextInput
-                            label="Spiel-ID"
-                            value={gameId}
-                            onChange={(e) => setGameId(e.target.value.replace(/\s/g, ''))}
+                          label="Spiel-ID"
+                          value={gameId}
+                          onChange={(e) => setGameId(e.target.value.replace(/\s/g, ''))}
                         />
                         <Button onClick={handleSubmit} fullWidth my="xl">
                             Login
                         </Button>
                     </Stack>
                     <Link href="dozent" style={{ textDecoration: 'none' }}>
-                        <Container fz={14} c={'darkgray'} w={100} mr={0} p={0} ta={'right'}>
-                            <Text >Dozenten-Login</Text>
-                            <Center><i className="fa fa-chevron-right"></i></Center>
+                        <Container fz={14} c="darkgray" w={100} mr={0} p={0} ta="right">
+                            <Text>Dozenten-Login</Text>
+                            <Center><i className="fa fa-chevron-right" /></Center>
                         </Container>
                     </Link>
                 </Paper>

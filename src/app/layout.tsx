@@ -1,16 +1,19 @@
-// Importieren von globalen CSS-Stilen und RootStyleRegistry-Komponente
-import './globals.css'
-import RootStyleRegistry from './emotion';
-import React, { ReactNode } from 'react';
+import '@mantine/core/styles.css';
+import React from 'react';
+import { MantineProvider } from '@mantine/core';
+import { theme } from '../../theme';
 
-// Definieren der RootLayout-Komponente
-export default function RootLayout({ children }: { children: ReactNode }) {
+export const metadata = {
+    title: 'Mantine Next.js template',
+    description: 'I am using Mantine with Next.js!',
+};
+
+export default function RootLayout({ children }: { children: any }) {
     return (
-        // HTML-Grundstruktur definieren
         <html lang="en-US">
             <head />
             <body>
-                <RootStyleRegistry>{children}</RootStyleRegistry>
+                <MantineProvider theme={theme}>{children}</MantineProvider>
             </body>
         </html>
     );
