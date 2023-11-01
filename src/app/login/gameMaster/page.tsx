@@ -30,23 +30,29 @@ export default function DozentLogin() {
   const handleLogin = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     notifications.loginPending();
+    logger.debug('Created wait notification');
 
     if (email === '' || password === '') {
       notifications.missingInput();
+      logger.debug('Created missing login input notification');
     } else {
       try {
         await signInWithEmailAndPassword(auth, email, password);
         notifications.loginSuccess();
+        logger.debug('Created login success notification.');
+        logger.info('Game master login successful.');
         router.push('/overview');
       } catch (err) {
         logger.error(err);
         notifications.loginFailed();
+        logger.debug('Created login failed notification.');
       }
     }
   };
 
   if (user) {
     router.push('/overview');
+    logger.debug('Redirected to /overview');
   } else {
     if (loading) {
       return (

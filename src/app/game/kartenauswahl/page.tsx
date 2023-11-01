@@ -29,9 +29,11 @@ export default function CardSelection() {
 
     setNumRedCards((prevCount) => {
       if (isChecked && side === 'left') {
+        logger.debug('Red card counter for this move increased by 1.');
         return prevCount + 1;
       }
       if (!isChecked && side === 'left') {
+        logger.debug('Red card counter for this move decreased by 1.');
         return prevCount - 1;
       }
       return prevCount;

@@ -37,37 +37,47 @@ export default function GamesOverview() {
   const [numberOfGames, setNumberOfGames] = useState(0);
   const [numRounds, setNumRounds] = useState<number | string>(10);
   const [clipboardClicked, setClipboardClicked] = useState(false);
-  const [deleteGameID, setDeleteGameID] = useState<string | null>(null);
-  const [clipboardGameID, setClipboardGameID] = useState<string | null>(null);
-  const [qrGameID, setQRGameID] = useState<string | null>(null);
+  const [deleteGameId, setDeleteGameId] = useState<string | null>(null);
+  const [clipboardGameId, setClipboardGameId] = useState<string | null>(null);
+  const [qrGameID, setQRGameId] = useState<string | null>(null);
 
   async function fetchGameList() {
     try {
       const response = await gameApi.getAllGames();
       setGames(response.data);
       setNumberOfGames(response.data.length);
+      logger.info('Fetched game data successfully.');
+      logger.debug(response.data);
     } catch (error) {
       logger.error('Error fetching data: ', error);
     }
   }
 
-  const handleDeleteButtonClick = (gameID: string) => {
+  const handleDeleteButtonClick = (gameId: string) => {
     openDeleteModal();
-    setDeleteGameID(gameID);
+    logger.debug('Delete modal opened.');
+    setDeleteGameId(gameId);
+    logger.debug(`DeleteGameId set to ${gameId}.`);
   };
 
-  const handleQRButtonClick = (gameID: string) => {
+  const handleQRButtonClick = (gameId: string) => {
     openQRModal();
-    setQRGameID(gameID);
+    logger.debug('QR modal opened.');
+    setQRGameId(gameId);
+    logger.debug(`QRGameId set to ${gameId}.`);
   };
 
-  function handleClipboardButtonClick(event: React.MouseEvent<HTMLElement>, gameID: string) {
-    navigator.clipboard.writeText(`${window.location.host}/login/student/${gameID}`);
-    setClipboardGameID(gameID);
+  function handleClipboardButtonClick(event: React.MouseEvent<HTMLElement>, gameId: string) {
+    const clipboardURL = `${window.location.host}/login/player/${gameId}`;
+    navigator.clipboard.writeText(clipboardURL);
+    logger.debug(`ClipboardURL: ${clipboardURL}`);
+    setClipboardGameId(gameId);
+    logger.debug(`ClipboardGameId set to ${gameId}.`);
     setTimeout(() => {
       setClipboardClicked(false);
-      setClipboardGameID(null);
+      setClipboardGameId(null);
     }, 1000);
+    logger.info('Copied game URL to clipboard.');
   }
 
   const handleSubmit = async () => {
@@ -82,15 +92,19 @@ export default function GamesOverview() {
     };
     await gameApi.createGame(game);
     closeCreateModal();
+    logger.debug(game);
+    logger.info('Created a new game.');
   };
 
   const handleDelete = async () => {
-    if (deleteGameID !== null) {
+    if (deleteGameId !== null) {
       try {
-        await gameApi.deleteGameById(deleteGameID);
+        await gameApi.deleteGameById(deleteGameId);
         await fetchGameList(); // Refresh the game list after deletion
         closeDeleteModal();
-        setDeleteGameID(null);
+        logger.debug('Delete modal closed.');
+        setDeleteGameId(null);
+        logger.info(`Deleted game ${deleteGameId} successfully.`);
       } catch (error) {
         logger.error("GameId to delete wasn't a number.");
       }
@@ -99,11 +113,13 @@ export default function GamesOverview() {
 
   function handleRowClick(gameID: string, event: React.MouseEvent) {
     const element = event.target as HTMLElement;
+    const redirectURL = `/overview/${gameID}`;
     if (element.classList.contains('mantine-icon')) {
       event.stopPropagation();
       return;
     }
-    push(`/overview/${gameID}`);
+    logger.debug(`Row clicked. Redirected to ${redirectURL}.`);
+    push(redirectURL);
   }
 
   useEffect(() => {
@@ -160,7 +176,7 @@ export default function GamesOverview() {
               handleDeleteButtonClick={handleDeleteButtonClick}
               handleClipboardButtonClick={handleClipboardButtonClick}
               clipboardClicked={clipboardClicked}
-              clipboardGameID={clipboardGameID}
+              clipboardGameID={clipboardGameId}
               handleQRButtonClick={handleQRButtonClick}
             />
           </Stack>

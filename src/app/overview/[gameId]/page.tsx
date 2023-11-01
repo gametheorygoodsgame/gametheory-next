@@ -25,6 +25,7 @@ export default function GameOverviewGameMaster({ params }: GameOverviewGameMaste
       const response = await fetch(`../api/rounds?gameID=${gameId}`);
       const data = await response.json();
       setCurrentRound(data.currentRound);
+      logger.info('Fetched game data successfully.');
     } catch (error) {
       logger.error('Error fetching data: ', error);
     }

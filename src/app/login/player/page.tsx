@@ -23,9 +23,11 @@ export default function StudentLogin(props: StudentLoginProps) {
   const handleSubmit = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     loginNotifications.loginPending();
+    logger.debug('Created wait notification');
 
     if (userName === '' || gameId === '') {
       loginNotifications.missingInput();
+      logger.debug('Created missing login input notification');
       return;
     }
 
@@ -38,20 +40,27 @@ export default function StudentLogin(props: StudentLoginProps) {
       };
       const response = await gamePlayerApi.addPlayerToGameById(gameId, player);
 
+      logger.debug(`Successfully created player ${response.data}`);
+
       if (response.status === 200) {
         // Handle success
         loginNotifications.loginSuccess();
+        logger.debug('Created login success notification.');
 
         document.cookie = `playerID=${response.data.id}`;
         document.cookie = `gameID=${gameId}`;
+
+        logger.debug(`Created cookie {playerID=${response.data.id};gameID=${gameId}}`);
 
         router.push('../../game/kartenauswahl');
       } else if (response.status === 404) {
         // Handle not found
         loginNotifications.loginFailed();
+        logger.debug('Created login failed notification.');
       } else {
         // Handle every other error from the server
         notifications.error({ message: (response.data as any as Error).message });
+        logger.debug('Created login error notification.');
       }
     } catch (error) {
       // Handle any exceptions or network errors
