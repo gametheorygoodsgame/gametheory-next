@@ -35,4 +35,19 @@ yarn-error.log*
 *.tsbuildinfo
 
 # storybook
-storybook-static
+storybook-static!/code_out.txt
+
+/app.log
+
+/.npmrc
+
+/node_modules/
+
+/.next/
+
+/logs/
+
+/.idea/
+
+/code_structure.txt
+/code_out.txt

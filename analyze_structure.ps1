@@ -15,7 +15,7 @@ function Get-FolderStructure {
     }
 }
 
-$FolderPath = "src\app\"  # Update this with the path to your 'app' folder
+$FolderPath = "src\"  # Update this with the path to your 'app' folder
 $OutputFile = "code_structure.txt"
 
 Get-FolderStructure -Path $FolderPath | Out-File -FilePath $OutputFile

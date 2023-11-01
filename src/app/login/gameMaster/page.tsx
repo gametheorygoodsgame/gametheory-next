@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { IconCheck, IconExclamationCircle } from '@tabler/icons-react';
 import {
   Button,
   Center,
@@ -17,8 +16,9 @@ import {
   TextInput,
   Title,
 } from '@mantine/core';
-import { notifications } from '@mantine/notifications';
-import firebase from '../../firebaseApp';
+import firebase from '../../../utils/firebaseApp';
+import * as notifications from '../../../components/login/loginNotifications';
+import { logger } from '@/utils/logger';
 
 export default function DozentLogin() {
   const auth = getAuth(firebase);
@@ -27,43 +27,20 @@ export default function DozentLogin() {
   const [password, setPassword] = useState('');
   const [user, loading, error] = useAuthState(auth);
 
-  const showNotification = (title: string, message: string, color: string) => {
-    notifications.update({
-      id: 'load-data',
-      loading: false,
-      color,
-      title,
-      message,
-      icon: color === 'red' ? <IconExclamationCircle size="1rem" /> : <IconCheck size="1rem" />,
-    });
-  };
-
   const handleLogin = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    notifications.show({
-      id: 'load-data',
-      color: 'brand.0',
-      loading: true,
-      title: 'Versuche Login',
-      message: 'Du kannst das noch nicht schließen.',
-      autoClose: false,
-      withCloseButton: false,
-    });
+    notifications.loginPending();
 
     if (email === '' || password === '') {
-      showNotification('Upps😵‍💫', 'Bitte geben Sie Ihre Nutzerinformationen ein!', 'red');
+      notifications.missingInput();
     } else {
       try {
         await signInWithEmailAndPassword(auth, email, password);
-        showNotification('Success', 'Login erfolgreich', 'teal');
+        notifications.loginSuccess();
         router.push('/overview');
       } catch (err) {
-        console.error(err);
-        showNotification(
-          'Upps, Anmeldung fehlgeschlagen. 😕',
-          'Bitte überprüfe deine Anmeldeinformationen!',
-          'red'
-        );
+        logger.error(err);
+        notifications.loginFailed();
       }
     }
   };
@@ -81,13 +58,7 @@ export default function DozentLogin() {
     return (
       <Center bg="brand.7" style={{ height: '100%' }}>
         <Container size={800} my={40}>
-          <Title
-            c="white"
-            ta="center"
-            style={{ fontFamily: 'Castellar, sans-serif', fontWeight: 800 }}
-          >
-            Game Theory
-          </Title>
+          <Title>Game Theory</Title>
           <Paper miw={300} withBorder shadow="md" p={20} mt={20} radius="md">
             <Stack gap="sm">
               <TextInput

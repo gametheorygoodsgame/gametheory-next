@@ -1,10 +1,10 @@
-import StudentMenuBar from './StudentMenuBar';
+import PlayerMenuBar from '../../components/menuBars/PlayerMenuBar';
 
-export default function StudentLayout({ children }:{ children: any }) {
-    return (
-        <>
-            <StudentMenuBar />
-            <main>{children}</main>
-        </>
-    );
+export default function StudentLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <>
+      <PlayerMenuBar />
+      <main>{children}</main>
+    </>
+  );
 }
