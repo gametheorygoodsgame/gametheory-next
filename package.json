@@ -30,6 +30,7 @@
     "@next/bundle-analyzer": "^13.5.6",
     "@tabler/icons-react": "^2.39.0",
     "@types/pino": "^7.0.5",
+    "@types/recharts": "^1.8.26",
     "axios": "^1.5.1",
     "encoding": "^0.1.13",
     "firebase": "^10.5.0",

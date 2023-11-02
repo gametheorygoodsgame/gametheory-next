@@ -4,18 +4,18 @@ import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { Bar, CartesianGrid, ComposedChart, Legend, Line, Tooltip, XAxis, YAxis } from 'recharts';
 
 type PlotProps = {
-  gameID: string;
+  gameId: string;
   portHeight: number;
   portWidth: number;
 };
 
 const Plot = forwardRef<any, PlotProps>((props, ref) => {
-  const { gameID, portHeight, portWidth } = props;
+  const { gameId, portHeight, portWidth } = props;
   const [gameStatistic, setGameStatistic] = useState<any[]>([]); // Change 'any' to the actual type of gameStatistic
 
   const fetchGameStatistic = async () => {
     try {
-      const response = await fetch(`../api/gameStatistics?gameID=${gameID}`);
+      const response = await fetch(`../api/gameStatistics?gameID=${gameId}`);
       const data = await response.json();
       setGameStatistic(data.gameStatistics);
       console.log(gameStatistic);
@@ -41,7 +41,7 @@ const Plot = forwardRef<any, PlotProps>((props, ref) => {
       }}
     >
       <CartesianGrid />
-      <XAxis dataKey="round" />
+      <XAxis dataKey="turn" />
       <Tooltip />
       <Legend />
       <Bar dataKey="numOfRedCardsPlayed" name="Anzahl Roter Karten im Pot" fill="#334d80" />
