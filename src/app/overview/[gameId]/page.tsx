@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Center, Container, Grid, Group, ScrollArea, Stack, Text } from '@mantine/core';
 import { useDisclosure, useViewportSize } from '@mantine/hooks';
+import { Game, GameApi } from '@eikermannlfh/gametheoryapi/api';
 import DataCollection from '../../../components/dataCollection/datacollection';
 import { StartGameModal } from '@/components/game/startGameModal';
 import { logger } from '@/utils/logger';
@@ -18,40 +19,52 @@ export default function GameOverviewGameMaster({ params }: GameOverviewGameMaste
   const { gameId } = params;
   const [redCardValue, setRedCardValue] = useState<number | string>(1);
   const [opened, { close }] = useDisclosure(false);
-  const [currentRound, setCurrentRound] = useState(0);
+  const [game, setGame] = useState<Game>();
 
-  async function fetchCurrentTurn() {
+  const gameApi = new GameApi();
+
+  async function fetchGame() {
     try {
-      const response = await fetch(`../api/rounds?gameID=${gameId}`);
-      const data = await response.json();
-      setCurrentRound(data.currentRound);
+      const response = await gameApi.getGameById(gameId);
+      setGame(response.data);
       logger.info('Fetched game data successfully.');
+      logger.debug(response.data);
     } catch (error) {
       logger.error('Error fetching data: ', error);
     }
   }
 
   const handleNextRound = async () => {
-    await fetch('/api/rounds', {
-      method: 'POST',
-      body: JSON.stringify({ gameID: gameId, redCardValue }),
-      headers: { 'Content-Type': 'application/json' },
-    });
-    fetchCurrentTurn();
+    try {
+      if (!game) {
+        throw new Error('Game not found');
+      }
+      // @ts-ignore
+      const response = await gameApi.updateGameById(gameId, game);
+      setGame(response.data);
+      logger.info('Updated game data successfully.');
+      logger.debug(response.data);
+    } catch (error) {
+      logger.error('Error updating data: ', error);
+    }
     close();
   };
 
   useEffect(() => {
-    fetchCurrentTurn();
-  }, [gameId]);
+    fetchGame();
+  }, [gameId, game]);
 
   useEffect(() => {
-    const interval = setInterval(fetchCurrentTurn, 10000); // Fetch current round every 10 seconds
+    const interval = setInterval(fetchGame, 10000); // Fetch current round every 10 seconds
 
     return () => {
       clearInterval(interval);
     };
-  }, [gameId]);
+  }, [gameId, game]);
+
+  if (!game) {
+    throw new Error('game not found.');
+  }
 
   return (
     <Container p={60} fluid h={height - 63}>
@@ -65,7 +78,7 @@ export default function GameOverviewGameMaster({ params }: GameOverviewGameMaste
           <Stack justify="space-between" h={height - 200}>
             <Group align="right" px={90}>
               <Text style={{ fontFamily: 'Instrument Sans, sans-serif', fontWeight: 700 }}>
-                Runde: {currentRound}
+                Runde: {game.currentTurn}
               </Text>
             </Group>
             <Center>Rundenauswertung</Center>
@@ -74,7 +87,7 @@ export default function GameOverviewGameMaster({ params }: GameOverviewGameMaste
                 Spielabbruch
               </Button>
               <StartGameModal
-                currentRound={currentRound}
+                currentRound={game.currentTurn}
                 isOpen={opened}
                 handleNextRound={handleNextRound}
                 redCardValue={redCardValue}

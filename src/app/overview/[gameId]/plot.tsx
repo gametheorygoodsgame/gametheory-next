@@ -2,6 +2,8 @@
 
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { Bar, CartesianGrid, ComposedChart, Legend, Line, Tooltip, XAxis, YAxis } from 'recharts';
+import { Game, GameApi } from '@eikermannlfh/gametheoryapi/api';
+import { logger } from '@/utils/logger';
 
 type PlotProps = {
   gameId: string;
@@ -12,20 +14,40 @@ type PlotProps = {
 const Plot = forwardRef<any, PlotProps>((props, ref) => {
   const { gameId, portHeight, portWidth } = props;
   const [gameStatistic, setGameStatistic] = useState<any[]>([]); // Change 'any' to the actual type of gameStatistic
+  const [game, setGame] = useState<Game>();
 
-  const fetchGameStatistic = async () => {
+  const gameApi = new GameApi();
+
+  const fetchGame = async () => {
     try {
-      const response = await fetch(`../api/gameStatistics?gameID=${gameId}`);
-      const data = await response.json();
-      setGameStatistic(data.gameStatistics);
-      console.log(gameStatistic);
+      const response = await gameApi.getGameById(gameId);
+      setGame(response.data);
+      logger.info('Fetched game data successfully.');
+      logger.debug(response.data);
     } catch (error) {
-      console.error('Error fetching Game Statistics: ', error);
+      logger.error('Error fetching data: ', error);
     }
   };
 
+  const gameStatisticsTemp: Object[] = [];
+
+  if (!game) {
+    throw new Error('Game not found');
+  }
+
+  // eslint-disable-next-line no-plusplus
+  for (let i = 1; i < game.currentTurn - 1; i++) {
+    const currentTurnObj = {
+      redCardPotValue: game.cardPotValue[i],
+      numOfRedCardsPlayed: game.potCards[i],
+    };
+    gameStatisticsTemp.push(currentTurnObj);
+  }
+
+  setGameStatistic(gameStatisticsTemp);
+
   useImperativeHandle(ref, () => ({
-    fetchGameStatistic,
+    fetchGame,
   }));
 
   return (
