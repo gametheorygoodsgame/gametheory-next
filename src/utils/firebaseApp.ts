@@ -1,6 +1,7 @@
 'use client';
 
 import { initializeApp } from 'firebase/app';
+import { logger } from '@/utils/logger';
 
 // Define the configuration object containing the Firebase project's API keys and settings
 const firebaseConfig = {
@@ -14,7 +15,5 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase with the configuration object
-const firebase = initializeApp(firebaseConfig);
-
-// Export the initialized Firebase instance as the default export of the module
-export default firebase;
+export const firebase = initializeApp(firebaseConfig);
+logger.debug(firebase);

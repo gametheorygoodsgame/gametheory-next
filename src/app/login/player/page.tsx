@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { MouseEvent, useState } from 'react';
+import { MouseEvent, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Button, Center, Container, Paper, Stack, Text, TextInput, Title } from '@mantine/core';
 import { GamePlayerApi, Player } from '@eikermannlfh/gametheoryapi/api';
@@ -15,17 +15,18 @@ interface StudentLoginProps {
 
 export default function StudentLogin(props: StudentLoginProps) {
   const { gameIdIn } = props;
-  const [userName, setUserName] = useState('');
+  const [playerName, setPlayerName] = useState('');
   const [gameId, setGameId] = useState(gameIdIn || '');
   const router = useRouter();
   const gamePlayerApi = new GamePlayerApi();
 
-  const handleSubmit = async (e: MouseEvent<HTMLButtonElement>) => {
+  const handleLoginSubmit = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     loginNotifications.loginPending();
     logger.debug('Created wait notification');
 
-    if (userName === '' || gameId === '') {
+    // if one is not entered show a notification
+    if (playerName === '' || gameId === '') {
       loginNotifications.missingInput();
       logger.debug('Created missing login input notification');
       return;
@@ -34,10 +35,12 @@ export default function StudentLogin(props: StudentLoginProps) {
     try {
       const player: Player = {
         id: '',
-        name: userName,
+        name: playerName,
         moves: [],
         score: 0,
       };
+
+      // sending request to server
       const response = await gamePlayerApi.addPlayerToGameById(gameId, player);
 
       logger.debug(`Successfully created player ${response.data}`);
@@ -68,9 +71,13 @@ export default function StudentLogin(props: StudentLoginProps) {
       notifications.error({ message: 'An error occurred while making the API call.' });
     }
 
-    setUserName('');
+    setPlayerName('');
     setGameId('');
   };
+
+  useEffect(() => {
+    setGameId(gameIdIn);
+  }, [gameIdIn]);
 
   return (
     <Center bg="brand.7" style={{ height: '100%' }}>
@@ -80,19 +87,19 @@ export default function StudentLogin(props: StudentLoginProps) {
           <Stack gap="sm">
             <TextInput
               label="Benutzername"
-              value={userName}
-              onChange={(e) => setUserName(e.target.value.replace(/\s/g, ''))}
+              value={playerName}
+              onChange={(e) => setPlayerName(e.target.value.replace(/\s/g, ''))}
             />
             <TextInput
               label="Spiel-ID"
               value={gameId}
               onChange={(e) => setGameId(e.target.value.replace(/\s/g, ''))}
             />
-            <Button onClick={handleSubmit} fullWidth my="xl">
+            <Button onClick={handleLoginSubmit} fullWidth my="xl">
               Login
             </Button>
           </Stack>
-          <Link href="dozent" style={{ textDecoration: 'none' }}>
+          <Link href="gameMaster" style={{ textDecoration: 'none' }}>
             <Container fz={14} c="darkgray" w={100} mr={0} p={0} ta="right">
               <Text>Dozenten-Login</Text>
               <Center>

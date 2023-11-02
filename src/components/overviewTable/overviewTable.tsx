@@ -1,11 +1,17 @@
 import { Game } from '@eikermannlfh/gametheoryapi';
 import { ActionIcon, Group, Table } from '@mantine/core';
-import { IconClipboard, IconClipboardCheck, IconQrcode, IconTrash } from '@tabler/icons-react';
+import {
+  IconClipboard,
+  IconClipboardCheck,
+  IconDoorEnter,
+  IconQrcode,
+  IconTrash,
+} from '@tabler/icons-react';
 import React from 'react';
 
 type OverviewTableProps = {
   games: Game[];
-  onRowClick: (gameID: string, event: React.MouseEvent) => void;
+  handleOpenButtonClick: (gameID: string) => void;
   handleDeleteButtonClick: (gameID: string) => void;
   handleClipboardButtonClick: (event: React.MouseEvent<HTMLElement>, gameID: string) => void;
   clipboardClicked: boolean;
@@ -15,7 +21,7 @@ type OverviewTableProps = {
 
 export function OverviewTable({
   games,
-  onRowClick,
+  handleOpenButtonClick,
   handleDeleteButtonClick,
   handleClipboardButtonClick,
   clipboardClicked,
@@ -46,13 +52,21 @@ export function OverviewTable({
       </Table.Thead>
       <Table.Tbody>
         {games.map((game: Game) => (
-          <Table.Tr
-            className="noselect"
-            key={game.id}
-            onDoubleClick={(event) => onRowClick(game.id, event)}
-          >
+          <Table.Tr className="noselect" key={game.id}>
+            <Table.Td className="mantine-icon">
+              <ActionIcon color="green" className="mantne-icon">
+                <IconDoorEnter
+                  className="mantine-icon"
+                  onClick={() => handleOpenButtonClick(game.id)}
+                />
+              </ActionIcon>
+            </Table.Td>
             {tableHeaders.map((header) => (
-              <Table.Td key={header.dataKey}>{getNestedValue(game, header.dataKey)}</Table.Td>
+              <Table.Td key={header.dataKey}>
+                {header.dataKey === 'currentTurn'
+                  ? `${getNestedValue(game, 'currentTurn')} / ${getNestedValue(game, 'numTurns')}`
+                  : getNestedValue(game, header.dataKey)}
+              </Table.Td>
             ))}
             <Table.Td className="mantine-icon">
               <Group className="mantine-icon">

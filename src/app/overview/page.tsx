@@ -18,7 +18,7 @@ import { IconSquarePlus } from '@tabler/icons-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { useRouter } from 'next/navigation';
 import '../../components/overviewTable/overviewTable.css';
-import { Game, GameApi } from '@eikermannlfh/gametheoryapi';
+import { Game, GameApi } from '@eikermannlfh/gametheoryapi/api';
 import { logger } from '@/utils/logger';
 import { OverviewTable } from '@/components/overviewTable/overviewTable';
 
@@ -35,7 +35,7 @@ export default function GamesOverview() {
 
   const [games, setGames] = useState<Game[]>([]);
   const [numberOfGames, setNumberOfGames] = useState(0);
-  const [numRounds, setNumRounds] = useState<number | string>(10);
+  const [numTurns, setNumTurns] = useState<number>(10);
   const [clipboardClicked, setClipboardClicked] = useState(false);
   const [deleteGameId, setDeleteGameId] = useState<string | null>(null);
   const [clipboardGameId, setClipboardGameId] = useState<string | null>(null);
@@ -52,6 +52,14 @@ export default function GamesOverview() {
       logger.error('Error fetching data: ', error);
     }
   }
+
+  const handleNumTurnsChange = (value: string | number) => {
+    // Ensure the value is parsed as a number
+    const parsedValue = typeof value === 'string' ? parseInt(value, 10) : value;
+
+    // Update the state
+    setNumTurns(parsedValue);
+  };
 
   const handleDeleteButtonClick = (gameId: string) => {
     openDeleteModal();
@@ -80,23 +88,33 @@ export default function GamesOverview() {
     logger.info('Copied game URL to clipboard.');
   }
 
-  const handleSubmit = async () => {
-    const game: Game = {
-      id: '',
-      numTurns: 5,
-      currentTurn: 0,
-      players: [],
-      cardHandValue: [1],
-      cardPotValue: [2],
-      potCards: [0],
-    };
-    await gameApi.createGame(game);
-    closeCreateModal();
-    logger.debug(game);
-    logger.info('Created a new game.');
+  const handleOpenButtonClick = (gameId: string) => {
+    push(`/overview/${gameId}`);
   };
 
-  const handleDelete = async () => {
+  const handleCreateGame = async () => {
+    try {
+      const game: Game = {
+        id: '',
+        numTurns,
+        currentTurn: 0,
+        players: [],
+        cardHandValue: [1],
+        cardPotValue: [2],
+        potCards: [0],
+      };
+      await gameApi.createGame(game);
+      closeCreateModal();
+      logger.debug(game);
+      logger.info('Created a new game.');
+    } catch (error) {
+      // Handle the error here
+      logger.error('An error occurred while creating the game:', error);
+      // Optionally, you can show an error message to the user or perform other error-handling actions.
+    }
+  };
+
+  const handleDeleteGame = async () => {
     if (deleteGameId !== null) {
       try {
         await gameApi.deleteGameById(deleteGameId);
@@ -111,16 +129,18 @@ export default function GamesOverview() {
     }
   };
 
-  function handleRowClick(gameID: string, event: React.MouseEvent) {
-    const element = event.target as HTMLElement;
-    const redirectURL = `/overview/${gameID}`;
-    if (element.classList.contains('mantine-icon')) {
-      event.stopPropagation();
-      return;
+  /*
+    function handleRowClick(gameID: string, event: React.MouseEvent) {
+      const element = event.target as HTMLElement;
+      const redirectURL = `/overview/${gameID}`;
+      if (element.classList.contains('mantine-icon')) {
+        event.stopPropagation();
+        return;
+      }
+      logger.debug(`Row clicked. Redirected to ${redirectURL}.`);
+      push(redirectURL);
     }
-    logger.debug(`Row clicked. Redirected to ${redirectURL}.`);
-    push(redirectURL);
-  }
+     */
 
   useEffect(() => {
     fetchGameList();
@@ -133,7 +153,7 @@ export default function GamesOverview() {
           <Text>Sind Sie sich sicher, dass Sie das Spiel löschen wollen?</Text>
           <Group align="center">
             <Button onClick={closeDeleteModal}>Abbrechen</Button>
-            <Button variant="outline" color="red" bg="white" onClick={handleDelete}>
+            <Button variant="outline" color="red" bg="white" onClick={handleDeleteGame}>
               Löschen
             </Button>
           </Group>
@@ -145,11 +165,11 @@ export default function GamesOverview() {
             type="text"
             min={1}
             label="Anzahl der Runden"
-            value={numRounds}
-            onChange={setNumRounds}
+            value={numTurns}
+            onChange={handleNumTurnsChange}
           />
           <Group align="right">
-            <Button onClick={handleSubmit}>Starten</Button>
+            <Button onClick={handleCreateGame}>Starten</Button>
           </Group>
         </Stack>
       </Modal>
@@ -165,14 +185,14 @@ export default function GamesOverview() {
       <Container p={60} fluid h={height - 63}>
         <Center px={120}>
           <Stack maw={1200} w={width - 120}>
-            <Group align="right">
-              <ActionIcon c="brand" size="lg" onClick={openCreateModal}>
+            <Group align="right" dir="right">
+              <ActionIcon c="brand" size="lg" bg="transparent" onClick={openCreateModal}>
                 <IconSquarePlus />
               </ActionIcon>
             </Group>
             <OverviewTable
               games={games}
-              onRowClick={handleRowClick}
+              handleOpenButtonClick={handleOpenButtonClick}
               handleDeleteButtonClick={handleDeleteButtonClick}
               handleClipboardButtonClick={handleClipboardButtonClick}
               clipboardClicked={clipboardClicked}

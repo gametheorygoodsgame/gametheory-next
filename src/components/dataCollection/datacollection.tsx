@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { GamePlayerApi } from '@eikermannlfh/gametheoryapi/api';
 import DataCollectionList, {
   DataCollectionItem,
 } from '@/components/dataCollection/dataCollectionList';
@@ -13,20 +14,21 @@ interface DataCollectionProps {
 export default function DataCollection({ gameId }: DataCollectionProps) {
   const [dataCollection, setDataCollection] = useState<DataCollectionItem[]>([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`../api/playerList?gameID=${gameId}`);
-        if (response.status === 404) {
-          throw new Error('Game not found');
-        }
-        const data = await response.json();
-        setDataCollection(data);
-      } catch (error) {
-        logger.error('Error fetching data: ', error);
-      }
-    };
+  const gamePlayerApi = new GamePlayerApi();
 
+  const fetchData = async () => {
+    try {
+      const response = await gamePlayerApi.getPlayersByGameId(gameId);
+      if (response.status === 404) {
+        throw new Error('Game not found');
+      }
+      setDataCollection(response.data);
+    } catch (error) {
+      logger.error('Error fetching data: ', error);
+    }
+  };
+
+  useEffect(() => {
     fetchData();
 
     const intervalId = setInterval(fetchData, 3000);

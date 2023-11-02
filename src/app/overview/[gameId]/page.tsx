@@ -20,7 +20,7 @@ export default function GameOverviewGameMaster({ params }: GameOverviewGameMaste
   const [opened, { close }] = useDisclosure(false);
   const [currentRound, setCurrentRound] = useState(0);
 
-  async function fetchCurrentRound() {
+  async function fetchCurrentTurn() {
     try {
       const response = await fetch(`../api/rounds?gameID=${gameId}`);
       const data = await response.json();
@@ -37,16 +37,16 @@ export default function GameOverviewGameMaster({ params }: GameOverviewGameMaste
       body: JSON.stringify({ gameID: gameId, redCardValue }),
       headers: { 'Content-Type': 'application/json' },
     });
-    fetchCurrentRound();
+    fetchCurrentTurn();
     close();
   };
 
   useEffect(() => {
-    fetchCurrentRound();
+    fetchCurrentTurn();
   }, [gameId]);
 
   useEffect(() => {
-    const interval = setInterval(fetchCurrentRound, 10000); // Fetch current round every 10 seconds
+    const interval = setInterval(fetchCurrentTurn, 10000); // Fetch current round every 10 seconds
 
     return () => {
       clearInterval(interval);

@@ -16,7 +16,7 @@ import {
   TextInput,
   Title,
 } from '@mantine/core';
-import firebase from '../../../utils/firebaseApp';
+import { firebase } from '@/utils/firebaseApp';
 import * as notifications from '../../../components/login/loginNotifications';
 import { logger } from '@/utils/logger';
 

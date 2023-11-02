@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { ActionIcon, Container, Flex, Group, Menu, Title } from '@mantine/core';
 import { IconLogout, IconUser } from '@tabler/icons-react';
@@ -5,7 +7,7 @@ import { getAuth, signOut } from 'firebase/auth';
 import { useViewportSize } from '@mantine/hooks';
 import Image from 'next/image';
 import gameTheoryLogo from 'public/GameTheory_Header.png';
-import firebase from '../../utils/firebaseApp';
+import { firebase } from '@/utils/firebaseApp';
 import { theme } from '@/utils/theme';
 
 function MenuDropdown({ auth }: { auth: any }) {

@@ -1,7 +1,7 @@
 .playCardBody-left {
     border-radius: 35px;
     box-shadow: 0 2px 4px 0 rgba(219, 215, 215, 0);
-    background: #cc4444;
+    background: #cc4444 url('../../../public/CardRed.png') no-repeat center center;
     height: 450px;
     width: 300px;
     margin: 30px;
@@ -10,7 +10,7 @@
 .playCardBody-right {
     border-radius: 35px;
     box-shadow: 0 2px 4px 0 rgba(219, 215, 215, 0);
-    background: #222530;
+    background: #222530 url('../../../public/CardBlack.png') no-repeat center center;
     height: 450px;
     width: 300px;
     margin: 30px;
@@ -21,21 +21,44 @@
 }
 
 .playCard-label input:checked + .playCardBody-right {
-    border-color: white; /* Setzt die Randfarbe des rechten Containers, wenn die Checkbox ausgewählt ist */
-    border: 10px; /* Setzt die Randbreite des rechten Containers, wenn die Checkbox ausgewählt ist */
+    /* Setzt die Randfarbe des rechten Containers, wenn die Checkbox ausgewählt ist */
+    /* Setzt die Randbreite des rechten Containers, wenn die Checkbox ausgewählt ist */
+    border: 10px white;
     transform: scale(0.9); /* Wendet einen Skalierungseffekt auf den rechten Container an, wenn die Checkbox ausgewählt ist */
 }
 
 .playCard-label input:checked + .playCardBody-left {
-    border-color: white; /* Setzt die Randfarbe des linken Containers, wenn die Checkbox ausgewählt ist */
-    border: 10px; /* Setzt die Randbreite des linken Containers, wenn die Checkbox ausgewählt ist */
+    /* Setzt die Randfarbe des linken Containers, wenn die Checkbox ausgewählt ist */
+    /* Setzt die Randbreite des linken Containers, wenn die Checkbox ausgewählt ist */
+    border: 10px white;
     transform: scale(0.9); /* Wendet einen Skalierungseffekt auf den linken Container an, wenn die Checkbox ausgewählt ist */
 }
 
-@media (max-height: 600px) {
+
+/* For screens wider than 768px */
+@media (min-width: 768px) {
     .playCardBody-left,
     .playCardBody-right {
-        height: 225px; /* Setzt die Höhe der Container auf 225px, wenn die maximale Höhe des Viewports 600px oder weniger beträgt */
-        width: 150px; /* Setzt die Breite der Container auf 150px, wenn die maximale Höhe des Viewports 600px oder weniger beträgt */
+        max-height: 450px;
+        max-width: 300px;
     }
 }
+
+/* For screens smaller than 768px */
+@media (max-width: 767px) {
+    .playCardBody-left,
+    .playCardBody-right {
+        max-height: 225px;
+        max-width: 150px;
+    }
+}
+
+/* For screens smaller than 404px */
+@media (max-width: 403px) {
+    .playCardBody-left,
+    .playCardBody-right {
+        max-height: 180px;
+        max-width: 120px;
+    }
+}
+
