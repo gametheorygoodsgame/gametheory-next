@@ -30,7 +30,8 @@ export default function GameOverviewGameMaster({ params }: GameOverviewGameMaste
       logger.info('Fetched game data successfully.');
       logger.debug(response.data);
     } catch (error) {
-      logger.error('Error fetching data: ', error);
+      logger.warn(`GameId: ${gameId}`)
+      logger.error('Error fetching data: ', error);;
     }
   }
 
@@ -62,9 +63,11 @@ export default function GameOverviewGameMaster({ params }: GameOverviewGameMaste
     };
   }, [gameId, game]);
 
+  /*
   if (!game) {
     throw new Error('game not found.');
   }
+   */
 
   return (
     <Container p={60} fluid h={height - 63}>
@@ -78,7 +81,7 @@ export default function GameOverviewGameMaster({ params }: GameOverviewGameMaste
           <Stack justify="space-between" h={height - 200}>
             <Group align="right" px={90}>
               <Text style={{ fontFamily: 'Instrument Sans, sans-serif', fontWeight: 700 }}>
-                Runde: {game.currentTurn}
+                Runde: {game?.currentTurn || 0}
               </Text>
             </Group>
             <Center>Rundenauswertung</Center>
@@ -87,7 +90,7 @@ export default function GameOverviewGameMaster({ params }: GameOverviewGameMaste
                 Spielabbruch
               </Button>
               <StartGameModal
-                currentRound={game.currentTurn}
+                currentRound={game?.currentTurn || 0}
                 isOpen={opened}
                 handleNextRound={handleNextRound}
                 redCardValue={redCardValue}
