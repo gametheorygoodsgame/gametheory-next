@@ -1,4 +1,4 @@
-import { Game } from '@eikermannlfh/gametheoryapi';
+import { Game } from '@gametheorygoodsgame/gametheory-openapi';
 import { ActionIcon, Group, Table } from '@mantine/core';
 import {
   IconClipboard,

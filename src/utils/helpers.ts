@@ -1,4 +1,4 @@
-import { MoveNumRedCardsEnum } from '@eikermannlfh/gametheoryapi/api';
+import { MoveNumRedCardsEnum } from '@gametheorygoodsgame/gametheory-openapi/api';
 
 export function getMoveNumRedCardEnumValue(
     num: number

@@ -15,7 +15,7 @@ import {
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useRouter } from 'next/navigation';
-import { GameApi, GamePlayerMoveApi, Move } from '@eikermannlfh/gametheoryapi/api';
+import { GameApi, GamePlayerMoveApi, Move } from '@gametheorygoodsgame/gametheory-openapi/api';
 import PlayCard from '../../../components/playCards/playCard';
 import { logger } from '@/utils/logger';
 import { getMoveNumRedCardEnumValue } from '@/utils/helpers';

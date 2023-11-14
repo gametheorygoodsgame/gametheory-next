@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { MouseEvent, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Button, Center, Container, Paper, Stack, Text, TextInput, Title } from '@mantine/core';
-import { GamePlayerApi, Player } from '@eikermannlfh/gametheoryapi/api';
+import { GamePlayerApi, Player } from '@gametheorygoodsgame/gametheory-openapi/api';
 import * as loginNotifications from '@/components/login/loginNotifications';
 import * as notifications from '@/components/notifications';
 import { logger } from '@/utils/logger';

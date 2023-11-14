@@ -2,7 +2,7 @@
 
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { Bar, CartesianGrid, ComposedChart, Legend, Line, Tooltip, XAxis, YAxis } from 'recharts';
-import { Game, GameApi } from '@eikermannlfh/gametheoryapi/api';
+import { Game, GameApi } from '@gametheorygoodsgame/gametheory-openapi/api';
 import { logger } from '@/utils/logger';
 
 type PlotProps = {

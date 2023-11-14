@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { GamePlayerApi } from '@eikermannlfh/gametheoryapi/api';
+import { GamePlayerApi } from '@gametheorygoodsgame/gametheory-openapi/api';
 import DataCollectionList, {
   DataCollectionItem,
 } from '@/components/dataCollection/dataCollectionList';

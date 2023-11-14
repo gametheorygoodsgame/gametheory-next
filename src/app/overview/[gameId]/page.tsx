@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Center, Container, Grid, Group, ScrollArea, Stack, Text } from '@mantine/core';
 import { useDisclosure, useViewportSize } from '@mantine/hooks';
-import { Game, GameApi } from '@eikermannlfh/gametheoryapi/api';
+import { Game, GameApi } from '@gametheorygoodsgame/gametheory-openapi/api';
 import DataCollection from '../../../components/dataCollection/datacollection';
 import { StartGameModal } from '@/components/game/startGameModal';
 import { logger } from '@/utils/logger';

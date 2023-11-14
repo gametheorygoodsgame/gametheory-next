@@ -18,7 +18,7 @@ import { IconSquarePlus } from '@tabler/icons-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { useRouter } from 'next/navigation';
 import '../../components/overviewTable/overviewTable.css';
-import { Game, GameApi } from '@eikermannlfh/gametheoryapi/api';
+import { Game, GameApi } from '@gametheorygoodsgame/gametheory-openapi/api';
 import { logger } from '@/utils/logger';
 import { OverviewTable } from '@/components/overviewTable/overviewTable';
 
