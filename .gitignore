@@ -52,3 +52,5 @@ storybook-static!/code_out.txt
 /code_structure.txt
 /code_out.txt
 package-lock.json
+collect_code.ps1
+package-lock.json

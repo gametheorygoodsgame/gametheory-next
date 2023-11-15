@@ -10,7 +10,7 @@ module.exports = withBundleAnalyzer({
   experimental: {
     optimizePackageImports: ['@mantine/core', '@mantine/hooks'],
   },
-  transpilePackages: ['@eikermannlfh/gametheoryapi'],
+  transpilePackages: ['@gametheorygoodsgame/gametheory-openapi'],
   webpack: (config) => {
     config.resolve.extensionAlias = {
       '.js': ['.ts', '.tsx', '.js', '.jsx'],

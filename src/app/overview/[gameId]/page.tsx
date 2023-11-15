@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import { Button, Center, Container, Grid, Group, ScrollArea, Stack, Text } from '@mantine/core';
 import { useDisclosure, useViewportSize } from '@mantine/hooks';
 import { Game, GameApi } from '@gametheorygoodsgame/gametheory-openapi/api';
 import DataCollection from '../../../components/dataCollection/datacollection';
 import { StartGameModal } from '@/components/game/startGameModal';
 import { logger } from '@/utils/logger';
+import Plot from "@/app/overview/[gameId]/plot";
 
 interface GameOverviewGameMasterProps {
   params: {
@@ -15,11 +16,13 @@ interface GameOverviewGameMasterProps {
 }
 
 export default function GameOverviewGameMaster({ params }: GameOverviewGameMasterProps) {
+  const { height: portHeight, width: portWidth } = useViewportSize();
   const { height } = useViewportSize();
   const { gameId } = params;
   const [redCardValue, setRedCardValue] = useState<number | string>(1);
   const [opened, { close }] = useDisclosure(false);
   const [game, setGame] = useState<Game>();
+  const plotRef = useRef();
 
   const gameApi = new GameApi();
 
@@ -81,10 +84,12 @@ export default function GameOverviewGameMaster({ params }: GameOverviewGameMaste
           <Stack justify="space-between" h={height - 200}>
             <Group align="right" px={90}>
               <Text style={{ fontFamily: 'Instrument Sans, sans-serif', fontWeight: 700 }}>
-                Runde: {game?.currentTurn || 0}
+                Runde: {game?.currentTurn || 0} / {game?.numTurns}
               </Text>
             </Group>
-            <Center>Rundenauswertung</Center>
+            <Center>
+              <Plot gameId={gameId} portHeight={portHeight} portWidth={portWidth} ref={plotRef}/>
+            </Center>
             <Group align="right" gap="xl">
               <Button variant="outline" color="red" bg="white">
                 Spielabbruch
