@@ -28,9 +28,9 @@ export default function GamesOverview() {
   const gameApi = new GameApi();
 
   const [openedCreateModal, { open: openCreateModal, close: closeCreateModal }] =
-    useDisclosure(false);
+      useDisclosure(false);
   const [openedDeleteModal, { open: openDeleteModal, close: closeDeleteModal }] =
-    useDisclosure(false);
+      useDisclosure(false);
   const [openedQRModal, { open: openQRModal, close: closeQRModal }] = useDisclosure(false);
 
   const [games, setGames] = useState<Game[]>([]);
@@ -76,7 +76,7 @@ export default function GamesOverview() {
   };
 
   function handleClipboardButtonClick(event: React.MouseEvent<HTMLElement>, gameId: string) {
-    const clipboardURL = `${window.location.host}/login/player/${gameId}`;
+    const clipboardURL = `${window.location.protocol}//${window.location.host}/login/player/${gameId}`;
     navigator.clipboard.writeText(clipboardURL);
     logger.debug(`ClipboardURL: ${clipboardURL}`);
     setClipboardGameId(gameId);
@@ -147,61 +147,61 @@ export default function GamesOverview() {
   }, [openedCreateModal, openedDeleteModal]);
 
   return (
-    <>
-      <Modal opened={openedDeleteModal} onClose={closeDeleteModal} title="Löschen?">
-        <Stack gap="xl">
-          <Text>Sind Sie sich sicher, dass Sie das Spiel löschen wollen?</Text>
-          <Group align="center">
-            <Button onClick={closeDeleteModal}>Abbrechen</Button>
-            <Button variant="outline" color="red" bg="white" onClick={handleDeleteGame}>
-              Löschen
-            </Button>
-          </Group>
-        </Stack>
-      </Modal>
-      <Modal opened={openedCreateModal} onClose={closeCreateModal} title="Neues Spiel">
-        <Stack gap="xl">
-          <NumberInput
-            type="text"
-            min={1}
-            label="Anzahl der Runden"
-            value={numTurns}
-            onChange={handleNumTurnsChange}
-          />
-          <Group align="right">
-            <Button onClick={handleCreateGame}>Starten</Button>
-          </Group>
-        </Stack>
-      </Modal>
-      <Modal size={800} opened={openedQRModal} onClose={closeQRModal} title="QR Code">
-        <Center>
+      <>
+        <Modal opened={openedDeleteModal} onClose={closeDeleteModal} title="Löschen?">
           <Stack gap="xl">
-            <Text>Scanne den Code zum Beitreten.</Text>
-            <QRCodeSVG value={`${window.location.host}/login/student/${qrGameID}`} size={500} />
-          </Stack>
-        </Center>
-        <Space h="lg" />
-      </Modal>
-      <Container p={60} fluid h={height - 63}>
-        <Center px={120}>
-          <Stack maw={1200} w={width - 120}>
-            <Group align="right" dir="right">
-              <ActionIcon c="brand" size="lg" bg="transparent" onClick={openCreateModal}>
-                <IconSquarePlus />
-              </ActionIcon>
+            <Text>Sind Sie sich sicher, dass Sie das Spiel löschen wollen?</Text>
+            <Group align="center">
+              <Button onClick={closeDeleteModal}>Abbrechen</Button>
+              <Button variant="outline" color="red" bg="white" onClick={handleDeleteGame}>
+                Löschen
+              </Button>
             </Group>
-            <OverviewTable
-              games={games}
-              handleOpenButtonClick={handleOpenButtonClick}
-              handleDeleteButtonClick={handleDeleteButtonClick}
-              handleClipboardButtonClick={handleClipboardButtonClick}
-              clipboardClicked={clipboardClicked}
-              clipboardGameID={clipboardGameId}
-              handleQRButtonClick={handleQRButtonClick}
-            />
           </Stack>
-        </Center>
-      </Container>
-    </>
+        </Modal>
+        <Modal opened={openedCreateModal} onClose={closeCreateModal} title="Neues Spiel">
+          <Stack gap="xl">
+            <NumberInput
+                type="text"
+                min={1}
+                label="Anzahl der Runden"
+                value={numTurns}
+                onChange={handleNumTurnsChange}
+            />
+            <Group align="right">
+              <Button onClick={handleCreateGame}>Starten</Button>
+            </Group>
+          </Stack>
+        </Modal>
+        <Modal size={800} opened={openedQRModal} onClose={closeQRModal} title="QR Code">
+          <Center>
+            <Stack gap="xl">
+              <Text>Scanne den Code zum Beitreten.</Text>
+              <QRCodeSVG value={`${window.location.host}/login/student/${qrGameID}`} size={500} />
+            </Stack>
+          </Center>
+          <Space h="lg" />
+        </Modal>
+        <Container p={60} fluid h={height - 63}>
+          <Center px={120}>
+            <Stack maw={1200} w={width - 120}>
+              <Group align="right" dir="right">
+                <ActionIcon c="brand" size="lg" bg="transparent" onClick={openCreateModal}>
+                  <IconSquarePlus />
+                </ActionIcon>
+              </Group>
+              <OverviewTable
+                  games={games}
+                  handleOpenButtonClick={handleOpenButtonClick}
+                  handleDeleteButtonClick={handleDeleteButtonClick}
+                  handleClipboardButtonClick={handleClipboardButtonClick}
+                  clipboardClicked={clipboardClicked}
+                  clipboardGameID={clipboardGameId}
+                  handleQRButtonClick={handleQRButtonClick}
+              />
+            </Stack>
+          </Center>
+        </Container>
+      </>
   );
 }

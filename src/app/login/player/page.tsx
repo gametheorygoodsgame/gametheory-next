@@ -16,7 +16,7 @@ interface StudentLoginProps {
 export default function StudentLogin(props: StudentLoginProps) {
   const { gameIdIn } = props;
   const [playerName, setPlayerName] = useState('');
-  const [gameId, setGameId] = useState(gameIdIn || '');
+  const [gameId, setGameId] = useState<string | null>(null);
   const router = useRouter();
   const gamePlayerApi = new GamePlayerApi();
 
@@ -39,6 +39,10 @@ export default function StudentLogin(props: StudentLoginProps) {
         moves: [],
         score: 0,
       };
+
+      if (!gameId) {
+        throw new Error('No game ID found.');
+      }
 
       // sending request to server
       const response = await gamePlayerApi.addPlayerToGameById(gameId, player);
@@ -72,43 +76,43 @@ export default function StudentLogin(props: StudentLoginProps) {
     }
 
     setPlayerName('');
-    setGameId('');
   };
 
   useEffect(() => {
     setGameId(gameIdIn);
-  }, [gameIdIn]);
+  }, []);
 
   return (
-    <Center bg="brand.7" style={{ height: '100%' }}>
-      <Container size={800} my={40}>
-        <Title>Game Theory</Title>
-        <Paper miw={300} withBorder shadow="md" p={20} mt={20} radius="md">
-          <Stack gap="sm">
-            <TextInput
-              label="Benutzername"
-              value={playerName}
-              onChange={(e) => setPlayerName(e.target.value.replace(/\s/g, ''))}
-            />
-            <TextInput
-              label="Spiel-ID"
-              value={gameId}
-              onChange={(e) => setGameId(e.target.value.replace(/\s/g, ''))}
-            />
-            <Button onClick={handleLoginSubmit} fullWidth my="xl">
-              Login
-            </Button>
-          </Stack>
-          <Link href="gameMaster" style={{ textDecoration: 'none' }}>
-            <Container fz={14} c="darkgray" w={100} mr={0} p={0} ta="right">
-              <Text>Dozenten-Login</Text>
-              <Center>
-                <i className="fa fa-chevron-right" />
-              </Center>
-            </Container>
-          </Link>
-        </Paper>
-      </Container>
-    </Center>
+      <Center bg="brand.7" style={{ height: '100%' }}>
+        <Container size={800} my={40}>
+          <Title>Game Theory</Title>
+          <Paper miw={300} withBorder shadow="md" p={20} mt={20} radius="md">
+            <Stack gap="sm">
+              <TextInput
+                  label="Benutzername"
+                  value={playerName}
+                  onChange={(e) => setPlayerName(e.target.value.replace(/\s/g, ''))}
+              />
+              <TextInput
+                  label="Spiel-ID"
+                  value={gameId ?? ''}
+                  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                  onChange={(e) => setGameId((_prevGameId) => e.target.value.replace(/\s/g, ''))}
+              />
+              <Button onClick={handleLoginSubmit} fullWidth my="xl">
+                Login
+              </Button>
+            </Stack>
+            <Link href="gameMaster" style={{ textDecoration: 'none' }}>
+              <Container fz={14} c="darkgray" w={100} mr={0} p={0} ta="right">
+                <Text>Dozenten-Login</Text>
+                <Center>
+                  <i className="fa fa-chevron-right" />
+                </Center>
+              </Container>
+            </Link>
+          </Paper>
+        </Container>
+      </Center>
   );
 }
