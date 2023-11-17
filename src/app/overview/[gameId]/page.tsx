@@ -43,6 +43,7 @@ export default function GameOverviewGameMaster() {
       if (!game) {
         throw new Error('Game not found');
       }
+      game.cardHandValue.push(typeof redCardValue === 'number' ? redCardValue : parseInt(redCardValue));
       // @ts-ignore
       const response = await gameApi.updateGameById(gameId, game);
       setGame(response.data);
@@ -138,6 +139,9 @@ export default function GameOverviewGameMaster() {
                       </Button>
                   )}
                 </Group>
+                <Text>
+                  {JSON.stringify(game)}
+                </Text>
               </Stack>
             </Grid.Col>
           </Grid>

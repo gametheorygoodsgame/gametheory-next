@@ -20,6 +20,11 @@
     display: none; /* Versteckt das Eingabefeld der Checkbox */
 }
 
+.playCard-label.selected {
+    border: 10px white;
+    transform: scale(0.9);
+}
+
 .playCard-label input:checked + .playCardBody-right {
     /* Setzt die Randfarbe des rechten Containers, wenn die Checkbox ausgewählt ist */
     /* Setzt die Randbreite des rechten Containers, wenn die Checkbox ausgewählt ist */

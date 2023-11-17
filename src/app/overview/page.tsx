@@ -99,8 +99,8 @@ export default function GamesOverview() {
         numTurns,
         currentTurn: 0,
         players: [],
-        cardHandValue: [1],
-        cardPotValue: [2],
+        cardHandValue: [0],
+        cardPotValue: [0],
         potCards: [0],
       };
       await gameApi.createGame(game);
