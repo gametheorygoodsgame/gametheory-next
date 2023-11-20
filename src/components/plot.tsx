@@ -20,7 +20,7 @@ const Plot = forwardRef<any, PlotProps>((props, ref) => {
             if (props.game) {
                 const gameStatisticsTemp: Object[] = [];
 
-                for (let i = 1; i < props.game.currentTurn; i++) {
+                for (let i = 1; i <= props.game.currentTurn; i++) {
                     const currentTurnObj = {
                         redCardHandValue: props.game.cardHandValue[i],
                         numOfRedCardsPlayed: props.game.potCards[i],

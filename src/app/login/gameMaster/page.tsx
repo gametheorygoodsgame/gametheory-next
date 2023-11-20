@@ -1,6 +1,6 @@
 'use client';
 
-import React, { MouseEvent, useState } from 'react';
+import React, {KeyboardEventHandler, MouseEvent, useRef, useState} from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
@@ -21,13 +21,14 @@ import * as notifications from '../../../components/login/loginNotifications';
 import { logger } from '@/utils/logger';
 
 export default function DozentLogin() {
+  const emailInputRef = useRef(null);
   const auth = getAuth(firebase);
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [user, loading, error] = useAuthState(auth);
 
-  const handleLogin = async (e: MouseEvent<HTMLButtonElement>) => {
+  const handleLogin = async (e: MouseEvent<HTMLButtonElement> | KeyboardEvent) => {
     e.preventDefault();
     notifications.loginPending();
     logger.debug('Created wait notification');
@@ -47,6 +48,15 @@ export default function DozentLogin() {
         notifications.loginFailed();
         logger.debug('Created login failed notification.');
       }
+    }
+  };
+
+  // @ts-ignore
+  const handleKeyPress: KeyboardEventHandler<HTMLInputElement> = (e: KeyboardEvent<HTMLInputElement>) => {
+    // Check if Enter key is pressed (key code 13)
+    if (e.key === 'Enter') {
+      // Call your form submission function here
+      handleLogin(e);
     }
   };
 
@@ -71,12 +81,15 @@ export default function DozentLogin() {
                 label="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value.replace(/\s/g, ''))}
+                onKeyDown={handleKeyPress}
+                ref={emailInputRef}
               />
               <PasswordInput
                 placeholder="Password"
                 label="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value.replace(/\s/g, ''))}
+                onKeyDown={handleKeyPress}
               />
               <Button onClick={handleLogin} fullWidth my="xl">
                 Login

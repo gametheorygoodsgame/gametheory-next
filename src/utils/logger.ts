@@ -3,23 +3,19 @@ const isProduction = process.env.NODE_ENV === 'production';
 const logger = {
     info: (...args: any[]) => {
         if (!isProduction) {
-            // eslint-disable-next-line no-console
-            console.log(...args);
+            console.log(`[INFO] ${args}`);
         }
     },
     debug: (...args: any[]) => {
         if (!isProduction) {
-            // eslint-disable-next-line no-console
-            console.debug(...args);
+            console.log(`[DEBUG] ${args}`);
         }
     },
     error: (...args: any[]) => {
-        // eslint-disable-next-line no-console
-        console.error(...args);
+        console.error(`[ERROR] ${args}`);
     },
     warn: (...args: any[]) => {
-        // eslint-disable-next-line no-console
-        console.warn(...args);
+        console.warn(`[WARN] ${args}`);
     },
 };
 

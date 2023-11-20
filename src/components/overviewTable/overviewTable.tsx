@@ -17,6 +17,7 @@ type OverviewTableProps = {
   clipboardClicked: boolean;
   clipboardGameID: string | null;
   handleQRButtonClick: (gameID: string) => void;
+  handleRowClick: (gameID: string, event: React.MouseEvent) => void;
 };
 
 export function OverviewTable({
@@ -27,18 +28,26 @@ export function OverviewTable({
   clipboardClicked,
   clipboardGameID,
   handleQRButtonClick,
+  handleRowClick
 }: OverviewTableProps) {
   const tableHeaders = [
     { label: 'Spiel-ID', dataKey: 'id' },
     { label: 'Anzahl der Spieler', dataKey: 'players.length' },
     { label: 'Runden', dataKey: 'currentTurn' },
-    // Add more headers as needed
   ];
 
   function getNestedValue(obj: any, path: string) {
     const keys = path.split('.');
     return keys.reduce((acc, key) => acc && acc[key], obj);
   }
+
+  const renderClipboardIcon = (gameId: string) => {
+    if (clipboardClicked && gameId === clipboardGameID) {
+      return <IconClipboardCheck color="green" className="mantine-icon" />;
+    } else {
+      return <IconClipboard className="mantine-icon" />;
+    }
+  };
 
   return (
     <Table highlightOnHover>
@@ -52,7 +61,7 @@ export function OverviewTable({
       </Table.Thead>
       <Table.Tbody>
         {games.map((game: Game) => (
-          <Table.Tr className="noselect" key={game.id}>
+          <Table.Tr className="noselect" key={game.id} onDoubleClick={(event) => handleRowClick(game.id, event)}>
             <Table.Td className="mantine-icon">
               <ActionIcon color="green" className="mantne-icon">
                 <IconDoorEnter
@@ -77,14 +86,10 @@ export function OverviewTable({
                   />
                 </ActionIcon>
                 <ActionIcon
-                  className="mantine-icon"
-                  onClick={(event) => handleClipboardButtonClick(event, game.id)}
+                    className="mantine-icon"
+                    onClick={(event) => handleClipboardButtonClick(event, game.id)}
                 >
-                  {clipboardClicked && game.id === clipboardGameID ? (
-                    <IconClipboardCheck color="green" className="mantine-icon" />
-                  ) : (
-                    <IconClipboard className="mantine-icon" />
-                  )}
+                  {renderClipboardIcon(game.id)}
                 </ActionIcon>
                 <ActionIcon className="mantine-icon">
                   <IconQrcode

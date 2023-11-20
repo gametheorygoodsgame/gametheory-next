@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { MouseEvent, useEffect, useState } from 'react';
+import {KeyboardEventHandler, MouseEvent, useEffect, useState} from 'react';
 import Link from 'next/link';
 import { Button, Center, Container, Paper, Stack, Text, TextInput, Title } from '@mantine/core';
 import { GamePlayerApi, Player } from '@gametheorygoodsgame/gametheory-openapi/api';
@@ -20,7 +20,8 @@ export default function StudentLogin(props: StudentLoginProps) {
   const router = useRouter();
   const gamePlayerApi = new GamePlayerApi();
 
-  const handleLoginSubmit = async (e: MouseEvent<HTMLButtonElement>) => {
+  // @ts-ignore
+  const handleLoginSubmit = async (e: MouseEvent<HTMLButtonElement> | KeyboardEvent<HTMLInputElement>) => {
     e.preventDefault();
     loginNotifications.loginPending();
     logger.debug('Created wait notification');
@@ -54,8 +55,8 @@ export default function StudentLogin(props: StudentLoginProps) {
         loginNotifications.loginSuccess();
         logger.debug('Created login success notification.');
 
-        document.cookie = `playerID=${response.data.id}`;
-        document.cookie = `gameID=${gameId}`;
+        document.cookie = `playerID=${response.data.id}; path=/; SameSite=None; Secure`;
+        document.cookie = `gameID=${gameId}; path=/; SameSite=None; Secure`;
 
         logger.debug(`Created cookie {playerID=${response.data.id};gameID=${gameId}}`);
 
@@ -78,6 +79,15 @@ export default function StudentLogin(props: StudentLoginProps) {
     setPlayerName('');
   };
 
+  // @ts-ignore
+  const handleKeyPress: KeyboardEventHandler<HTMLInputElement> = (e: KeyboardEvent<HTMLInputElement>) => {
+    // Check if Enter key is pressed (key code 13)
+    if (e.key === 'Enter') {
+      // Call your form submission function here
+      handleLoginSubmit(e);
+    }
+  };
+
   useEffect(() => {
     setGameId(gameIdIn);
   }, []);
@@ -92,12 +102,14 @@ export default function StudentLogin(props: StudentLoginProps) {
                   label="Benutzername"
                   value={playerName}
                   onChange={(e) => setPlayerName(e.target.value.replace(/\s/g, ''))}
+                  onKeyDown={handleKeyPress}
               />
               <TextInput
                   label="Spiel-ID"
                   value={gameId ?? ''}
                   // eslint-disable-next-line @typescript-eslint/no-unused-vars
                   onChange={(e) => setGameId((_prevGameId) => e.target.value.replace(/\s/g, ''))}
+                  onKeyDown={handleKeyPress}
               />
               <Button onClick={handleLoginSubmit} fullWidth my="xl">
                 Login

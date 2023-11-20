@@ -19,6 +19,9 @@ import {Game, GameApi, GamePlayerMoveApi, Move} from '@gametheorygoodsgame/gamet
 import PlayCard from '../../../components/playCards/playCard';
 import { logger } from '@/utils/logger';
 import { getMoveNumRedCardEnumValue } from '@/utils/helpers';
+import WaitingModal from "@/components/modals/watingModal";
+import ErrorModal from "@/components/modals/errorRetryModal";
+import PlayCardGrid from "@/components/playCards/playCardGrid";
 
 interface Card {
   id?: string;
@@ -29,12 +32,6 @@ export default function CardSelection() {
   const [windowWidth, setWindowWidth] = useState(
       typeof window !== 'undefined' ? window.innerWidth : 0
   );
-
-  useEffect(() => {
-    const handleResize = () => setWindowWidth(window.innerWidth);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   const [selectedCount, setSelectedCount] = useState(0);
   const [currentTurn, setCurrentTurn] = useState(0);
@@ -70,31 +67,15 @@ export default function CardSelection() {
   };
 
   const resetSelection = () => {
-    // Using the functional form of state update to ensure correct order of updates
-    setSelectedCount((prevCount) => {
-      if (prevCount !== 0) {
-        return 0;
-      }
-      return prevCount;
-    });
-
-    setNumRedCards((prevCount) => {
-      if (prevCount !== 0) {
-        return 0;
-      }
-      return prevCount;
-    });
+    setSelectedCount(0);
+    setNumRedCards(0);
   };
 
-  function getPlayerScore(game: Game, playerId: string): number {
-    const player = game.players.find((p) => p.id === playerId);
 
-    if (player) {
-      return player.score;
-    }
-
-    return 0;
-  }
+  const getPlayerScore = (game: Game, playerId: string): number => {
+    const player = game.players.find((p) => p.id === playerId) || { score: 0 };
+    return player.score;
+  };
 
   useEffect(() => {
     const playCardIds = ['1', '2', '3', '4'];
@@ -117,8 +98,6 @@ export default function CardSelection() {
     return null;
   };
 
-
-
   const handleMakeMove = async () => {
     try {
       if (!gameId || !playerId) {
@@ -129,7 +108,7 @@ export default function CardSelection() {
         numTurn: currentTurn,
         numRedCards: getMoveNumRedCardEnumValue(numRedCards),
       };
-      logger.warn(move);
+      logger.debug(move);
 
       const response = await gamePlayerMoveApi.createMoveForPlayerInGame(gameId, playerId, move);
 
@@ -188,43 +167,9 @@ export default function CardSelection() {
 
   return (
       <>
-        <Modal opened={isWaitingForNextTurn} onClose={closeWaitingForNextTurnModal} centered withCloseButton={false}>
-          <Stack align="center" justify="center">
-            <Text ff="Instrument Sans, sans-serif" fz={18} fw={700} p={40} className="lbl-round">
-              <Group>
-                {' '}
-                Du hast <Text c="#cc4444">{numRedCards}</Text> rote Karten abgegeben.{' '}
-              </Group>
-              <Text>Warten auf nächste Runde</Text>
-            </Text>
-            <Loader variant="dots" />
-          </Stack>
-        </Modal>
-        <Modal opened={isWaitingForGameStart} onClose={closeWaitingForGameStartModal} centered withCloseButton={false}>
-          <Stack align="center">
-            <Text ff="Instrument Sans, sans-serif" fz={18} fw={700} p={40} className="lbl-round">
-              Warten auf den Start des Spiels durch den Spielleiter...
-            </Text>
-            <Loader variant="dots" />
-          </Stack>
-        </Modal>
-        <Modal opened={errorModalOpened} onClose={() => setErrorModalOpened(false)} title="Fehler">
-          <Stack gap="xl" align="center">
-            <Text>Spiel wurde nicht gefunden!</Text>
-            <Group>
-              <Button onClick={() => router.push('/login/player')}>Zurück zum Login</Button>
-              <Button
-                  onClick={() => {
-                    setErrorModalOpened(false);
-                    openWaitingForNextTurnModal();
-                    handleMakeMove();
-                  }}
-              >
-                Erneut senden
-              </Button>
-            </Group>
-          </Stack>
-        </Modal>
+        <WaitingModal isOpen={isWaitingForNextTurn} onClose={closeWaitingForNextTurnModal} text={`Du hast ${numRedCards} rote Karten abgegeben. Warten auf nächste Runde`} />
+        <WaitingModal isOpen={isWaitingForGameStart} onClose={closeWaitingForGameStartModal} text="Warten auf den Start des Spiels durch den Spielleiter..." />
+        <ErrorModal isOpen={errorModalOpened} onClose={() => setErrorModalOpened(false)} onRetry={handleMakeMove} />
         <Container
             fluid
             p={0}
@@ -235,40 +180,13 @@ export default function CardSelection() {
               justifyContent: 'center',
             }}
         >
-          <Flex align="center" direction="column" justify="center">
-            <Container ta="center" w="100%">
-              <Center>
-                <Text ff="Instrument Sans, sans-serif" fz={19} fw={700} p={40} className="lbl-round">
-                  Runde: {currentTurn} / {numTurns}
-                </Text>
-              </Center>
-              <Center>
-                <Text c="#cc4444">
-                  Kartenwert: {numRedCards}
-                </Text>
-              </Center>
-              <Center>
-                <Text ff="Instrument Sans, sans-serif" fz={19} fw={700} p={40} className="lbl-round">
-                  Score: {playerScore}
-                </Text>
-              </Center>
-            </Container>
-              <Grid gutter="md">
-                {[
-                  { id: '1', side: 'left' },
-                  { id: '2', side: 'left' },
-                  { id: '3', side: 'right' },
-                  { id: '4', side: 'right' },
-                ].map((card) => (
-                    <Grid.Col span={3} key={card.id}>
-                      <PlayCard
-                          id={card.id}
-                          onChange={handleInputChangeCard}
-                          side={card.side}
-                      />
-                    </Grid.Col>
-                ))}
+            <Container fluid p={0}>
+              <Grid  justify = "flex-end" p={20}>
+                <Text ff={'Instrument Sans, sans-serif'} fz={19} fw={700} p={10} className="lbl-round">Konto: {playerScore} ct</Text>
+                <Text ff={'Instrument Sans, sans-serif'} fz={19} fw={700} p={10} className="lbl-round">Runde: {currentTurn} / {numTurns}</Text>
               </Grid>
+            </Container>
+              <PlayCardGrid onChange={handleInputChangeCard} />
               <Center my="xl">
                 <Button
                     disabled={selectedCount !== 2}
@@ -280,7 +198,6 @@ export default function CardSelection() {
                   {selectedCount !== 2 ? 'Bitte zwei Karten auswählen' : 'Auswahl bestätigen'}
                 </Button>
               </Center>
-          </Flex>
         </Container>
       </>
   );

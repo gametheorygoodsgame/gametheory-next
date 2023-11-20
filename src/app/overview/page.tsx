@@ -21,20 +21,32 @@ import '../../components/overviewTable/overviewTable.css';
 import { Game, GameApi } from '@gametheorygoodsgame/gametheory-openapi/api';
 import { logger } from '@/utils/logger';
 import { OverviewTable } from '@/components/overviewTable/overviewTable';
+import {useModal} from "@/utils/hooks";
 
 export default function GamesOverview() {
-  const { height, width } = useViewportSize();
+  const { height: screenHeight, width: screenWidth } = useViewportSize();
   const { push } = useRouter();
   const gameApi = new GameApi();
 
-  const [openedCreateModal, { open: openCreateModal, close: closeCreateModal }] =
-      useDisclosure(false);
-  const [openedDeleteModal, { open: openDeleteModal, close: closeDeleteModal }] =
-      useDisclosure(false);
-  const [openedQRModal, { open: openQRModal, close: closeQRModal }] = useDisclosure(false);
+  const {
+    isOpen: isCreateModalOpen,
+    openModal: openCreateModal,
+    closeModal: closeCreateModal,
+  } = useModal();
+
+  const {
+    isOpen: isDeleteModalOpen,
+    openModal: openDeleteModal,
+    closeModal: closeDeleteModal,
+  } = useModal();
+
+  const {
+    isOpen: isQrModalOpen,
+    openModal: openQrModal,
+    closeModal: closeQrModal,
+  } = useModal();
 
   const [games, setGames] = useState<Game[]>([]);
-  const [numberOfGames, setNumberOfGames] = useState(0);
   const [numTurns, setNumTurns] = useState<number>(10);
   const [clipboardClicked, setClipboardClicked] = useState(false);
   const [deleteGameId, setDeleteGameId] = useState<string | null>(null);
@@ -45,7 +57,6 @@ export default function GamesOverview() {
     try {
       const response = await gameApi.getAllGames();
       setGames(response.data);
-      setNumberOfGames(response.data.length);
       logger.info('Fetched game data successfully.');
       logger.debug(response.data);
     } catch (error) {
@@ -53,11 +64,17 @@ export default function GamesOverview() {
     }
   }
 
-  const handleNumTurnsChange = (value: string | number) => {
-    // Ensure the value is parsed as a number
-    const parsedValue = typeof value === 'string' ? parseInt(value, 10) : value;
+  const handleRowClick = (gameId: string, event: React.MouseEvent) => {
+    const targetElement = event.target as HTMLElement;
+    if (targetElement.classList.contains('mantine-icon')) {
+      event.stopPropagation();
+      return;
+    }
+    push(`/overview/${gameId}`); // Weiterleitung zur Detailansicht des ausgewählten Spiels
+  };
 
-    // Update the state
+  const handleNumTurnsChange = (value: string | number) => {
+    const parsedValue = typeof value === 'string' ? parseInt(value, 10) : value;
     setNumTurns(parsedValue);
   };
 
@@ -68,8 +85,8 @@ export default function GamesOverview() {
     logger.debug(`DeleteGameId set to ${gameId}.`);
   };
 
-  const handleQRButtonClick = (gameId: string) => {
-    openQRModal();
+  const handleQrButtonClick = (gameId: string) => {
+    openQrModal();
     logger.debug('QR modal opened.');
     setQRGameId(gameId);
     logger.debug(`QRGameId set to ${gameId}.`);
@@ -80,6 +97,7 @@ export default function GamesOverview() {
     navigator.clipboard.writeText(clipboardURL);
     logger.debug(`ClipboardURL: ${clipboardURL}`);
     setClipboardGameId(gameId);
+    setClipboardClicked(true);
     logger.debug(`ClipboardGameId set to ${gameId}.`);
     setTimeout(() => {
       setClipboardClicked(false);
@@ -129,26 +147,13 @@ export default function GamesOverview() {
     }
   };
 
-  /*
-    function handleRowClick(gameID: string, event: React.MouseEvent) {
-      const element = event.target as HTMLElement;
-      const redirectURL = `/overview/${gameID}`;
-      if (element.classList.contains('mantine-icon')) {
-        event.stopPropagation();
-        return;
-      }
-      logger.debug(`Row clicked. Redirected to ${redirectURL}.`);
-      push(redirectURL);
-    }
-     */
-
   useEffect(() => {
     fetchGameList();
-  }, [openedCreateModal, openedDeleteModal]);
+  }, [isCreateModalOpen, isDeleteModalOpen]);
 
   return (
       <>
-        <Modal opened={openedDeleteModal} onClose={closeDeleteModal} title="Löschen?">
+        <Modal opened={isDeleteModalOpen} onClose={closeDeleteModal} title="Löschen?">
           <Stack gap="xl">
             <Text>Sind Sie sich sicher, dass Sie das Spiel löschen wollen?</Text>
             <Group align="center">
@@ -159,7 +164,7 @@ export default function GamesOverview() {
             </Group>
           </Stack>
         </Modal>
-        <Modal opened={openedCreateModal} onClose={closeCreateModal} title="Neues Spiel">
+        <Modal opened={isCreateModalOpen} onClose={closeCreateModal} title="Neues Spiel">
           <Stack gap="xl">
             <NumberInput
                 type="text"
@@ -173,18 +178,18 @@ export default function GamesOverview() {
             </Group>
           </Stack>
         </Modal>
-        <Modal size={800} opened={openedQRModal} onClose={closeQRModal} title="QR Code">
+        <Modal size={800} opened={isQrModalOpen} onClose={closeQrModal} title="QR Code">
           <Center>
             <Stack gap="xl">
               <Text>Scanne den Code zum Beitreten.</Text>
-              <QRCodeSVG value={`${window.location.host}/login/student/${qrGameID}`} size={500} />
+              <QRCodeSVG value={`${window.location.host}/login/player/${qrGameID}`}  size={screenHeight>900 ? 700: screenHeight - 200} />
             </Stack>
           </Center>
           <Space h="lg" />
         </Modal>
-        <Container p={60} fluid h={height - 63}>
+        <Container p={60} fluid h={screenHeight - 63}>
           <Center px={120}>
-            <Stack maw={1200} w={width - 120}>
+            <Stack maw={1200} w={screenWidth - 120}>
               <Group align="right" dir="right">
                 <ActionIcon c="brand" size="lg" bg="transparent" onClick={openCreateModal}>
                   <IconSquarePlus />
@@ -197,7 +202,8 @@ export default function GamesOverview() {
                   handleClipboardButtonClick={handleClipboardButtonClick}
                   clipboardClicked={clipboardClicked}
                   clipboardGameID={clipboardGameId}
-                  handleQRButtonClick={handleQRButtonClick}
+                  handleQRButtonClick={handleQrButtonClick}
+                  handleRowClick={handleRowClick}
               />
             </Stack>
           </Center>
