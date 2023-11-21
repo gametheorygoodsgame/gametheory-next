@@ -8,6 +8,8 @@ import {
   IconTrash,
 } from '@tabler/icons-react';
 import React from 'react';
+import classes from './ActionIcon.module.css'
+import {theme} from "@/utils/theme";
 
 type OverviewTableProps = {
   games: Game[];
@@ -43,9 +45,9 @@ export function OverviewTable({
 
   const renderClipboardIcon = (gameId: string) => {
     if (clipboardClicked && gameId === clipboardGameID) {
-      return <IconClipboardCheck color="green" className="mantine-icon" />;
+      return <IconClipboardCheck className={`mantine-icon ${classes.green}`} />;
     } else {
-      return <IconClipboard className="mantine-icon" />;
+      return <IconClipboard className={`mantine-icon ${classes.brand}`} />;
     }
   };
 
@@ -63,9 +65,9 @@ export function OverviewTable({
         {games.map((game: Game) => (
           <Table.Tr className="noselect" key={game.id} onDoubleClick={(event) => handleRowClick(game.id, event)}>
             <Table.Td className="mantine-icon">
-              <ActionIcon color="green" className="mantne-icon">
+              <ActionIcon className={'mantine-icon'} variant={"transparent"}>
                 <IconDoorEnter
-                  className="mantine-icon"
+                  className={`mantine-icon ${classes.green}`}
                   onClick={() => handleOpenButtonClick(game.id)}
                 />
               </ActionIcon>
@@ -79,21 +81,22 @@ export function OverviewTable({
             ))}
             <Table.Td className="mantine-icon">
               <Group className="mantine-icon">
-                <ActionIcon color="red" className="mantine-icon">
+                <ActionIcon className={'mantine-icon'} variant={"transparent"}>
                   <IconTrash
-                    className="mantine-icon"
+                    className={`mantine-icon ${classes.red}`}
                     onClick={() => handleDeleteButtonClick(game.id)}
                   />
                 </ActionIcon>
                 <ActionIcon
-                    className="mantine-icon"
+                    className={'mantine-icon'}
+                    variant={"transparent"}
                     onClick={(event) => handleClipboardButtonClick(event, game.id)}
                 >
                   {renderClipboardIcon(game.id)}
                 </ActionIcon>
-                <ActionIcon className="mantine-icon">
+                <ActionIcon className={'mantine-icon'} variant={"transparent"}>
                   <IconQrcode
-                    className="mantine-icon"
+                      className={`mantine-icon ${classes.brand}`}
                     onClick={() => handleQRButtonClick(game.id)}
                   />
                 </ActionIcon>

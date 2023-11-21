@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {ReactNode} from 'react';
 import { Modal, Stack, Text, Group, Button } from '@mantine/core';
 import {router} from "next/client";
 

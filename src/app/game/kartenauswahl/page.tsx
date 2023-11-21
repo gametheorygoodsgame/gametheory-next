@@ -5,23 +5,19 @@ import {
   Button,
   Center,
   Container,
-  Flex,
   Grid,
   Group,
   Loader,
-  Modal,
-  Stack,
+  Modal, Stack,
   Text,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useRouter } from 'next/navigation';
 import {Game, GameApi, GamePlayerMoveApi, Move} from '@gametheorygoodsgame/gametheory-openapi/api';
-import PlayCard from '../../../components/playCards/playCard';
 import { logger } from '@/utils/logger';
 import { getMoveNumRedCardEnumValue } from '@/utils/helpers';
-import WaitingModal from "@/components/modals/watingModal";
-import ErrorModal from "@/components/modals/errorRetryModal";
 import PlayCardGrid from "@/components/playCards/playCardGrid";
+import {router} from "next/client";
 
 interface Card {
   id?: string;
@@ -38,7 +34,7 @@ export default function CardSelection() {
   const [numTurns, setNumTurns] = useState(0);
   const [numRedCards, setNumRedCards] = useState(0);
   const [isWaitingForNextTurn, { open: openWaitingForNextTurnModal, close: closeWaitingForNextTurnModal }] = useDisclosure(false);
-  const [errorModalOpened, setErrorModalOpened] = useState(false);
+  const [errorModalOpened, {open: openErrorModal, close: closeErrorModal}] = useDisclosure(false);
   const [isWaitingForGameStart, { open: openWaitingForGameStartModal, close: closeWaitingForGameStartModal }] = useDisclosure(true);
   const [gameId, setGameId] = useState('');
   const [playerId, setPlayerId] = useState('');
@@ -113,15 +109,15 @@ export default function CardSelection() {
       const response = await gamePlayerMoveApi.createMoveForPlayerInGame(gameId, playerId, move);
 
       if (response.status !== 200) {
-        setErrorModalOpened(true);
+        openErrorModal();
       } else {
-        setErrorModalOpened(false);
+        closeErrorModal();
       }
 
       await checkGameStatus();
       openWaitingForNextTurnModal();
     } catch (error) {
-      setErrorModalOpened(true);
+      openErrorModal();
     }
   };
 
@@ -149,7 +145,7 @@ export default function CardSelection() {
         }
       }
     } catch (error) {
-      setErrorModalOpened(true);
+      openErrorModal();
     }
   };
 
@@ -167,9 +163,28 @@ export default function CardSelection() {
 
   return (
       <>
-        <WaitingModal isOpen={isWaitingForNextTurn} onClose={closeWaitingForNextTurnModal} text={`Du hast ${numRedCards} rote Karten abgegeben. Warten auf nächste Runde`} />
-        <WaitingModal isOpen={isWaitingForGameStart} onClose={closeWaitingForGameStartModal} text="Warten auf den Start des Spiels durch den Spielleiter..." />
-        <ErrorModal isOpen={errorModalOpened} onClose={() => setErrorModalOpened(false)} onRetry={handleMakeMove} />
+        <Modal opened={isWaitingForNextTurn} onClose={closeWaitingForNextTurnModal} centered withCloseButton={false}>
+          <Text ff={'Instrument Sans, sans-serif'} fz={18} fw={700} p={40} className="lbl-round">
+              <Group> Du hast <Text c="#cc4444">{numRedCards}</Text> rote Karten abgegeben. </Group>
+              <Text>Warten auf nächste Runde</Text>
+                <Loader variant="dots" />
+          </Text>
+        </Modal>
+        <Modal opened={isWaitingForGameStart} onClose={closeWaitingForGameStartModal}>
+          <Text ff={'Instrument Sans, sans-serif'} fz={18} fw={700} p={40} className="lbl-round">
+            Warten auf den Start des Spiels durch den Spielleiter...
+            <Loader variant="dots" />
+          </Text>
+        </Modal>
+        <Modal opened={errorModalOpened} onClose={closeErrorModal} title="Fehler">
+          <Stack gap="xl" align="center">
+            <Text>Spiel wurde nicht gefunden!</Text>
+            <Group>
+              <Button onClick={() => router.push('/login/player')}>Zurück zum Login</Button>
+              <Button onClick={() => { closeErrorModal(); handleMakeMove(); }}>Erneut senden</Button>
+            </Group>
+          </Stack>
+        </Modal>
         <Container
             fluid
             p={0}

@@ -12,9 +12,9 @@ export default function PlayerMenuBar() {
   const { height: screenHeight, width: screenWidth } = useViewportSize();
 
   return (
-    <Container bg="brand.7" fluid px={40} p={10}>
+    <Container bg="brand.7" fluid px={40} p={19}>
       <Flex align="center">
-        <Image src={gameTheoryLogo} height={screenHeight < 980 ? 0.07*screenHeight : 70 } alt="." />
+        <Image src={gameTheoryLogo} height={screenHeight < 980 ? 0.09*screenHeight : 90 } alt="." />
         {screenWidth > 980 ? (
           <Title style={theme.components?.Title?.styles.root}>Game Theory</Title>
         ) : (

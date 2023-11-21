@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Button, Center, Container, Grid, Group, Modal, NumberInput, ScrollArea, Stack, Text } from '@mantine/core';
 import { useDisclosure, useViewportSize } from '@mantine/hooks';
 import { Game, GameApi } from '@gametheorygoodsgame/gametheory-openapi/api';
-import DataCollection from '../../../components/dataCollection/datacollection';
+import PlayerList from '@/components/playerList/playerList';
 import Plot from "@/components/plot";
 import { useParams, useRouter } from "next/navigation";
 import { useInterval } from '@/utils/hooks';
@@ -58,6 +58,8 @@ export default function GameOverviewGameMaster() {
       setGame(response.data);
       logger.info('Updated game data successfully.');
       logger.debug(response.data);
+      closeTurnProgressionModal();
+
     } catch (error) {
       logger.error('Error updating data: ', error);
     }
@@ -87,11 +89,11 @@ export default function GameOverviewGameMaster() {
             </Group>
           </Stack>
         </Modal>
-        <Container p={60} fluid h={screenHeight - 63}>
+        <Container p={60} pb={0} fluid >
           <Grid grow justify="space-around" h={screenHeight - 200}>
             <Grid.Col span={1}>
               <ScrollArea h={screenHeight - 220}>
-                <DataCollection gameId={gameId || ''} />
+                <PlayerList game={game} />
               </ScrollArea>
             </Grid.Col>
             <Grid.Col span={5}>

@@ -187,7 +187,7 @@ export default function GamesOverview() {
           </Center>
           <Space h="lg" />
         </Modal>
-        <Container p={60} fluid h={screenHeight - 63}>
+        <Container p={60} fluid >
           <Center px={120}>
             <Stack maw={1200} w={screenWidth - 120}>
               <Group align="right" dir="right">

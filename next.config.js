@@ -24,33 +24,9 @@ module.exports = withBundleAnalyzer({
   webpack: (config) => {
     // Use the custom logger for webpack logging
     config.stats = {
-      colors: true,
-      logging: (type, message) => {
-        switch (type) {
-          case 'info':
-            if (!isProduction) {
-              logger.info(message);
-            }
-            break;
-          case 'warn':
-            if (!isProduction) {
-              logger.warn(message);
-            }
-            break;
-          case 'error':
-            logger.error(message);
-            break;
-          case 'debug':
-            if (!isProduction) {
-              logger.debug(message);
-            }
-            break;
-          default:
-            if (!isProduction) {
-              logger.debug(message);
-            }
-        }
-      },
+      // Choose one of the predefined values or configure specific options
+      // Options: "none" | "error" | "warn" | "info" | "log" | "verbose" | boolean
+      logging: isProduction ? "error" : "verbose",
     };
 
     // Extend or modify the existing webpack configuration

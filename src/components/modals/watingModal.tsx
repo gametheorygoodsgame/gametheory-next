@@ -1,10 +1,10 @@
-import React from 'react';
+import React, {ReactNode} from 'react';
 import { Modal, Stack, Text, Loader } from '@mantine/core';
 
 type WaitingModalProps = {
     isOpen: boolean;
     onClose: () => void;
-    text: string;
+    text: ReactNode;
 };
 
 const WaitingModal: React.FC<WaitingModalProps> = ({ isOpen, onClose, text }) => (
