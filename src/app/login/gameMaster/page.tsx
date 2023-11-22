@@ -20,6 +20,9 @@ import { firebase } from '@/utils/firebaseApp';
 import * as notifications from '@/components/notifications/login/loginNotifications';
 import { logger } from '@/utils/logger';
 import {IconChevronRight} from "@tabler/icons-react";
+import ButtonModal from "@/components/modals/buttonModal";
+import {Text} from "@mantine/core";
+import {useDisclosure} from "@mantine/hooks";
 
 export default function DozentLogin() {
   const emailInputRef = useRef(null);
@@ -28,6 +31,8 @@ export default function DozentLogin() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [user, loading, error] = useAuthState(auth);
+  const [hasError, {open: openErrorModal, close: closeErrorModal}] = useDisclosure(false);
+  const [errorDescription, setErrorDescription] = useState('');
 
   const handleLogin = async (e: MouseEvent<HTMLButtonElement> | KeyboardEvent) => {
     e.preventDefault();
@@ -48,7 +53,9 @@ export default function DozentLogin() {
       } catch (err) {
         logger.error(err);
         notifications.loginFailed();
-        logger.debug('Created login failed notification.');
+        setErrorDescription((err as Error).message);
+        openErrorModal();
+        logger.debug('Opened login failed modal.');
       }
     }
   };
@@ -73,45 +80,55 @@ export default function DozentLogin() {
       );
     }
     return (
-      <Center bg="brand.7" style={{ height: '100%' }}>
-        <Container size={800} my={40}>
-          <Title>Game Theory</Title>
-          <Paper miw={300} withBorder shadow="md" p={20} mt={20} radius="md">
-            <Stack gap="sm">
-              <TextInput
-                label="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value.replace(/\s/g, ''))}
-                onKeyDown={handleKeyPress}
-                ref={emailInputRef}
-              />
-              <PasswordInput
-                placeholder="Password"
-                label="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value.replace(/\s/g, ''))}
-                onKeyDown={handleKeyPress}
-              />
-              <Button onClick={handleLogin} fullWidth my="xl">
-                Login
-              </Button>
-            </Stack>
-            <Stack align="center" gap="xs">
-              <Link href="/" style={{ textDecoration: 'none' }}>
-                Passwort vergessen?
+      <>
+        <ButtonModal
+            opened={hasError}
+            onClose={closeErrorModal}
+            title="Fehler"
+            rightButton={{callback: closeErrorModal, text: 'Schließen'}}
+        >
+          <Text>{errorDescription}</Text>
+        </ButtonModal>
+        <Center bg="brand.7" style={{ height: '100%' }}>
+          <Container size={800} my={40}>
+            <Title>Game Theory</Title>
+            <Paper miw={300} withBorder shadow="md" p={20} mt={20} radius="md">
+              <Stack gap="sm">
+                <TextInput
+                  label="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value.replace(/\s/g, ''))}
+                  onKeyDown={handleKeyPress}
+                  ref={emailInputRef}
+                />
+                <PasswordInput
+                  placeholder="Password"
+                  label="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value.replace(/\s/g, ''))}
+                  onKeyDown={handleKeyPress}
+                />
+                <Button onClick={handleLogin} fullWidth my="xl">
+                  Login
+                </Button>
+              </Stack>
+              <Stack align="center" gap="xs">
+                <Link href="/" style={{ textDecoration: 'none' }}>
+                  Passwort vergessen?
+                </Link>
+                <Link href="/" style={{ textDecoration: 'none' }}>
+                  Registrieren
+                </Link>
+              </Stack>
+              <Link href="../../login/player" style={{ textDecoration: 'none' }} >
+                  <Container fz={14} c="darkgray" ta="right" mr={0} p={0} pt={20}>
+                    Studenten-Login  <IconChevronRight size={16} style={{ verticalAlign: 'text-bottom' }}/>
+                  </Container>
               </Link>
-              <Link href="/" style={{ textDecoration: 'none' }}>
-                Registrieren
-              </Link>
-            </Stack>
-            <Link href="../../login/player" style={{ textDecoration: 'none' }} >
-                <Container fz={14} c="darkgray" ta="right" mr={0} p={0} pt={20}>
-                  Studenten-Login  <IconChevronRight size={16} style={{ verticalAlign: 'text-bottom' }}/>
-                </Container>
-            </Link>
-          </Paper>
-        </Container>
-      </Center>
+            </Paper>
+          </Container>
+        </Center>
+      </>
     );
   }
 }

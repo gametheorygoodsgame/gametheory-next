@@ -1,7 +1,19 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, Center, Container, Grid, Group, Modal, NumberInput, ScrollArea, Stack, Text } from '@mantine/core';
+import {
+  Button,
+  Center,
+  Container,
+  Grid,
+  Group,
+  Loader,
+  Modal,
+  NumberInput,
+  ScrollArea,
+  Stack,
+  Text
+} from '@mantine/core';
 import { useDisclosure, useViewportSize } from '@mantine/hooks';
 import { Game, GameApi } from '@gametheorygoodsgame/gametheory-openapi/api';
 import PlayerList from '@/components/playerList/playerList';
@@ -9,6 +21,7 @@ import Plot from "@/components/plot/plot";
 import { useParams, useRouter } from "next/navigation";
 import { useInterval } from '@/utils/hooks';
 import { logger } from "@/utils/logger";
+import ButtonModal from "@/components/modals/buttonModal";
 
 export default function GameOverviewGameMaster() {
   const router = useRouter();
@@ -20,19 +33,12 @@ export default function GameOverviewGameMaster() {
   const [redCardHandValue, setRedCardHandValue] = useState<number | string>(1);
   const [game, setGame] = useState<Game>();
 
+  const [hasError, {open: openErrorModal, close: closeErrorModal}] = useDisclosure(false);
+  const [errorDescription, setErrorDescription] = useState('');
+
   const [isTurnProgressionModalOpen, { open: openTurnProgressionModal, close: closeTurnProgressionModal }] = useDisclosure(false);
 
   const gameApi = new GameApi();
-
-  useEffect(() => {
-    fetchGame();
-
-    const interval = setInterval(fetchGame, 10000);
-
-    return () => {
-      clearInterval(interval);
-    };
-  }, [gameId]);
 
   async function fetchGame() {
     try {
@@ -44,10 +50,10 @@ export default function GameOverviewGameMaster() {
       logger.info('Fetched game data successfully.');
       logger.debug(response.data);
     } catch (error) {
-      logger.warn(`GameId: ${gameId}`);
+      setErrorDescription((error as Error).message);
+      openErrorModal();
       logger.error('Error fetching data: ', error);
     } finally {
-      // Set loading to false regardless of success or failure
       setLoading(false);
     }
   }
@@ -64,20 +70,37 @@ export default function GameOverviewGameMaster() {
       logger.info('Updated game data successfully.');
       logger.debug(response.data);
       closeTurnProgressionModal();
-
     } catch (error) {
       logger.error('Error updating data: ', error);
     }
-    close();
   };
 
+  useInterval(fetchGame, 10000);
+
   if (loading) {
-    return <p>Loading...</p>;
+    return (
+        <Center>
+          <Loader />
+        </Center>
+    );
   }
 
   return (
       <>
-        <Modal opened={isTurnProgressionModalOpen} onClose={closeTurnProgressionModal} title={game?.currentTurn === 0 ? 'Spiel Starten' : 'Nächste Runde'}>
+        <ButtonModal
+            opened={hasError}
+            onClose={closeErrorModal}
+            title="Fehler"
+            rightButton={{callback: closeErrorModal, text: 'Schließen'}}
+        >
+          <Text>{errorDescription}</Text>
+        </ButtonModal>
+        <Modal
+            opened={isTurnProgressionModalOpen}
+            onClose={closeTurnProgressionModal}
+            title={game?.currentTurn === 0 ? 'Spiel Starten' : 'Nächste Runde'}
+            closeOnClickOutside={false}
+        >
           <Stack gap="xl">
             <NumberInput
                 type="text"

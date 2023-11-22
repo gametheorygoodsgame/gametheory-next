@@ -12,7 +12,7 @@ export default function PlayerMenuBar() {
   const { height: screenHeight, width: screenWidth } = useViewportSize();
 
   return (
-    <Container bg="brand.7" fluid px={40} p={19}>
+    <Container bg="brand.7" fluid px={40} p={10}>
         <Flex align="center">
             <Image src={gameTheoryLogo} height={70} alt="." />
             {screenWidth > 980 ? (

@@ -9,6 +9,9 @@ import * as loginNotifications from '@/components/notifications/login/loginNotif
 import * as notifications from '@/components/notifications/notifications';
 import { logger } from '@/utils/logger';
 import {IconChevronRight} from "@tabler/icons-react";
+import ButtonModal from "@/components/modals/buttonModal";
+import {useDisclosure} from "@mantine/hooks";
+import {Loader} from "@mantine/core";
 
 interface StudentLoginProps {
   gameIdIn: string;
@@ -18,6 +21,9 @@ export default function StudentLogin(props: StudentLoginProps) {
   const { gameIdIn } = props;
   const [playerName, setPlayerName] = useState('');
   const [gameId, setGameId] = useState<string | null>(null);
+  const [hasError, {open: openErrorModal, close: closeErrorModal}] = useDisclosure(false);
+  const [errorDescription, setErrorDescription] = useState('');
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const gamePlayerApi = new GamePlayerApi();
 
@@ -43,6 +49,8 @@ export default function StudentLogin(props: StudentLoginProps) {
       };
 
       if (!gameId) {
+        setErrorDescription('No game ID found.');
+        openErrorModal();
         throw new Error('No game ID found.');
       }
 
@@ -87,36 +95,54 @@ export default function StudentLogin(props: StudentLoginProps) {
     setGameId(gameIdIn);
   }, []);
 
+  if (loading) {
+    return (
+        <Center>
+          <Loader />
+        </Center>
+    );
+  }
+
   return (
-      <Center bg="brand.7" style={{ height: '100%' }}>
-        <Container size={800} my={40}>
-          <Title>Game Theory</Title>
-          <Paper miw={300} withBorder shadow="md" p={20} mt={20} radius="md">
-            <Stack gap="sm">
-              <TextInput
-                  label="Benutzername"
-                  value={playerName}
-                  onChange={(e) => setPlayerName(e.target.value.replace(/\s/g, ''))}
-                  onKeyDown={handleKeyPress}
-              />
-              <TextInput
-                  label="Spiel-ID"
-                  value={gameId ?? ''}
-                  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                  onChange={(e) => setGameId((_prevGameId) => e.target.value.replace(/\s/g, ''))}
-                  onKeyDown={handleKeyPress}
-              />
-              <Button onClick={handleLoginSubmit} fullWidth my="xl">
-                Login
-              </Button>
-            </Stack>
-            <Link href="../../login/gameMaster" style={{ textDecoration: 'none' }} >
-              <Container fz={14} c="darkgray" ta="right" mr={0} p={0} pt={20}>
-                Dozenten-Login  <IconChevronRight size={16} style={{ verticalAlign: 'text-bottom' }}/>
-              </Container>
-            </Link>
-          </Paper>
-        </Container>
-      </Center>
+      <>
+        <ButtonModal
+            opened={hasError}
+            onClose={closeErrorModal}
+            title="Fehler"
+            rightButton={{callback: closeErrorModal, text: 'Schließen'}}
+        >
+          <Text>{errorDescription}</Text>
+        </ButtonModal>
+        <Center bg="brand.7" style={{ height: '100%' }}>
+          <Container size={800} my={40}>
+            <Title>Game Theory</Title>
+            <Paper miw={300} withBorder shadow="md" p={20} mt={20} radius="md">
+              <Stack gap="sm">
+                <TextInput
+                    label="Benutzername"
+                    value={playerName}
+                    onChange={(e) => setPlayerName(e.target.value.replace(/\s/g, ''))}
+                    onKeyDown={handleKeyPress}
+                />
+                <TextInput
+                    label="Spiel-ID"
+                    value={gameId ?? ''}
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                    onChange={(e) => setGameId((_prevGameId) => e.target.value.replace(/\s/g, ''))}
+                    onKeyDown={handleKeyPress}
+                />
+                <Button onClick={handleLoginSubmit} fullWidth my="xl">
+                  Login
+                </Button>
+              </Stack>
+              <Link href="../../login/gameMaster" style={{ textDecoration: 'none' }} >
+                <Container fz={14} c="darkgray" ta="right" mr={0} p={0} pt={20}>
+                  Dozenten-Login  <IconChevronRight size={16} style={{ verticalAlign: 'text-bottom' }}/>
+                </Container>
+              </Link>
+            </Paper>
+          </Container>
+        </Center>
+      </>
   );
 }

@@ -6,7 +6,7 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { getAuth } from 'firebase/auth';
 import GameMasterMenuBar from '../../components/menuBars/GameMasterMenuBar';
 import { firebase } from '@/utils/firebaseApp';
-import {AppShell} from "@mantine/core";
+import {AppShell, Center, Loader} from "@mantine/core";
 
 export default function GameMasterLayout({ children }: { children: any }) {
   const auth = getAuth(firebase);
@@ -26,7 +26,11 @@ export default function GameMasterLayout({ children }: { children: any }) {
   }
 
   if (loading) {
-    return <p>Loading...</p>;
+    return (
+        <Center>
+            <Loader />
+        </Center>
+    );
   }
 
   redirect('/');

@@ -18,28 +18,31 @@ import { logger } from '@/utils/logger';
 import { getMoveNumRedCardEnumValue } from '@/utils/helpers';
 import PlayCardGrid from "@/components/playCards/playCardGrid";
 import {router} from "next/client";
+import {useInterval} from "@/utils/hooks";
+import LoadModal from "@/components/modals/loadModal";
+import ButtonModal from "@/components/modals/buttonModal";
 
-interface Card {
-  id?: string;
-  side?: string;
-}
 
 export default function CardSelection() {
   const [windowWidth, setWindowWidth] = useState(
       typeof window !== 'undefined' ? window.innerWidth : 0
   );
 
+  const [loading, setLoading] = useState(true);
+
   const [selectedCount, setSelectedCount] = useState(0);
   const [currentTurn, setCurrentTurn] = useState(0);
   const [numTurns, setNumTurns] = useState(0);
   const [numRedCards, setNumRedCards] = useState(0);
   const [isWaitingForNextTurn, { open: openWaitingForNextTurnModal, close: closeWaitingForNextTurnModal }] = useDisclosure(false);
-  const [errorModalOpened, {open: openErrorModal, close: closeErrorModal}] = useDisclosure(false);
+  const [hasError, {open: openErrorModal, close: closeErrorModal}] = useDisclosure(false);
   const [isWaitingForGameStart, { open: openWaitingForGameStartModal, close: closeWaitingForGameStartModal }] = useDisclosure(true);
   const [gameId, setGameId] = useState('');
   const [playerId, setPlayerId] = useState('');
   const [playerScore, setPlayerScore] = useState(0);
   const [redCardHandValue, setRedCardHandValue] = useState(0);
+
+  const[errorDescription, setErrorDescription] = useState('');
 
   const gameApi = new GameApi();
   const gamePlayerMoveApi = new GamePlayerMoveApi();
@@ -69,8 +72,11 @@ export default function CardSelection() {
 
 
   const getPlayerScore = (game: Game, playerId: string): number => {
-    const player = game.players.find((p) => p.id === playerId) || { score: 0 };
-    return player.score;
+    if (game.players) {
+      const player = game.players.find((p) => p.id === playerId) || {score: 0};
+      return player.score;
+    }
+    else return 0;
   };
 
   useEffect(() => {
@@ -118,6 +124,7 @@ export default function CardSelection() {
       await checkGameStatus();
       openWaitingForNextTurnModal();
     } catch (error) {
+      setErrorDescription((error as Error).message)
       openErrorModal();
     }
   };
@@ -146,11 +153,26 @@ export default function CardSelection() {
         }
       }
     } catch (error) {
+      setErrorDescription((error as Error).message)
       openErrorModal();
+    } finally {
+      setLoading(false);
     }
   };
 
-  useEffect(() => {
+  function fetchData(){
+    if (!gameId || gameId === ''){
+      setGameId(getCookie('gameID') || '');
+    }
+    if (!playerId || playerId === ''){
+      setPlayerId(getCookie('playerID') || '');
+    }
+    checkGameStatus();
+  }
+
+  useInterval(fetchData, 10000);
+
+  /* useEffect(() => {
     setGameId(getCookie('gameID') || '');
     setPlayerId(getCookie('playerID') || '');
     checkGameStatus();
@@ -160,32 +182,33 @@ export default function CardSelection() {
     return () => {
       clearInterval(interval);
     };
-  }, [gameId, currentTurn, openWaitingForGameStartModal, closeWaitingForGameStartModal]);
+  }, [gameId, currentTurn, openWaitingForGameStartModal, closeWaitingForGameStartModal]);*/
+
+
+  if (loading) {
+    return <Loader />;
+  }
 
   return (
       <>
-        <Modal opened={isWaitingForNextTurn} onClose={closeWaitingForNextTurnModal} centered withCloseButton={false}>
-          <Text fz={18} fw={700} p={40} className="lbl-round">
-              <Group> Du hast <Text c="#cc4444">{numRedCards}</Text> rote Karten abgegeben. </Group>
-              <Text>Warten auf nächste Runde</Text>
-                <Loader variant="dots" />
-          </Text>
-        </Modal>
-        <Modal opened={isWaitingForGameStart} onClose={closeWaitingForGameStartModal}>
-          <Text fz={18} fw={700} p={40} className="lbl-round">
-            Warten auf den Start des Spiels durch den Spielleiter...
-            <Loader variant="dots" />
-          </Text>
-        </Modal>
-        <Modal opened={errorModalOpened} onClose={closeErrorModal} title="Fehler">
-          <Stack gap="xl" align="center">
-            <Text>Spiel wurde nicht gefunden!</Text>
-            <Group>
-              <Button onClick={() => router.push('/login/player')}>Zurück zum Login</Button>
-              <Button onClick={() => { closeErrorModal(); handleMakeMove(); }}>Erneut senden</Button>
-            </Group>
-          </Stack>
-        </Modal>
+        <LoadModal opened={isWaitingForNextTurn} onClose={closeWaitingForNextTurnModal}>
+            <Group> Du hast <Text c="#cc4444">{numRedCards}</Text> rote Karten abgegeben. </Group>
+            <Text>Warten auf nächste Runde</Text>
+        </LoadModal>
+        <LoadModal opened={isWaitingForGameStart} onClose={closeWaitingForGameStartModal}>
+            <Text>
+              Warten auf den Start des Spiels durch den Spielleiter...
+            </Text>
+        </LoadModal>
+        <ButtonModal
+            opened={hasError}
+            onClose={closeErrorModal}
+            title="Fehler"
+            leftButton={{callback: () => router.push('/login/player'), text: 'Zurück zum Login'}}
+            rightButton={{callback: () => { closeErrorModal(); handleMakeMove();}, text: 'Erneut senden'}}
+        >
+            <Text>{errorDescription}</Text>
+        </ButtonModal>
         <Container
             fluid
             p={0}

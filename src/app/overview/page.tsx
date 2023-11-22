@@ -20,30 +20,23 @@ import { useRouter } from 'next/navigation';
 import { Game, GameApi } from '@gametheorygoodsgame/gametheory-openapi/api';
 import { logger } from '@/utils/logger';
 import { OverviewTable } from '@/components/overviewTable/overviewTable';
-import {useModal} from "@/utils/hooks";
+import {useInterval, useModal} from "@/utils/hooks";
+import {Loader} from "@mantine/core";
+import ButtonModal from "@/components/modals/buttonModal";
 
 export default function GamesOverview() {
   const { height: screenHeight, width: screenWidth } = useViewportSize();
   const { push } = useRouter();
   const gameApi = new GameApi();
 
-  const {
-    isOpen: isCreateModalOpen,
-    openModal: openCreateModal,
-    closeModal: closeCreateModal,
-  } = useModal();
+  const [isCreateModalOpen, {open: openCreateModal, close: closeCreateModal}] = useDisclosure();
+  const [isDeleteModalOpen, {open: openDeleteModal, close: closeDeleteModal}] = useDisclosure();
+  const [isQrModalOpen, {open: openQrModal, close: closeQrModal}] = useDisclosure();
+  const [hasError, {open: openErrorModal, close: closeErrorModal}] = useDisclosure(false);
+  const [errorDescription, setErrorDescription] = useState('');
+  const router = useRouter();
 
-  const {
-    isOpen: isDeleteModalOpen,
-    openModal: openDeleteModal,
-    closeModal: closeDeleteModal,
-  } = useModal();
-
-  const {
-    isOpen: isQrModalOpen,
-    openModal: openQrModal,
-    closeModal: closeQrModal,
-  } = useModal();
+  const [loading, setLoading] = useState(true);
 
   const [games, setGames] = useState<Game[]>([]);
   const [numTurns, setNumTurns] = useState<number>(10);
@@ -59,7 +52,10 @@ export default function GamesOverview() {
       logger.info('Fetched game data successfully.');
       logger.debug(response.data);
     } catch (error) {
+      setErrorDescription((error as Error).message)
       logger.error('Error fetching data: ', error);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -144,42 +140,54 @@ export default function GamesOverview() {
     }
   };
 
-  useEffect(() => {
+  /* useEffect(() => {
     fetchGameList();
   }, [isCreateModalOpen, isDeleteModalOpen]);
 
+   */
+  useInterval(fetchGameList, 10000);
+
+  if (loading) {
+    return (
+        <Center>
+          <Loader />
+        </Center>
+    );
+  }
+
   return (
       <>
-        <Modal opened={isDeleteModalOpen} onClose={closeDeleteModal} title="Löschen?">
-          <Stack gap="xl">
-            <Text>Sind Sie sich sicher, dass Sie das Spiel löschen wollen?</Text>
-            <Group align="center">
-              <Button onClick={closeDeleteModal}>Abbrechen</Button>
-              <Button variant="outline" color="red" bg="white" onClick={handleDeleteGame}>
-                Löschen
-              </Button>
-            </Group>
-          </Stack>
-        </Modal>
-        <Modal opened={isCreateModalOpen} onClose={closeCreateModal} title="Neues Spiel">
-          <Stack gap="xl">
-            <NumberInput
-                type="text"
-                min={1}
-                label="Anzahl der Runden"
-                value={numTurns}
-                onChange={handleNumTurnsChange}
-            />
-            <Group align="right">
-              <Button onClick={handleCreateGame}>Starten</Button>
-            </Group>
-          </Stack>
-        </Modal>
-        <Modal size={800} opened={isQrModalOpen} onClose={closeQrModal} title="QR Code">
+        <ButtonModal
+            opened={hasError}
+            onClose={closeErrorModal}
+            title="Fehler"
+            leftButton={{callback: closeErrorModal, text: 'Schließen'}}
+            rightButton={{callback: () => router.push('/overview'), text: 'Zurück zur Übersicht'}}
+        >
+          <Text>{errorDescription}</Text>
+        </ButtonModal>
+        <ButtonModal
+            opened={isDeleteModalOpen}
+            onClose={closeDeleteModal}
+            title="Löschen?"
+            leftButton={{callback: closeDeleteModal, text: 'Abbrechen'}}
+            rightButton={{callback: handleDeleteGame, text: 'Löschen'}}
+        >
+          <Text>{errorDescription}</Text>
+        </ButtonModal>
+        <ButtonModal
+            opened={isCreateModalOpen}
+            onClose={closeCreateModal}
+            title="Neues Spiel"
+            rightButton={{callback: handleCreateGame, text: 'Starten'}}
+        >
+          <Text>{errorDescription}</Text>
+        </ButtonModal>
+        <Modal size={screenHeight * 0.8} opened={isQrModalOpen} onClose={closeQrModal} title="QR Code" closeOnClickOutside={false}>
           <Center>
             <Stack gap="xl">
               <Text>Scanne den Code zum Beitreten.</Text>
-              <QRCodeSVG value={`${window.location.host}/login/player/${qrGameID}`}  size={screenHeight>900 ? 700: screenHeight - 200} />
+              <QRCodeSVG value={`${window.location.host}/login/player/${qrGameID}`}  size={screenHeight * 0.6} />
             </Stack>
           </Center>
           <Space h="lg" />
@@ -187,7 +195,7 @@ export default function GamesOverview() {
         <Container p={60} fluid >
           <Center px={120}>
             <Stack maw={1200} w={screenWidth - 120}>
-              <Group ta="right" dir="right">
+              <Group justify={"end"}>
                 <ActionIcon c="brand" size="lg" bg="transparent" onClick={openCreateModal}>
                   <IconSquarePlus />
                 </ActionIcon>
