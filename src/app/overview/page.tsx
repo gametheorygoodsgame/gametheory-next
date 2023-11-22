@@ -17,7 +17,6 @@ import { useDisclosure, useViewportSize } from '@mantine/hooks';
 import { IconSquarePlus } from '@tabler/icons-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { useRouter } from 'next/navigation';
-import '../../components/overviewTable/overviewTable.css';
 import { Game, GameApi } from '@gametheorygoodsgame/gametheory-openapi/api';
 import { logger } from '@/utils/logger';
 import { OverviewTable } from '@/components/overviewTable/overviewTable';
@@ -126,9 +125,7 @@ export default function GamesOverview() {
       logger.debug(game);
       logger.info('Created a new game.');
     } catch (error) {
-      // Handle the error here
       logger.error('An error occurred while creating the game:', error);
-      // Optionally, you can show an error message to the user or perform other error-handling actions.
     }
   };
 
@@ -136,7 +133,7 @@ export default function GamesOverview() {
     if (deleteGameId !== null) {
       try {
         await gameApi.deleteGameById(deleteGameId);
-        await fetchGameList(); // Refresh the game list after deletion
+        await fetchGameList();
         closeDeleteModal();
         logger.debug('Delete modal closed.');
         setDeleteGameId(null);
@@ -190,7 +187,7 @@ export default function GamesOverview() {
         <Container p={60} fluid >
           <Center px={120}>
             <Stack maw={1200} w={screenWidth - 120}>
-              <Group align="right" dir="right">
+              <Group ta="right" dir="right">
                 <ActionIcon c="brand" size="lg" bg="transparent" onClick={openCreateModal}>
                   <IconSquarePlus />
                 </ActionIcon>

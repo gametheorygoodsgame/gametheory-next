@@ -1,13 +1,14 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import {KeyboardEventHandler, MouseEvent, useEffect, useState} from 'react';
+import React, {KeyboardEventHandler, MouseEvent, useEffect, useState} from 'react';
 import Link from 'next/link';
 import { Button, Center, Container, Paper, Stack, Text, TextInput, Title } from '@mantine/core';
 import { GamePlayerApi, Player } from '@gametheorygoodsgame/gametheory-openapi/api';
-import * as loginNotifications from '@/components/login/loginNotifications';
-import * as notifications from '@/components/notifications';
+import * as loginNotifications from '@/components/notifications/login/loginNotifications';
+import * as notifications from '@/components/notifications/notifications';
 import { logger } from '@/utils/logger';
+import {IconChevronRight} from "@tabler/icons-react";
 
 interface StudentLoginProps {
   gameIdIn: string;
@@ -45,13 +46,11 @@ export default function StudentLogin(props: StudentLoginProps) {
         throw new Error('No game ID found.');
       }
 
-      // sending request to server
       const response = await gamePlayerApi.addPlayerToGameById(gameId, player);
 
       logger.debug(`Successfully created player ${response.data}`);
 
       if (response.status === 200) {
-        // Handle success
         loginNotifications.loginSuccess();
         logger.debug('Created login success notification.');
 
@@ -60,18 +59,15 @@ export default function StudentLogin(props: StudentLoginProps) {
 
         logger.debug(`Created cookie {playerID=${response.data.id};gameID=${gameId}}`);
 
-        router.push('../../game/kartenauswahl');
+        router.push('../../game/cardSelection');
       } else if (response.status === 404) {
-        // Handle not found
         loginNotifications.loginFailed();
         logger.debug('Created login failed notification.');
       } else {
-        // Handle every other error from the server
         notifications.error({ message: (response.data as any as Error).message });
         logger.debug('Created login error notification.');
       }
     } catch (error) {
-      // Handle any exceptions or network errors
       logger.error(error);
       notifications.error({ message: 'An error occurred while making the API call.' });
     }
@@ -79,11 +75,10 @@ export default function StudentLogin(props: StudentLoginProps) {
     setPlayerName('');
   };
 
+  // Absenden des Formulars mit drücken der Enter-Taste ermöglichen
   // @ts-ignore
   const handleKeyPress: KeyboardEventHandler<HTMLInputElement> = (e: KeyboardEvent<HTMLInputElement>) => {
-    // Check if Enter key is pressed (key code 13)
     if (e.key === 'Enter') {
-      // Call your form submission function here
       handleLoginSubmit(e);
     }
   };
@@ -115,12 +110,9 @@ export default function StudentLogin(props: StudentLoginProps) {
                 Login
               </Button>
             </Stack>
-            <Link href="gameMaster" style={{ textDecoration: 'none' }}>
-              <Container fz={14} c="darkgray" w={100} mr={0} p={0} ta="right">
-                <Text>Dozenten-Login</Text>
-                <Center>
-                  <i className="fa fa-chevron-right" />
-                </Center>
+            <Link href="../../login/gameMaster" style={{ textDecoration: 'none' }} >
+              <Container fz={14} c="darkgray" ta="right" mr={0} p={0} pt={20}>
+                Dozenten-Login  <IconChevronRight size={16} style={{ verticalAlign: 'text-bottom' }}/>
               </Container>
             </Link>
           </Paper>

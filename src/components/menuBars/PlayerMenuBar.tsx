@@ -13,14 +13,14 @@ export default function PlayerMenuBar() {
 
   return (
     <Container bg="brand.7" fluid px={40} p={19}>
-      <Flex align="center">
-        <Image src={gameTheoryLogo} height={screenHeight < 980 ? 0.09*screenHeight : 90 } alt="." />
-        {screenWidth > 980 ? (
-          <Title style={theme.components?.Title?.styles.root}>Game Theory</Title>
-        ) : (
-          <></>
-        )}
-      </Flex>
+        <Flex align="center">
+            <Image src={gameTheoryLogo} height={70} alt="." />
+            {screenWidth > 980 ? (
+                <Title style={theme.components?.Title?.styles.left}>Game Theory</Title>
+            ) : (
+                <></>
+            )}
+        </Flex>
     </Container>
   );
 }

@@ -1,0 +1,41 @@
+.action-icon {
+    color: white;
+}
+
+.action-icon:hover{
+    color: lightgray;
+}
+
+.red {
+    color: #cc4444;
+}
+
+.red:hover{
+    filter: brightness(75%);
+}
+
+.green {
+    color: #0dcd83;
+}
+
+.green:hover{
+    filter: brightness(75%);
+}
+
+.brand {
+    color: #334d80;
+}
+
+.brand:hover{
+    filter: brightness(75%);
+}
+
+.noselect {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently
+                                    supported by Chrome, Edge, Opera and Firefox */
+}

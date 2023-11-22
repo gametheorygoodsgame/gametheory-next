@@ -17,8 +17,9 @@ import {
   Title,
 } from '@mantine/core';
 import { firebase } from '@/utils/firebaseApp';
-import * as notifications from '../../../components/login/loginNotifications';
+import * as notifications from '@/components/notifications/login/loginNotifications';
 import { logger } from '@/utils/logger';
+import {IconChevronRight} from "@tabler/icons-react";
 
 export default function DozentLogin() {
   const emailInputRef = useRef(null);
@@ -31,17 +32,18 @@ export default function DozentLogin() {
   const handleLogin = async (e: MouseEvent<HTMLButtonElement> | KeyboardEvent) => {
     e.preventDefault();
     notifications.loginPending();
-    logger.debug('Created wait notification');
+    logger.debug('Created wait notification.');
 
     if (email === '' || password === '') {
       notifications.missingInput();
-      logger.debug('Created missing login input notification');
+      logger.debug('Created missing login input notification.');
     } else {
       try {
         await signInWithEmailAndPassword(auth, email, password);
         notifications.loginSuccess();
         logger.debug('Created login success notification.');
         logger.info('Game master login successful.');
+
         router.push('/overview');
       } catch (err) {
         logger.error(err);
@@ -51,11 +53,10 @@ export default function DozentLogin() {
     }
   };
 
+  // Absenden des Formulars mit drücken der Enter-Taste ermöglichen
   // @ts-ignore
   const handleKeyPress: KeyboardEventHandler<HTMLInputElement> = (e: KeyboardEvent<HTMLInputElement>) => {
-    // Check if Enter key is pressed (key code 13)
     if (e.key === 'Enter') {
-      // Call your form submission function here
       handleLogin(e);
     }
   };
@@ -103,13 +104,10 @@ export default function DozentLogin() {
                 Registrieren
               </Link>
             </Stack>
-            <Link href="/" style={{ textDecoration: 'none' }}>
-              <Container fz={14} c="darkgray" ta="right" w={110} mr={0} p={0}>
-                Studenten Login
-                <Center>
-                  <i className="fa fa-chevron-right" />
-                </Center>
-              </Container>
+            <Link href="../../login/player" style={{ textDecoration: 'none' }} >
+                <Container fz={14} c="darkgray" ta="right" mr={0} p={0} pt={20}>
+                  Studenten-Login  <IconChevronRight size={16} style={{ verticalAlign: 'text-bottom' }}/>
+                </Container>
             </Link>
           </Paper>
         </Container>

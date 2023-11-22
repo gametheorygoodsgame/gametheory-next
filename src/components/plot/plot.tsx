@@ -57,7 +57,7 @@ const Plot = forwardRef<any, PlotProps>((props, ref) => {
             <Tooltip />
             <Legend />
             <Bar dataKey="numOfRedCardsPlayed" name="Anzahl Roter Karten im Pot" fill="#334d80" />
-            <Line dataKey="redCardHandValue" name="Wert der Roten Karte" stroke="red" />
+            <Line dataKey="redCardHandValue" name="Wert der Roten Karte" stroke="#cc4444" />
             <YAxis />
         </ComposedChart>
     );

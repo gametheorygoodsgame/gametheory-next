@@ -5,7 +5,7 @@ import { Button, Center, Container, Grid, Group, Modal, NumberInput, ScrollArea,
 import { useDisclosure, useViewportSize } from '@mantine/hooks';
 import { Game, GameApi } from '@gametheorygoodsgame/gametheory-openapi/api';
 import PlayerList from '@/components/playerList/playerList';
-import Plot from "@/components/plot";
+import Plot from "@/components/plot/plot";
 import { useParams, useRouter } from "next/navigation";
 import { useInterval } from '@/utils/hooks';
 import { logger } from "@/utils/logger";
@@ -24,10 +24,15 @@ export default function GameOverviewGameMaster() {
 
   const gameApi = new GameApi();
 
-  // Hook um Funktion auf Intervall auszuführen
-  useInterval(() => {
+  useEffect(() => {
     fetchGame();
-  }, 10000);
+
+    const interval = setInterval(fetchGame, 10000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [gameId]);
 
   async function fetchGame() {
     try {
@@ -99,7 +104,7 @@ export default function GameOverviewGameMaster() {
             <Grid.Col span={5}>
               <Stack justify="space-between" h={screenHeight - 200}>
                 <Group align="right" px={90}>
-                  <Text style={{ fontFamily: 'Instrument Sans, sans-serif', fontWeight: 700 }}>
+                  <Text fw={700}>
                     Runde: {game?.currentTurn || 0} / {game?.numTurns || 0}
                   </Text>
                 </Group>
@@ -107,7 +112,7 @@ export default function GameOverviewGameMaster() {
                   <Plot game={game} portHeight={screenHeight} portWidth={screenWidth} ref={plotRef} />
                 </Center>
                 <Group align="right" gap="xl">
-                  <Button variant="outline" color="red" bg="white" onClick={() => router.push('/overview')}>
+                  <Button variant="outline" color="#cc4444" bg="white" onClick={() => router.push('/overview')}>
                     Übersicht
                   </Button>
                   {game?.currentTurn === 0 ? (
@@ -120,9 +125,6 @@ export default function GameOverviewGameMaster() {
                       </Button>
                   )}
                 </Group>
-                <Text>
-                  {JSON.stringify(game)}
-                </Text>
               </Stack>
             </Grid.Col>
           </Grid>

@@ -104,6 +104,7 @@ export default function CardSelection() {
         numTurn: currentTurn,
         numRedCards: getMoveNumRedCardEnumValue(numRedCards),
       };
+
       logger.debug(move);
 
       const response = await gamePlayerMoveApi.createMoveForPlayerInGame(gameId, playerId, move);
@@ -164,14 +165,14 @@ export default function CardSelection() {
   return (
       <>
         <Modal opened={isWaitingForNextTurn} onClose={closeWaitingForNextTurnModal} centered withCloseButton={false}>
-          <Text ff={'Instrument Sans, sans-serif'} fz={18} fw={700} p={40} className="lbl-round">
+          <Text fz={18} fw={700} p={40} className="lbl-round">
               <Group> Du hast <Text c="#cc4444">{numRedCards}</Text> rote Karten abgegeben. </Group>
               <Text>Warten auf nächste Runde</Text>
                 <Loader variant="dots" />
           </Text>
         </Modal>
         <Modal opened={isWaitingForGameStart} onClose={closeWaitingForGameStartModal}>
-          <Text ff={'Instrument Sans, sans-serif'} fz={18} fw={700} p={40} className="lbl-round">
+          <Text fz={18} fw={700} p={40} className="lbl-round">
             Warten auf den Start des Spiels durch den Spielleiter...
             <Loader variant="dots" />
           </Text>
@@ -197,8 +198,8 @@ export default function CardSelection() {
         >
             <Container fluid p={0}>
               <Grid  justify = "flex-end" p={20}>
-                <Text ff={'Instrument Sans, sans-serif'} fz={19} fw={700} p={10} className="lbl-round">Konto: {playerScore} ct</Text>
-                <Text ff={'Instrument Sans, sans-serif'} fz={19} fw={700} p={10} className="lbl-round">Runde: {currentTurn} / {numTurns}</Text>
+                <Text fz={19} fw={700} p={10} className="lbl-round">Konto: {playerScore} ct</Text>
+                <Text fz={19} fw={700} p={10} className="lbl-round">Runde: {currentTurn} / {numTurns}</Text>
               </Grid>
             </Container>
               <PlayCardGrid onChange={handleInputChangeCard} />

@@ -1,43 +1,38 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import {GameApi, GamePlayerApi, Player} from '@gametheorygoodsgame/gametheory-openapi/api';
-import PlayerListView, {
-  DataCollectionItem,
-} from '@/components/playerList/playerListView';
-import { logger } from '@/utils/logger';
+import React from 'react';
+import { Badge, Stack } from '@mantine/core';
+import {IconCards, IconCircleCheck, IconClockHour3} from '@tabler/icons-react';
+import classes from "@/components/overviewTable/overviewTable.module.css";
+import {Player} from "@gametheorygoodsgame/gametheory-openapi/api";
+import {Game} from "@gametheorygoodsgame/gametheory-openapi";
 
-export default function PlayerList({ game: Game }) {
-  const [playerList, setPlayerList] = useState<Player[]>([]);
-  const [currentTurn, setCurrentTurn] = useState<number>(0);
+export interface DataCollectionItem {
+  id: string;
+  name: string;
+  isMoveMade: boolean;
+}
 
-  const gameApi = new GameApi();
+export default function PlayerList({game}: {game: Game | undefined;}) {
+  const icon = <IconCards />;
+  const waiting = <IconClockHour3 />;
+  const success = <IconCircleCheck />;
 
-  const fetchData = async () => {
-    try {
-      const response = await gameApi.getGameById(gameId);
-      if (response.status === 404) {
-        throw new Error('Game not found');
-      }
-      setPlayerList(response.data.players);
-      setCurrentTurn(response.data.currentTurn)
-    } catch (error) {
-      logger.error('Error fetching data: ', error);
-    }
-  };
-
-  useEffect(() => {
-    fetchData();
-
-    const intervalId = setInterval(fetchData, 3000);
-
-    return () => clearInterval(intervalId);
-  }, [gameId]);
-
-  if (playerList.length === 0) {
-    return <div>Loading...</div>;
-  }
-
-  // Render the DataCollectionList component with the fetched data
-  return <PlayerListView playerList={game.players} currentTurn={currentTurn} />;
+  return (
+    <Stack>
+      {game?.players.map((player: Player) => (
+        <Badge
+            leftSection={icon}
+            rightSection={player.moves.length - 1 >= game?.currentTurn ? success : waiting}
+            h={50}
+            w={200}
+            size="xl"
+            radius="md"
+            color={player.moves.length - 1 >= game?.currentTurn ? "brand.0" : "brand.7"}
+            key={player.id}>
+          {player.name}
+        </Badge>
+      ))}
+    </Stack>
+  );
 }

@@ -43,4 +43,5 @@ export const theme = createTheme({
     },
   },
   primaryColor: 'brand',
+  fontFamily: 'Instrument Sans, sans-serif',
 });

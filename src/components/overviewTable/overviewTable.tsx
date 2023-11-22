@@ -8,8 +8,7 @@ import {
   IconTrash,
 } from '@tabler/icons-react';
 import React from 'react';
-import classes from './ActionIcon.module.css'
-import {theme} from "@/utils/theme";
+import classes from './overviewTable.module.css'
 
 type OverviewTableProps = {
   games: Game[];
@@ -63,7 +62,7 @@ export function OverviewTable({
       </Table.Thead>
       <Table.Tbody>
         {games.map((game: Game) => (
-          <Table.Tr className="noselect" key={game.id} onDoubleClick={(event) => handleRowClick(game.id, event)}>
+          <Table.Tr className={classes.noselect} key={game.id} onDoubleClick={(event) => handleRowClick(game.id, event)}>
             <Table.Td className="mantine-icon">
               <ActionIcon className={'mantine-icon'} variant={"transparent"}>
                 <IconDoorEnter
