@@ -20,7 +20,7 @@ const Plot = forwardRef<any, PlotProps>((props, ref) => {
             if (props.game) {
                 const gameStatisticsTemp: Object[] = [];
 
-                for (let i = 1; i < props.game.currentTurn; i++) {
+                for (let i = 1; i <= props.game.currentTurn; i++) {
                     const currentTurnObj = {
                         redCardHandValue: props.game.cardHandValue[i],
                         numOfRedCardsPlayed: props.game.potCards[i],
@@ -57,7 +57,7 @@ const Plot = forwardRef<any, PlotProps>((props, ref) => {
             <Tooltip />
             <Legend />
             <Bar dataKey="numOfRedCardsPlayed" name="Anzahl Roter Karten im Pot" fill="#334d80" />
-            <Line dataKey="redCardHandValue" name="Wert der Roten Karte" stroke="red" />
+            <Line dataKey="redCardHandValue" name="Wert der Roten Karte" stroke="#cc4444" />
             <YAxis />
         </ComposedChart>
     );

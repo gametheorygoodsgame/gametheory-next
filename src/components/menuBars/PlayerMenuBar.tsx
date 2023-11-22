@@ -9,18 +9,18 @@ import { useViewportSize } from '@mantine/hooks';
 import { theme } from '@/utils/theme';
 
 export default function PlayerMenuBar() {
-  const { height: screenHight, width: screenWidth } = useViewportSize();
+  const { height: screenHeight, width: screenWidth } = useViewportSize();
 
   return (
     <Container bg="brand.7" fluid px={40} p={10}>
-      <Flex align="center">
-        <Image src={gameTheoryLogo} height={70} alt="." />
-        {screenWidth > 980 ? (
-          <Title style={theme.components?.Title?.styles.root}>Game Theory</Title>
-        ) : (
-          <></>
-        )}
-      </Flex>
+        <Flex align="center">
+            <Image src={gameTheoryLogo} height={70} alt="." />
+            {screenWidth > 980 ? (
+                <Title style={theme.components?.Title?.styles.left}>Game Theory</Title>
+            ) : (
+                <></>
+            )}
+        </Flex>
     </Container>
   );
 }

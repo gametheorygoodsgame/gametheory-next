@@ -3,13 +3,13 @@
 import React from 'react';
 import './playCard.css'; // Import the CSS file
 
-interface CardProps {
+export interface PlayCardProps {
     id: string;
     onChange: (event: React.ChangeEvent<HTMLInputElement>, side: string) => void;
     side: string;
 }
 
-const PlayCard: React.FC<CardProps> = React.memo(({ id, onChange, side }) => {
+const PlayCard: React.FC<PlayCardProps> = React.memo(({ id, onChange, side }) => {
     return (
         <div>
             <label htmlFor={`playCard-${id}`} className={`playCard-label playCardBody-${side}`}>

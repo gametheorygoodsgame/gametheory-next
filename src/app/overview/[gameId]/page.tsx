@@ -1,25 +1,42 @@
 'use client';
 
-import React, {useEffect, useRef, useState} from 'react';
-import {Button, Center, Container, Grid, Group, Modal, NumberInput, ScrollArea, Stack, Text} from '@mantine/core';
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  Button,
+  Center,
+  Container,
+  Grid,
+  Group,
+  Loader,
+  Modal,
+  NumberInput,
+  ScrollArea,
+  Stack,
+  Text
+} from '@mantine/core';
 import { useDisclosure, useViewportSize } from '@mantine/hooks';
 import { Game, GameApi } from '@gametheorygoodsgame/gametheory-openapi/api';
-import DataCollection from '../../../components/dataCollection/datacollection';
-import { StartGameModal } from '@/components/game/startGameModal';
-import { logger } from '@/utils/logger';
-import Plot from "@/app/overview/[gameId]/plot";
-import {useParams, useRouter} from "next/navigation";
+import PlayerList from '@/components/playerList/playerList';
+import Plot from "@/components/plot/plot";
+import { useParams, useRouter } from "next/navigation";
+import { useInterval } from '@/utils/hooks';
+import { logger } from "@/utils/logger";
+import ButtonModal from "@/components/modals/buttonModal";
 
 export default function GameOverviewGameMaster() {
-  const { height } = useViewportSize();
-  const { gameId } = useParams<{ gameId?: string }>();
-  const [redCardValue, setRedCardValue] = useState<number | string>(1);
-  const [opened, { open, close }] = useDisclosure(false);
-  const [game, setGame] = useState<Game>();
-  const plotRef = useRef();
-  const { height: portHeight, width: portWidth } = useViewportSize();
   const router = useRouter();
+  const plotRef = useRef();
+  const { height: screenHeight, width: screenWidth } = useViewportSize();
   const [loading, setLoading] = useState(true);
+
+  const { gameId } = useParams<{ gameId?: string }>();
+  const [redCardHandValue, setRedCardHandValue] = useState<number | string>(1);
+  const [game, setGame] = useState<Game>();
+
+  const [hasError, {open: openErrorModal, close: closeErrorModal}] = useDisclosure(false);
+  const [errorDescription, setErrorDescription] = useState('');
+
+  const [isTurnProgressionModalOpen, { open: openTurnProgressionModal, close: closeTurnProgressionModal }] = useDisclosure(false);
 
   const gameApi = new GameApi();
 
@@ -33,8 +50,11 @@ export default function GameOverviewGameMaster() {
       logger.info('Fetched game data successfully.');
       logger.debug(response.data);
     } catch (error) {
-      logger.warn(`GameId: ${gameId}`);
+      setErrorDescription((error as Error).message);
+      openErrorModal();
       logger.error('Error fetching data: ', error);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -43,61 +63,50 @@ export default function GameOverviewGameMaster() {
       if (!game) {
         throw new Error('Game not found');
       }
-      game.cardHandValue.push(typeof redCardValue === 'number' ? redCardValue : parseInt(redCardValue));
+      game.cardHandValue.push(typeof redCardHandValue === 'number' ? redCardHandValue : parseInt(redCardHandValue));
       // @ts-ignore
       const response = await gameApi.updateGameById(gameId, game);
       setGame(response.data);
       logger.info('Updated game data successfully.');
       logger.debug(response.data);
+      closeTurnProgressionModal();
     } catch (error) {
       logger.error('Error updating data: ', error);
     }
-    close();
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        if (!gameId) {
-          throw new Error('No Game ID.');
-        }
-        const response = await gameApi.getGameById(gameId);
-        setGame(response.data);
-        logger.info('Fetched game data successfully.');
-        logger.debug(response.data);
-      } catch (error) {
-        logger.warn(`GameId: ${gameId}`);
-        logger.error('Error fetching data: ', error);
-      } finally {
-        // Set loading to false regardless of success or failure
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [gameId]);
-
-  useEffect(() => {
-    const interval = setInterval(fetchGame, 10000); // Fetch current round every 10 seconds
-
-    return () => {
-      clearInterval(interval);
-    };
-  }, [gameId]);
+  useInterval(fetchGame, 10000);
 
   if (loading) {
-    return <p>Loading...</p>;
+    return (
+        <Center>
+          <Loader />
+        </Center>
+    );
   }
 
   return (
       <>
-        <Modal opened={opened} onClose={close} title={game?.currentTurn === 0 ? 'Spiel Starten' : 'Nächste Runde'}>
+        <ButtonModal
+            opened={hasError}
+            onClose={closeErrorModal}
+            title="Fehler"
+            rightButton={{callback: closeErrorModal, text: 'Schließen'}}
+        >
+          <Text>{errorDescription}</Text>
+        </ButtonModal>
+        <Modal
+            opened={isTurnProgressionModalOpen}
+            onClose={closeTurnProgressionModal}
+            title={game?.currentTurn === 0 ? 'Spiel Starten' : 'Nächste Runde'}
+            closeOnClickOutside={false}
+        >
           <Stack gap="xl">
             <NumberInput
                 type="text"
                 label="Roter Kartenwert"
-                value={redCardValue}
-                onChange={setRedCardValue}
+                value={redCardHandValue}
+                onChange={setRedCardHandValue}
             />
             <Group align="right">
               {game?.currentTurn === 0 ? (
@@ -108,40 +117,37 @@ export default function GameOverviewGameMaster() {
             </Group>
           </Stack>
         </Modal>
-        <Container p={60} fluid h={height - 63}>
-          <Grid grow justify="space-around" h={height - 200}>
+        <Container p={60} pb={0} fluid >
+          <Grid grow justify="space-around" h={screenHeight - 200}>
             <Grid.Col span={1}>
-              <ScrollArea h={height - 220}>
-                <DataCollection gameId={gameId || ''} />
+              <ScrollArea h={screenHeight - 220}>
+                <PlayerList game={game} />
               </ScrollArea>
             </Grid.Col>
             <Grid.Col span={5}>
-              <Stack justify="space-between" h={height - 200}>
+              <Stack justify="space-between" h={screenHeight - 200}>
                 <Group align="right" px={90}>
-                  <Text style={{ fontFamily: 'Instrument Sans, sans-serif', fontWeight: 700 }}>
+                  <Text fw={700}>
                     Runde: {game?.currentTurn || 0} / {game?.numTurns || 0}
                   </Text>
                 </Group>
                 <Center>
-                  <Plot game={game} portHeight={portHeight} portWidth={portWidth} ref={plotRef}/>
+                  <Plot game={game} portHeight={screenHeight} portWidth={screenWidth} ref={plotRef} />
                 </Center>
                 <Group align="right" gap="xl">
-                  <Button variant="outline" color="red" bg="white" onClick={() => router.push('/overview')}>
+                  <Button variant="outline" color="#cc4444" bg="white" onClick={() => router.push('/overview')}>
                     Übersicht
                   </Button>
                   {game?.currentTurn === 0 ? (
-                      <Button bg="brand.0" onClick={open}>
+                      <Button bg="brand.0" onClick={openTurnProgressionModal}>
                         Spiel Starten
                       </Button>
                   ) : (
-                      <Button onClick={open}>
+                      <Button onClick={openTurnProgressionModal}>
                         Nächste Runde
                       </Button>
                   )}
                 </Group>
-                <Text>
-                  {JSON.stringify(game)}
-                </Text>
               </Stack>
             </Grid.Col>
           </Grid>

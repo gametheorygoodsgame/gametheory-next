@@ -8,6 +8,7 @@ import {
   IconTrash,
 } from '@tabler/icons-react';
 import React from 'react';
+import classes from './overviewTable.module.css'
 
 type OverviewTableProps = {
   games: Game[];
@@ -17,6 +18,7 @@ type OverviewTableProps = {
   clipboardClicked: boolean;
   clipboardGameID: string | null;
   handleQRButtonClick: (gameID: string) => void;
+  handleRowClick: (gameID: string, event: React.MouseEvent) => void;
 };
 
 export function OverviewTable({
@@ -27,18 +29,26 @@ export function OverviewTable({
   clipboardClicked,
   clipboardGameID,
   handleQRButtonClick,
+  handleRowClick
 }: OverviewTableProps) {
   const tableHeaders = [
     { label: 'Spiel-ID', dataKey: 'id' },
     { label: 'Anzahl der Spieler', dataKey: 'players.length' },
     { label: 'Runden', dataKey: 'currentTurn' },
-    // Add more headers as needed
   ];
 
   function getNestedValue(obj: any, path: string) {
     const keys = path.split('.');
     return keys.reduce((acc, key) => acc && acc[key], obj);
   }
+
+  const renderClipboardIcon = (gameId: string) => {
+    if (clipboardClicked && gameId === clipboardGameID) {
+      return <IconClipboardCheck className={`mantine-icon ${classes.green}`} />;
+    } else {
+      return <IconClipboard className={`mantine-icon ${classes.brand}`} />;
+    }
+  };
 
   return (
     <Table highlightOnHover>
@@ -52,11 +62,11 @@ export function OverviewTable({
       </Table.Thead>
       <Table.Tbody>
         {games.map((game: Game) => (
-          <Table.Tr className="noselect" key={game.id}>
+          <Table.Tr className={classes.noselect} key={game.id} onDoubleClick={(event) => handleRowClick(game.id, event)}>
             <Table.Td className="mantine-icon">
-              <ActionIcon color="green" className="mantne-icon">
+              <ActionIcon className={'mantine-icon'} variant={"transparent"}>
                 <IconDoorEnter
-                  className="mantine-icon"
+                  className={`mantine-icon ${classes.green}`}
                   onClick={() => handleOpenButtonClick(game.id)}
                 />
               </ActionIcon>
@@ -70,25 +80,22 @@ export function OverviewTable({
             ))}
             <Table.Td className="mantine-icon">
               <Group className="mantine-icon">
-                <ActionIcon color="red" className="mantine-icon">
+                <ActionIcon className={'mantine-icon'} variant={"transparent"}>
                   <IconTrash
-                    className="mantine-icon"
+                    className={`mantine-icon ${classes.red}`}
                     onClick={() => handleDeleteButtonClick(game.id)}
                   />
                 </ActionIcon>
                 <ActionIcon
-                  className="mantine-icon"
-                  onClick={(event) => handleClipboardButtonClick(event, game.id)}
+                    className={'mantine-icon'}
+                    variant={"transparent"}
+                    onClick={(event) => handleClipboardButtonClick(event, game.id)}
                 >
-                  {clipboardClicked && game.id === clipboardGameID ? (
-                    <IconClipboardCheck color="green" className="mantine-icon" />
-                  ) : (
-                    <IconClipboard className="mantine-icon" />
-                  )}
+                  {renderClipboardIcon(game.id)}
                 </ActionIcon>
-                <ActionIcon className="mantine-icon">
+                <ActionIcon className={'mantine-icon'} variant={"transparent"}>
                   <IconQrcode
-                    className="mantine-icon"
+                      className={`mantine-icon ${classes.brand}`}
                     onClick={() => handleQRButtonClick(game.id)}
                   />
                 </ActionIcon>

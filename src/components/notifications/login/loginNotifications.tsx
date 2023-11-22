@@ -1,4 +1,4 @@
-import { error, pending, success } from '@/components/notifications';
+import { error, pending, success } from '@/components/notifications/notifications';
 
 export const missingInput = () => {
   error({ message: 'Bitte geben Sie Ihre Nutzerinformationen ein!' });
