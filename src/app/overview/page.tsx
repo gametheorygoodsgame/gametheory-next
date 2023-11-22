@@ -52,7 +52,7 @@ export default function GamesOverview() {
       logger.info('Fetched game data successfully.');
       logger.debug(response.data);
     } catch (error) {
-      setErrorDescription((error as Error).message)
+      setErrorDescription(`${(error as Error).name}: ${(error as Error).cause}; ${(error as Error).stack}`);
       logger.error('Error fetching data: ', error);
     } finally {
       setLoading(false);

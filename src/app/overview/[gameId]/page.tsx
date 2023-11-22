@@ -50,7 +50,7 @@ export default function GameOverviewGameMaster() {
       logger.info('Fetched game data successfully.');
       logger.debug(response.data);
     } catch (error) {
-      setErrorDescription((error as Error).message);
+      setErrorDescription(`${(error as Error).name}: ${(error as Error).cause}; ${(error as Error).stack}`);
       openErrorModal();
       logger.error('Error fetching data: ', error);
     } finally {

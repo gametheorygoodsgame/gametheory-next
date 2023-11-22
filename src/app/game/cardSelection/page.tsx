@@ -42,7 +42,7 @@ export default function CardSelection() {
   const [playerScore, setPlayerScore] = useState(0);
   const [redCardHandValue, setRedCardHandValue] = useState(0);
 
-  const[errorDescription, setErrorDescription] = useState('');
+  const [errorDescription, setErrorDescription] = useState('');
 
   const gameApi = new GameApi();
   const gamePlayerMoveApi = new GamePlayerMoveApi();
@@ -72,11 +72,11 @@ export default function CardSelection() {
 
 
   const getPlayerScore = (game: Game, playerId: string): number => {
-    if (game.players) {
-      const player = game.players.find((p) => p.id === playerId) || {score: 0};
-      return player.score;
+    let player = null;
+    if (game.players){
+      player = game.players.find((p) => p.id === playerId);
     }
-    else return 0;
+    return player ? player.score : 0;
   };
 
   useEffect(() => {
@@ -124,7 +124,8 @@ export default function CardSelection() {
       await checkGameStatus();
       openWaitingForNextTurnModal();
     } catch (error) {
-      setErrorDescription((error as Error).message)
+      logger.error(error);
+      setErrorDescription(`${(error as Error).name}: ${(error as Error).cause}; ${(error as Error).stack}`)
       openErrorModal();
     }
   };
@@ -132,12 +133,13 @@ export default function CardSelection() {
   const checkGameStatus = async () => {
     try {
       const response = await gameApi.getGameById(gameId);
+      const game: Game = response.data;
 
-      if (response.status === 200 && response.data) {
-        const newCurrentTurn = response.data.currentTurn;
-        setNumTurns(response.data.numTurns);
-        setPlayerScore(getPlayerScore(response.data, playerId));
-        setRedCardHandValue(response.data.cardHandValue[currentTurn]);
+      if (response.status === 200 && game) {
+        const newCurrentTurn = game.currentTurn;
+        setNumTurns(game.numTurns);
+        setPlayerScore(getPlayerScore(game, playerId));
+        //setRedCardHandValue(game.cardHandValue[currentTurn]);
 
         if (newCurrentTurn === 0) {
           openWaitingForGameStartModal();
@@ -153,7 +155,8 @@ export default function CardSelection() {
         }
       }
     } catch (error) {
-      setErrorDescription((error as Error).message)
+      logger.error(error);
+      setErrorDescription(`${(error as Error).name}: ${(error as Error).cause}; ${(error as Error).stack}`)
       openErrorModal();
     } finally {
       setLoading(false);
@@ -172,7 +175,7 @@ export default function CardSelection() {
 
   useInterval(fetchData, 10000);
 
-  /* useEffect(() => {
+  useEffect(() => {
     setGameId(getCookie('gameID') || '');
     setPlayerId(getCookie('playerID') || '');
     checkGameStatus();
@@ -182,11 +185,15 @@ export default function CardSelection() {
     return () => {
       clearInterval(interval);
     };
-  }, [gameId, currentTurn, openWaitingForGameStartModal, closeWaitingForGameStartModal]);*/
+  }, [gameId, currentTurn, openWaitingForGameStartModal, closeWaitingForGameStartModal]);
 
 
   if (loading) {
-    return <Loader />;
+    return (
+        <Center>
+          <Loader />
+        </Center>
+    );
   }
 
   return (
