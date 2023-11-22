@@ -72,7 +72,7 @@ export default function StudentLogin(props: StudentLoginProps) {
         loginNotifications.loginFailed();
         logger.debug('Created login failed notification.');
       } else {
-        notifications.error({ message: (response.data as any as Error).message });
+        notifications.error({ message: JSON.stringify(response.data)});
         logger.debug('Created login error notification.');
       }
     } catch (error) {

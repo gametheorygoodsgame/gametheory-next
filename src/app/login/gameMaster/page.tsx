@@ -50,10 +50,10 @@ export default function DozentLogin() {
         logger.info('Game master login successful.');
 
         router.push('/overview');
-      } catch (err) {
-        logger.error(err);
+      } catch (error) {
+        logger.error(error);
         notifications.loginFailed();
-        setErrorDescription((err as Error).message);
+        setErrorDescription(`${(error as Error).name}: ${(error as Error).cause}; ${(error as Error).stack}`);
         openErrorModal();
         logger.debug('Opened login failed modal.');
       }
