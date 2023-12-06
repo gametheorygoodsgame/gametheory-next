@@ -1,142 +1,174 @@
-# Public Goods Game
+Game Theory App mit Next.js, Axios und Mantine
+==============================================
 
-This project aims to implement the *Public Goods Game*, a simulation with the goal of making the dynamics of public goods easier to
-understand.
+Die Game Theory App ist eine moderne Webanwendung, die mit den bewährten Technologien Next.js, Axios und Mantine entwickelt wurde. Diese README gibt einen Überblick über die Struktur, Funktionalitäten und die Verwendung der genannten Technologien.
 
-## Table of contents
-[Quick start guide](#quick-start-guide)\
-[Detailed explanation](#detailed-explanation)\
-[Server-side deployment](#server-side-deployment)
+Inhaltsverzeichnis
+------------------
 
+-   [Game Theory App mit Next.js, Axios und Mantine](https://chat.openai.com/c/f94f1538-af0c-4405-a092-076d688785b3#game-theory-app-mit-nextjs-axios-und-mantine)
+  -   [Inhaltsverzeichnis](https://chat.openai.com/c/f94f1538-af0c-4405-a092-076d688785b3#inhaltsverzeichnis)
+  -   [Public Goods Game](https://chat.openai.com/c/f94f1538-af0c-4405-a092-076d688785b3#public-goods-game)
+    -   [Beschreibung](https://chat.openai.com/c/f94f1538-af0c-4405-a092-076d688785b3#beschreibung)
+    -   [Verzeichnisstruktur](https://chat.openai.com/c/f94f1538-af0c-4405-a092-076d688785b3#verzeichnisstruktur)
+    -   [Firebase-Konfiguration](https://chat.openai.com/c/f94f1538-af0c-4405-a092-076d688785b3#firebase-konfiguration)
+    -   [Hilfsfunktionen](https://chat.openai.com/c/f94f1538-af0c-4405-a092-076d688785b3#hilfsfunktionen)
+    -   [Hooks](https://chat.openai.com/c/f94f1538-af0c-4405-a092-076d688785b3#hooks)
+    -   [Logger](https://chat.openai.com/c/f94f1538-af0c-4405-a092-076d688785b3#logger)
+    -   [Themen](https://chat.openai.com/c/f94f1538-af0c-4405-a092-076d688785b3#themen)
+  -   [Quick Start Guide](https://chat.openai.com/c/f94f1538-af0c-4405-a092-076d688785b3#quick-start-guide)
+  -   [Detaillierte Erklärung](https://chat.openai.com/c/f94f1538-af0c-4405-a092-076d688785b3#detaillierte-erkl%C3%A4rung)
+    -   [Verwendete Technologien](https://chat.openai.com/c/f94f1538-af0c-4405-a092-076d688785b3#verwendete-technologien)
+      -   [Next.js](https://chat.openai.com/c/f94f1538-af0c-4405-a092-076d688785b3#nextjs)
+      -   [Axios](https://chat.openai.com/c/f94f1538-af0c-4405-a092-076d688785b3#axios)
+      -   [Mantine](https://chat.openai.com/c/f94f1538-af0c-4405-a092-076d688785b3#mantine)
+    -   [Projektstruktur](https://chat.openai.com/c/f94f1538-af0c-4405-a092-076d688785b3#projektstruktur)
+    -   [Firebase Integration](https://chat.openai.com/c/f94f1538-af0c-4405-a092-076d688785b3#firebase-integration)
+    -   [Benachrichtigungen](https://chat.openai.com/c/f94f1538-af0c-4405-a092-076d688785b3#benachrichtigungen)
+    -   [Datenvisualisierung](https://chat.openai.com/c/f94f1538-af0c-4405-a092-076d688785b3#datenvisualisierung)
+  -   [Serverseitige Bereitstellung](https://chat.openai.com/c/f94f1538-af0c-4405-a092-076d688785b3#serverseitige-bereitstellung)
 
-## Quick start guide
+Public Goods Game
+-----------------
 
-- start the development server: `npm run dev`
-- open [http://localhost:3000/overview](http://localhost:3000/overview) and create a new game. Copy the corresponding *gameID*
-to your clipboard.
-- open [http://localhost:3000](http://localhost:3000) in your browser (will redirect to [http://localhost:3000/login/student](http://localhost:3000/login/student)) and join a game using the *gameID*
-- the newly joined player can now be seen on the overview page 
+### Beschreibung
 
-Alternatively, you can build the project locally and run in on your computer:
-```bash
-npm run build
-npm start
-```
+Die Game Theory App wurde mit Next.js, Axios und Mantine entwickelt, um eine effiziente und benutzerfreundliche Webanwendung zu erstellen. Die Anwendung ermöglicht es Benutzern, Spiele basierend auf Spieltheorieprinzipien zu erstellen, zu verwalten und zu spielen. Spieler können Aktionen ausführen, Karten spielen und den Fortschritt ihrer Spiele verfolgen.
 
-## Detailed explanation
+### Verzeichnisstruktur
 
-This section is intended to give in depth information on the project, its structure and technical details. It aims
-at providing the reader with the ability to maintain and develop the project.
+Die Anwendung ist in verschiedene Verzeichnisse strukturiert:
 
-### Technologies used
+-   components: Enthält React-Komponenten für verschiedene Ansichten und Aktionen der App.
+-   utils: Hier finden sich Hilfsfunktionen, benutzerdefinierte Hooks, Firebase-Konfiguration und der Logger.
+-   public: Bilder und Ressourcen, die von der Anwendung genutzt werden.
 
-This project uses **npm** to manage all installed packages. Install missing dependencies using `npm install`. It is not necessary
-to specify the packages to be installed since those information are taken from *package.json* file.
+### Firebase-Konfiguration
 
-[*Next.js*](https://nextjs.org/) is the underlying framework used in this project. You can find the documentation [here](https://nextjs.org/docs).
-It is worth explaining the advantages of *Next.js* over plain *React.js.*:
-- **page routing**:
-The path to every accessible webpage is mapped directly to the `/app` directory without having to manually specify the routing 
-for each page. Example: The file for [http://localhost:3000/login/dozent](http://localhost:3000/login/dozent) has the corresponding
-path `/app/login/dozent/page.tsx`.
+Die Firebase-Konfiguration befindet sich in der Datei `firebaseApp.ts`. Diese Datei initialisiert Firebase mit den benötigten API-Schlüsseln und Einstellungen, und die Firebase-Instanz wird in der gesamten Anwendung verwendet.
 
-  **Dynamic routing** is used to view games with their corresponding gameID. Example: if gameID is the game ID of a newly created game,
-  then the game overview can be accessed using the following URL: [http://localhost:3000/overview/gameID](http://localhost:3000/overview/~<gameID~).
-  The corresponding file path is `/app/game/overview/[dozentgame]/page.tsx`. Notice the brackets ("[]") inside the file path.
-  Please refer to the [dynamic routing documentation](https://nextjs.org/docs/app/building-your-application/routing/dynamic-routes) for more information.
-  
+### Hilfsfunktionen
 
-- **API**:
-*Next.js* comes with a build-in API available. Similar to the mapping of webpages, API endpoints are also being mapped
-to the corresponding path`/pages/api`. In JavaScript the `fetch()`function can be used to submit API requests. Take a look
-the following example from `/app/overview/page.tsx`: 
-    ```javascript
-    async function fetchdata() {
-        try {
-            const response = await fetch('/api/games');
-            const data = await response.json();
-            setGames(data.gameList);
-            setNumberOfGames(data.totalNumber)
-        } catch (error) {
-            console.error("Error fetching data: ", error);
-        }
-    };
-    ```
-  Upon calling `fetchdata()` a HTTP-GET request is send to `/api/games`. If the request is successful, a json object is
-  returned and its data are being processed.
-  Different HTTP requests such as POST can also be send. In this case the method argument needs to be specified. Refer to the [docs](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch) for more detailed information on `fetch()`.
-  
-  Let's have a look at the backend code to understand the processing of incoming API requests. This is an excerpt from `/pages/api/games.ts`:
-  ```javascript
-  export default async function handler(request, response) {
-    switch (request.method) {
-      case 'POST':
-        /* ... */
-      case 'GET':
-        try {
-          console.log('Get request arrived')
-          const gameListInfo = getGameListInfo();
-          response.status(200);
-          response.json(gameListInfo);
-          break;
-        } catch (error) {
-          response.status(404).send({ message: 'Something went wrong' });
-          break;
-      }
-    }
-  }
-   ```
-  Implementing the `handler()` function lets the backend listen for http requests and respond accordingly. In our example
-  the status code is set to 200 (OK) and `gameListInfo` data is returned in json format. You can easily test this using 
-  your webbrowser. Going to page [http://localhost:3000/api/games](http://localhost:3000/api/games) will show you the http
-  response (assuming your local server is up and running).
+Die Datei `helpers.ts` enthält eine Hilfsfunktion zur Validierung von Zahlen, die einem bestimmten Enumerationswert entsprechen. Diese Funktion wird für die Verarbeitung von Spieleraktionen im Spiel verwendet.
 
-[Google firebase](https://console.firebase.google.com/project/gametheory-leibniz-fh/overview) is used for accomplishing
-user authentication. That is, the lecturer is able to log into the service and create game lobbies where each
-game is identified by ist respective gameID. This functionality can be used in code after importing
-*signInWithEmailAndPassword* from *firebase/auth*. For puposes of testing the login data
-*test@game.com* with the password *123456* is available. Login data can be administrated on the
-[authenticaion page](https://console.firebase.google.com/project/gametheory-leibniz-fh/authentication/users).
+### Hooks
 
+Die Datei `hooks.ts` enthält benutzerdefinierte Hooks, darunter `useInterval` für die Ausführung von Funktionen in Intervallen und `useModal` für die Verwaltung von Modalzuständen.
 
-[Mantine](https://mantine.dev/) is a UI library that this project uses for most of its UI elements, e.g. buttons, login error
-messages etc.  
+### Logger
 
-Run the development server: `npm run dev`
+Der Logger in der Datei `logger.ts` wird für die Protokollierung von Informationen, Debugging-Details, Fehlern und Warnungen verwendet. In der Produktionsumgebung werden nur Fehler und Warnungen protokolliert.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result. Initially, you will be redirected
-to [http://localhost:3000/login/student](http://localhost:3000/login/student). This is where 
+### Themen
 
+Das Designthema der Anwendung wird in der Datei `theme.ts` festgelegt. Es enthält Farbdefinitionen und benutzerdefinierte Stile für bestimmte Komponenten wie Buttons und Titel.
 
-## Server-side deployment
-If you are happy with the changes that you made you can create a
-production build (that kind of build will be used for deployment on the server later).
-Use `npm run build` to create the production build and
-execute `npm start` to start the local production server. If you are happy
-with the result the changes can be published on the server. However, ssh access to
-the server is required in order to do so. Please consult your project groups' IT-Steuerkreis
-member for more information.
-If you have ssh access to the server follow the steps below:
-- Connect to the project server via ssh:\
-  `ssh atlasserver`\
-  *atlasserver* refers to the alias given in the ~/.ssh/config file.
-- Navigate to the directory where the git repository got cloned to:\
-  `cd /etc/gametheory/pulic-goods-game`\
-  Please note the typo in *pulic-goods-game*.
-- Update local files to the most recent changes:\
-`git fetch`\
-`git pull`
-- You can check if the repository is actually up-to-date:\
-`git status`
-- Open the ./docker subdirectory:\
-`cd docker/`
-- Build the docker image with the latest changes:\
-`docker compose build`\
-Note that in this step docker itself is running *npm run build* and *npm start*
-and is creating the newest build available for you.
-- (Re)start the docker container:\
-`docker compose up -d`\
-The application is now up and running on [gametheory.atlasproject.de](https://gametheory.atlasproject.de).
+Quick Start Guide
+-----------------
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+-   Starten Sie den Entwicklungsserver: `npm run dev`
+-   Öffnen Sie <http://localhost:3000/overview> und erstellen Sie ein neues Spiel. Kopieren Sie die entsprechende *gameID* in die Zwischenablage.
+-   Öffnen Sie [http://localhost:3000](http://localhost:3000/) in Ihrem Browser (leitet weiter zu <http://localhost:3000/login/student>) und treten Sie einem Spiel bei, indem Sie die *gameID* verwenden.
+-   Der neu beigetretene Spieler ist nun auf der Übersichtsseite zu sehen.
 
+Alternativ können Sie das Projekt lokal erstellen und auf Ihrem Computer ausführen:
+
+bashCopy code
+
+`npm run build
+npm start`
+
+Detaillierte Erklärung
+----------------------
+
+Diese Sektion bietet detaillierte Informationen zum Projekt, seiner Struktur und technischen Details.
+
+### Verwendete Technologien
+
+#### Next.js
+
+[Next.js](https://nextjs.org/) ist das zugrunde liegende Framework dieses Projekts. Es erleichtert die Entwicklung von React-Anwendungen und bietet erweiterte Funktionen wie Server-Side Rendering (SSR) und statische Seiten-Generierung (SSG). Die Verzeichnisstruktur wird automatisch generiert, und dynamische Routen können einfach erstellt werden.
+
+#### Axios
+
+[Axios](https://axios-http.com/) wird in der Anwendung verwendet, um Daten von einem Server abzurufen. Ein Beispiel aus der `overviewTable.tsx`-Datei zeigt die Verwendung von Axios für den Zugriff auf API-Endpunkte:
+
+javascriptCopy code
+
+`// Verwendung von Axios in overviewTable.tsx
+import axios from 'axios';
+
+const fetchGames = async () => {
+try {
+const response = await axios.get('/api/games');
+const games = response.data;
+// Verarbeite die Spiele...
+} catch (error) {
+console.error('Fehler beim Abrufen der Spiele:', error);
+}
+};`
+
+Axios ermöglicht eine effiziente asynchrone Kommunikation mit dem Server.
+
+#### Mantine
+
+[Mantine](https://mantine.dev/) ist eine React-Komponentenbibliothek, die für viele UI-Elemente in der Anwendung verwendet wird. Hier ein Beispiel aus der `GameMasterMenuBar.tsx`-Datei:
+
+javascriptCopy code
+
+`// Verwendung von Mantine in GameMasterMenuBar.tsx
+import { Container, Flex, Title, Menu, ActionIcon } from '@mantine/core';
+import { IconLogout, IconUser } from '@tabler/icons-react';
+
+function GameMasterMenuBar() {
+return (
+<Container>
+<Flex>
+<Title>Game Theory</Title>
+<Menu>
+<Menu.Target>
+<ActionIcon>
+<IconUser />
+</ActionIcon>
+</Menu.Target>
+{/* Weitere Mantine-Komponenten für das Dropdown-Menü */}
+</Menu>
+</Flex>
+</Container>
+);
+}`
+
+Mantine erleichtert die Erstellung moderner UI-Elemente.
+
+### Projektstruktur
+
+Die Anwendung ist in verschiedene Verzeichnisse strukturiert, darunter `components`, `utils` und `public`. Diese Verzeichnisse enthalten React-Komponenten, Hilfsfunktionen, Ressourcen und mehr.
+
+### Firebase Integration
+
+Die Anwendung integriert Firebase für die Backend-Infrastruktur. Die Konfiguration ist in `firebaseApp.ts` zu finden.
+
+### Benachrichtigungen
+
+Die `notifications`-Komponente in `loginNotifications.tsx` und `notifications.tsx` zeigt Erfolgs- und Fehlermeldungen.
+
+### Datenvisualisierung
+
+Die `Plot`-Komponente in `plot.tsx` verwendet Recharts für die Darstellung von Spielstatistiken.
+
+Serverseitige Bereitstellung
+----------------------------
+
+Wenn Sie mit den Änderungen zufrieden sind, können Sie einen Produktionsbuild erstellen und den lokalen Produktionsserver starten. Verwenden Sie `npm run build` für den Build und `npm start` für den lokalen Produktionsserver. Wenn Sie mit dem Ergebnis zufrieden sind, können die Änderungen auf den Server hochgeladen werden. SSH-Zugriff auf den Server ist erforderlich. Folgen Sie diesen Schritten:
+
+1.  Verbinden Sie sich über SSH mit dem Server: `ssh atlasserver`.
+2.  Navigieren Sie zum Verzeichnis, in dem das Git-Repository geklont wurde: `cd /etc/gametheory/pulic-goods-game`.
+3.  Aktualisieren Sie lokale Dateien mit den neuesten Änderungen: `git fetch` und `git pull`.
+4.  Überprüfen Sie, ob das Repository auf dem neuesten Stand ist: `git status`.
+5.  Öffnen Sie das Unterverzeichnis `./docker`: `cd docker/`.
+6.  Erstellen Sie das Docker-Image mit den neuesten Änderungen: `docker compose build`.
+7.  Starten Sie den Docker-Container neu: `docker compose up -d`.
+
+Die Anwendung ist jetzt unter [gametheory.atlasproject.de](https://gametheory.atlasproject.de/) verfügbar.
+
+Weitere Details zur [Next.js-Bereitstellung](https://nextjs.org/docs/deployment).

@@ -8,7 +8,7 @@ if (Test-Path -Path $outputFile) {
 
 # Define the directories to search recursively with absolute paths
 $directories = @(
-    ".\src\app\overview"
+    ".\src\utils"
 )
 
 # Iterate over specified directories and their subdirectories for .ts files
