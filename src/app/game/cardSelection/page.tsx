@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import {
+  Badge,
   Button,
   Center,
   Container,
@@ -217,6 +218,13 @@ export default function CardSelection() {
             <Text>{errorDescription}</Text>
         </ButtonModal>
         <Container
+        style={{
+          justifyContent:'flex-end',
+          display:'flex'
+        }}>
+            <Badge ta="right" color='#334d80'>Roter Kartenwert: {redCardHandValue}</Badge>
+          </Container>
+        <Container
             fluid
             p={0}
             style={{
@@ -226,6 +234,7 @@ export default function CardSelection() {
               justifyContent: 'center',
             }}
         >
+          
             <Container fluid p={0}>
               <Grid  justify = "flex-end" p={20}>
                 <Text fz={19} fw={700} p={10} className="lbl-round">Konto: {playerScore} ct</Text>
