@@ -5,24 +5,20 @@ import {
   Badge,
   Button,
   Center,
-  Container,
-  Grid,
+  Container, Flex,
   Group,
   Loader,
-  Modal, Stack,
   Text,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useRouter } from 'next/navigation';
-import {Game, GameApi, GamePlayerMoveApi, Move} from '@gametheorygoodsgame/gametheory-openapi/api';
+import { Game, GameApi, GamePlayerMoveApi, Move } from '@gametheorygoodsgame/gametheory-openapi/api';
 import { logger } from '@/utils/logger';
 import { getMoveNumRedCardEnumValue } from '@/utils/helpers';
-import PlayCardGrid from "@/components/playCards/playCardGrid";
-import {router} from "next/client";
-import {useInterval} from "@/utils/hooks";
-import LoadModal from "@/components/modals/loadModal";
-import ButtonModal from "@/components/modals/buttonModal";
-
+import PlayCardGrid from '@/components/playCards/playCardGrid';
+import { useInterval } from '@/utils/hooks';
+import LoadModal from '@/components/modals/loadModal';
+import ButtonModal from '@/components/modals/buttonModal';
 
 export default function CardSelection() {
   const [windowWidth, setWindowWidth] = useState(
@@ -35,9 +31,11 @@ export default function CardSelection() {
   const [currentTurn, setCurrentTurn] = useState(0);
   const [numTurns, setNumTurns] = useState(0);
   const [numRedCards, setNumRedCards] = useState(0);
-  const [isWaitingForNextTurn, { open: openWaitingForNextTurnModal, close: closeWaitingForNextTurnModal }] = useDisclosure(false);
-  const [hasError, {open: openErrorModal, close: closeErrorModal}] = useDisclosure(false);
-  const [isWaitingForGameStart, { open: openWaitingForGameStartModal, close: closeWaitingForGameStartModal }] = useDisclosure(true);
+  const [isWaitingForNextTurn, { open: openWaitingForNextTurnModal,
+    close: closeWaitingForNextTurnModal }] = useDisclosure(false);
+  const [hasError, { open: openErrorModal, close: closeErrorModal }] = useDisclosure(false);
+  const [isWaitingForGameStart, { open: openWaitingForGameStartModal,
+    close: closeWaitingForGameStartModal }] = useDisclosure(true);
   const [gameId, setGameId] = useState('');
   const [playerId, setPlayerId] = useState('');
   const [playerScore, setPlayerScore] = useState(0);
@@ -71,11 +69,10 @@ export default function CardSelection() {
     setNumRedCards(0);
   };
 
-
-  const getPlayerScore = (game: Game, playerId: string): number => {
+  const getPlayerScore = (aGame: Game, aPlayerId: string): number => {
     let player = null;
-    if (game.players){
-      player = game.players.find((p) => p.id === playerId);
+    if (aGame.players) {
+      player = aGame.players.find((p) => p.id === aPlayerId);
     }
     return player ? player.score : 0;
   };
@@ -92,6 +89,7 @@ export default function CardSelection() {
 
   const getCookie = (name: string) => {
     const cookies = document.cookie.split(';');
+    // eslint-disable-next-line no-plusplus
     for (let i = 0; i < cookies.length; i++) {
       const cookie = cookies[i].trim();
       if (cookie.startsWith(`${name}=`)) {
@@ -99,6 +97,39 @@ export default function CardSelection() {
       }
     }
     return null;
+  };
+
+  const checkGameStatus = async () => {
+    try {
+      const response = await gameApi.getGameById(gameId);
+      const game: Game = response.data;
+
+      if (response.status === 200 && game) {
+        const newCurrentTurn = game.currentTurn;
+        setNumTurns(game.numTurns);
+        setPlayerScore(getPlayerScore(game, playerId));
+        setRedCardHandValue(game.cardHandValue[currentTurn]);
+
+        if (newCurrentTurn === 0) {
+          openWaitingForGameStartModal();
+          closeWaitingForNextTurnModal();
+        } else {
+          closeWaitingForGameStartModal();
+        }
+
+        if (newCurrentTurn !== currentTurn) {
+          setCurrentTurn(newCurrentTurn);
+          resetSelection();
+          closeWaitingForNextTurnModal();
+        }
+      }
+    } catch (error) {
+      logger.error(error);
+      setErrorDescription(`${(error as Error).name}: ${(error as Error).cause}; ${(error as Error).stack}`);
+      openErrorModal();
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleMakeMove = async () => {
@@ -126,49 +157,16 @@ export default function CardSelection() {
       openWaitingForNextTurnModal();
     } catch (error) {
       logger.error(error);
-      setErrorDescription(`${(error as Error).name}: ${(error as Error).cause}; ${(error as Error).stack}`)
+      setErrorDescription(`${(error as Error).name}: ${(error as Error).cause}; ${(error as Error).stack}`);
       openErrorModal();
     }
   };
 
-  const checkGameStatus = async () => {
-    try {
-      const response = await gameApi.getGameById(gameId);
-      const game: Game = response.data;
-
-      if (response.status === 200 && game) {
-        const newCurrentTurn = game.currentTurn;
-        setNumTurns(game.numTurns);
-        setPlayerScore(getPlayerScore(game, playerId));
-        //setRedCardHandValue(game.cardHandValue[currentTurn]);
-
-        if (newCurrentTurn === 0) {
-          openWaitingForGameStartModal();
-          closeWaitingForNextTurnModal();
-        } else {
-          closeWaitingForGameStartModal();
-        }
-
-        if (newCurrentTurn !== currentTurn) {
-          setCurrentTurn(newCurrentTurn);
-          resetSelection();
-          closeWaitingForNextTurnModal();
-        }
-      }
-    } catch (error) {
-      logger.error(error);
-      setErrorDescription(`${(error as Error).name}: ${(error as Error).cause}; ${(error as Error).stack}`)
-      openErrorModal();
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  function fetchData(){
-    if (!gameId || gameId === ''){
+  function fetchData() {
+    if (!gameId || gameId === '') {
       setGameId(getCookie('gameID') || '');
     }
-    if (!playerId || playerId === ''){
+    if (!playerId || playerId === '') {
       setPlayerId(getCookie('playerID') || '');
     }
     checkGameStatus();
@@ -187,7 +185,6 @@ export default function CardSelection() {
       clearInterval(interval);
     };
   }, [gameId, currentTurn, openWaitingForGameStartModal, closeWaitingForGameStartModal]);
-
 
   if (loading) {
     return (
@@ -209,50 +206,48 @@ export default function CardSelection() {
             </Text>
         </LoadModal>
         <ButtonModal
-            opened={hasError}
-            onClose={closeErrorModal}
-            title="Fehler"
-            leftButton={{callback: () => router.push('/login/player'), text: 'Zurück zum Login'}}
-            rightButton={{callback: () => { closeErrorModal(); handleMakeMove();}, text: 'Erneut senden'}}
+          opened={hasError}
+          onClose={closeErrorModal}
+          title="Fehler"
+          leftButton={{ callback: () => router.push('/login/player'), text: 'Zurück zum Login' }}
+          rightButton={{ callback: () => { closeErrorModal(); handleMakeMove(); }, text: 'Erneut senden' }}
         >
             <Text>{errorDescription}</Text>
         </ButtonModal>
         <Container
-        style={{
-          justifyContent:'flex-end',
-          display:'flex'
-        }}>
-            <Badge ta="right" color='#334d80'>Roter Kartenwert: {redCardHandValue}</Badge>
-          </Container>
-        <Container
-            fluid
-            p={0}
-            style={{
+          fluid
+          p={0}
+          style={{
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
             }}
         >
-          
-            <Container fluid p={0}>
-              <Grid  justify = "flex-end" p={20}>
-                <Text fz={19} fw={700} p={10} className="lbl-round">Konto: {playerScore} ct</Text>
-                <Text fz={19} fw={700} p={10} className="lbl-round">Runde: {currentTurn} / {numTurns}</Text>
-              </Grid>
-            </Container>
-              <PlayCardGrid onChange={handleInputChangeCard} />
-              <Center my="xl">
-                <Button
-                    disabled={selectedCount !== 2}
-                    onClick={() => {
-                      openWaitingForNextTurnModal();
-                      handleMakeMove();
-                    }}
-                >
-                  {selectedCount !== 2 ? 'Bitte zwei Karten auswählen' : 'Auswahl bestätigen'}
-                </Button>
-              </Center>
+          <Flex
+            mih={50}
+            gap="md"
+            justify="flex-end"
+            align="flex-end"
+            direction="column"
+            wrap="wrap"
+          >
+            <Badge size="xl" color="#cc4444" w="100%">Roter Kartenwert: {redCardHandValue}</Badge>
+            <Badge size="xl" color="#334d80" w="100%">Konto: {playerScore} ct</Badge>
+            <Badge size="xl" color="#334d80" w="100%">Runde: {currentTurn} / {numTurns}</Badge>
+          </Flex>
+          <PlayCardGrid onChange={handleInputChangeCard} />
+          <Center my="xl">
+            <Button
+              disabled={selectedCount !== 2}
+              onClick={() => {
+                  openWaitingForNextTurnModal();
+                  handleMakeMove();
+                }}
+            >
+              {selectedCount !== 2 ? 'Bitte zwei Karten auswählen' : 'Auswahl bestätigen'}
+            </Button>
+          </Center>
         </Container>
       </>
   );
