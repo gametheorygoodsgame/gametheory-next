@@ -1,42 +1,48 @@
-.playCardBody-left {
+.playCardBody {
     border-radius: 35px;
     box-shadow: 0 2px 4px 0 rgba(219, 215, 215, 0);
-    background: #cc4444 url('../../../public/CardRed.png') no-repeat center center;
     height: 345px;
     width: 230px;
     margin: 30px;
+}
+
+.playCardBody-left {
+    background: #cc4444 url('../../../public/CardRed.png') no-repeat center center;
 }
 
 .playCardBody-right {
-    border-radius: 35px;
-    box-shadow: 0 2px 4px 0 rgba(219, 215, 215, 0);
     background: #222530 url('../../../public/CardBlack.png') no-repeat center center;
-    height: 345px;
-    width: 230px;
-    margin: 30px;
+}
+
+.playCardBody:hover,
+.playCardBody-left:hover,
+.playCardBody-right:hover {
+    animation: shake 0.82s cubic-bezier(.36, .07, .19, .97) both;
+}
+
+@keyframes shake {
+    10%, 90% {
+        transform: translate3d(-1px, 0, 0);
+    }
+    20%, 80% {
+        transform: translate3d(2px, 0, 0);
+    }
+    30%, 50%, 70% {
+        transform: translate3d(-4px, 0, 0);
+    }
+    40%, 60% {
+        transform: translate3d(4px, 0, 0);
+    }
 }
 
 .playCard-label input {
-    display: none; /* Versteckt das Eingabefeld der Checkbox */
+    display: none;
 }
 
-.playCard-label.selected {
-    border: 10px white;
-    transform: scale(0.9);
-}
-
-.playCard-label input:checked + .playCardBody-right {
-    /* Setzt die Randfarbe des rechten Containers, wenn die Checkbox ausgewählt ist */
-    /* Setzt die Randbreite des rechten Containers, wenn die Checkbox ausgewählt ist */
-    border: 10px white;
-    transform: scale(0.9); /* Wendet einen Skalierungseffekt auf den rechten Container an, wenn die Checkbox ausgewählt ist */
-}
-
+.playCard-label input:checked + .playCardBody-right,
 .playCard-label input:checked + .playCardBody-left {
-    /* Setzt die Randfarbe des linken Containers, wenn die Checkbox ausgewählt ist */
-    /* Setzt die Randbreite des linken Containers, wenn die Checkbox ausgewählt ist */
-    border: 10px white;
-    transform: scale(0.9); /* Wendet einen Skalierungseffekt auf den linken Container an, wenn die Checkbox ausgewählt ist */
+    transform: scale(1.1);
+    animation: none; /* Disable the shake animation when the checkbox is checked */
 }
 
 

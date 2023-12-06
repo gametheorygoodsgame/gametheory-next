@@ -22,7 +22,7 @@ const PlayCard: React.FC<PlayCardProps> = React.memo(({ id, onChange, side }) =>
                     onChange={(e) => onChange(e, side)}
                     data-side={side}
                 />
-                <div className={`playCardBody-${side}`} />
+                <div className={`playCardBody-${side}  playCardBody`} />
             </label>
         </div>
     );
