@@ -75,6 +75,13 @@ export default function GameOverviewGameMaster() {
     }
   };
 
+  /*
+  useEffect(() => {
+    fetchGame();
+  }, [game]);
+
+   */
+
   useInterval(fetchGame, 10000);
 
   if (loading) {

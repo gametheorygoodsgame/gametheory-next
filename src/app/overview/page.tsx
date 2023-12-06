@@ -118,6 +118,7 @@ export default function GamesOverview() {
       };
       await gameApi.createGame(game);
       closeCreateModal();
+      fetchGameList();
       logger.debug(game);
       logger.info('Created a new game.');
     } catch (error) {
@@ -140,11 +141,13 @@ export default function GamesOverview() {
     }
   };
 
-  /* useEffect(() => {
+  /*
+  useEffect(() => {
     fetchGameList();
   }, [isCreateModalOpen, isDeleteModalOpen]);
 
    */
+
   useInterval(fetchGameList, 10000);
 
   if (loading) {
@@ -181,7 +184,12 @@ export default function GamesOverview() {
             title="Neues Spiel"
             rightButton={{callback: handleCreateGame, text: 'Starten'}}
         >
-          <Text>{errorDescription}</Text>
+          <NumberInput
+              min={1}
+              label="Anzahl der Runden"
+              value={numTurns}
+              onChange={handleNumTurnsChange}
+          />
         </ButtonModal>
         <Modal size={screenHeight * 0.8} opened={isQrModalOpen} onClose={closeQrModal} title="QR Code" closeOnClickOutside={false}>
           <Center>
