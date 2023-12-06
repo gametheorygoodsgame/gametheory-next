@@ -21,10 +21,6 @@ import LoadModal from '@/components/modals/loadModal';
 import ButtonModal from '@/components/modals/buttonModal';
 
 export default function CardSelection() {
-  const [windowWidth, setWindowWidth] = useState(
-      typeof window !== 'undefined' ? window.innerWidth : 0
-  );
-
   const [loading, setLoading] = useState(true);
 
   const [selectedCount, setSelectedCount] = useState(0);
@@ -108,7 +104,7 @@ export default function CardSelection() {
         const newCurrentTurn = game.currentTurn;
         setNumTurns(game.numTurns);
         setPlayerScore(getPlayerScore(game, playerId));
-        setRedCardHandValue(game.cardHandValue[currentTurn]);
+        setRedCardHandValue(game.cardHandValue ? game.cardHandValue[currentTurn] : 1);
 
         if (newCurrentTurn === 0) {
           openWaitingForGameStartModal();

@@ -1,6 +1,6 @@
 'use client';
 
-import React, {KeyboardEventHandler, MouseEvent, useRef, useState} from 'react';
+import React, { KeyboardEventHandler, MouseEvent, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
@@ -15,14 +15,13 @@ import {
   Stack,
   TextInput,
   Title,
-} from '@mantine/core';
+Text } from '@mantine/core';
+import { IconChevronRight } from '@tabler/icons-react';
+import { useDisclosure } from '@mantine/hooks';
 import { firebase } from '@/utils/firebaseApp';
 import * as notifications from '@/components/notifications/login/loginNotifications';
 import { logger } from '@/utils/logger';
-import {IconChevronRight} from "@tabler/icons-react";
-import ButtonModal from "@/components/modals/buttonModal";
-import {Text} from "@mantine/core";
-import {useDisclosure} from "@mantine/hooks";
+import ButtonModal from '@/components/modals/buttonModal';
 
 export default function DozentLogin() {
   const emailInputRef = useRef(null);
@@ -30,8 +29,8 @@ export default function DozentLogin() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [user, loading, error] = useAuthState(auth);
-  const [hasError, {open: openErrorModal, close: closeErrorModal}] = useDisclosure(false);
+  const [user, loading] = useAuthState(auth);
+  const [hasError, { open: openErrorModal, close: closeErrorModal }] = useDisclosure(false);
   const [errorDescription, setErrorDescription] = useState('');
 
   const handleLogin = async (e: MouseEvent<HTMLButtonElement> | KeyboardEvent) => {
@@ -62,6 +61,7 @@ export default function DozentLogin() {
 
   // Absenden des Formulars mit drücken der Enter-Taste ermöglichen
   // @ts-ignore
+  // eslint-disable-next-line max-len
   const handleKeyPress: KeyboardEventHandler<HTMLInputElement> = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       handleLogin(e);
@@ -82,10 +82,10 @@ export default function DozentLogin() {
     return (
       <>
         <ButtonModal
-            opened={hasError}
-            onClose={closeErrorModal}
-            title="Fehler"
-            rightButton={{callback: closeErrorModal, text: 'Schließen'}}
+          opened={hasError}
+          onClose={closeErrorModal}
+          title="Fehler"
+          rightButton={{ callback: closeErrorModal, text: 'Schließen' }}
         >
           <Text>{errorDescription}</Text>
         </ButtonModal>
@@ -120,9 +120,9 @@ export default function DozentLogin() {
                   Registrieren
                 </Link>
               </Stack>
-              <Link href="../../login/player" style={{ textDecoration: 'none' }} >
+              <Link href="../../login/player" style={{ textDecoration: 'none' }}>
                   <Container fz={14} c="darkgray" ta="right" mr={0} p={0} pt={20}>
-                    Studenten-Login  <IconChevronRight size={16} style={{ verticalAlign: 'text-bottom' }}/>
+                    Studenten-Login  <IconChevronRight size={16} style={{ verticalAlign: 'text-bottom' }} />
                   </Container>
               </Link>
             </Paper>

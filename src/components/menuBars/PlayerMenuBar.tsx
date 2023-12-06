@@ -9,7 +9,7 @@ import { useViewportSize } from '@mantine/hooks';
 import { theme } from '@/utils/theme';
 
 export default function PlayerMenuBar() {
-  const { height: screenHeight, width: screenWidth } = useViewportSize();
+  const { width: screenWidth } = useViewportSize();
 
   return (
     <Container bg="brand.7" fluid px={40} p={10}>

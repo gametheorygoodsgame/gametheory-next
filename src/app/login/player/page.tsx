@@ -1,17 +1,16 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import React, {KeyboardEventHandler, MouseEvent, useEffect, useState} from 'react';
+import React, { KeyboardEventHandler, MouseEvent, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Button, Center, Container, Paper, Stack, Text, TextInput, Title } from '@mantine/core';
+import { Button, Center, Container, Paper, Stack, Text, TextInput, Title, Loader } from '@mantine/core';
 import { GamePlayerApi, Player } from '@gametheorygoodsgame/gametheory-openapi/api';
+import { IconChevronRight } from '@tabler/icons-react';
+import { useDisclosure } from '@mantine/hooks';
 import * as loginNotifications from '@/components/notifications/login/loginNotifications';
 import * as notifications from '@/components/notifications/notifications';
 import { logger } from '@/utils/logger';
-import {IconChevronRight} from "@tabler/icons-react";
-import ButtonModal from "@/components/modals/buttonModal";
-import {useDisclosure} from "@mantine/hooks";
-import {Loader} from "@mantine/core";
+import ButtonModal from '@/components/modals/buttonModal';
 
 interface StudentLoginProps {
   gameIdIn: string;
@@ -21,13 +20,14 @@ export default function StudentLogin(props: StudentLoginProps) {
   const { gameIdIn } = props;
   const [playerName, setPlayerName] = useState('');
   const [gameId, setGameId] = useState<string | null>(null);
-  const [hasError, {open: openErrorModal, close: closeErrorModal}] = useDisclosure(false);
+  const [hasError, { open: openErrorModal, close: closeErrorModal }] = useDisclosure(false);
   const [errorDescription, setErrorDescription] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
   const router = useRouter();
   const gamePlayerApi = new GamePlayerApi();
 
   // @ts-ignore
+  // eslint-disable-next-line max-len
   const handleLoginSubmit = async (e: MouseEvent<HTMLButtonElement> | KeyboardEvent<HTMLInputElement>) => {
     e.preventDefault();
     loginNotifications.loginPending();
@@ -72,7 +72,7 @@ export default function StudentLogin(props: StudentLoginProps) {
         loginNotifications.loginFailed();
         logger.debug('Created login failed notification.');
       } else {
-        notifications.error({ message: JSON.stringify(response.data)});
+        notifications.error({ message: JSON.stringify(response.data) });
         logger.debug('Created login error notification.');
       }
     } catch (error) {
@@ -85,6 +85,7 @@ export default function StudentLogin(props: StudentLoginProps) {
 
   // Absenden des Formulars mit drücken der Enter-Taste ermöglichen
   // @ts-ignore
+  // eslint-disable-next-line max-len
   const handleKeyPress: KeyboardEventHandler<HTMLInputElement> = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       handleLoginSubmit(e);
@@ -106,10 +107,10 @@ export default function StudentLogin(props: StudentLoginProps) {
   return (
       <>
         <ButtonModal
-            opened={hasError}
-            onClose={closeErrorModal}
-            title="Fehler"
-            rightButton={{callback: closeErrorModal, text: 'Schließen'}}
+          opened={hasError}
+          onClose={closeErrorModal}
+          title="Fehler"
+          rightButton={{ callback: closeErrorModal, text: 'Schließen' }}
         >
           <Text>{errorDescription}</Text>
         </ButtonModal>
@@ -119,25 +120,25 @@ export default function StudentLogin(props: StudentLoginProps) {
             <Paper miw={300} withBorder shadow="md" p={20} mt={20} radius="md">
               <Stack gap="sm">
                 <TextInput
-                    label="Benutzername"
-                    value={playerName}
-                    onChange={(e) => setPlayerName(e.target.value.replace(/\s/g, ''))}
-                    onKeyDown={handleKeyPress}
+                  label="Benutzername"
+                  value={playerName}
+                  onChange={(e) => setPlayerName(e.target.value.replace(/\s/g, ''))}
+                  onKeyDown={handleKeyPress}
                 />
                 <TextInput
-                    label="Spiel-ID"
-                    value={gameId ?? ''}
+                  label="Spiel-ID"
+                  value={gameId ?? ''}
                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                    onChange={(e) => setGameId((_prevGameId) => e.target.value.replace(/\s/g, ''))}
-                    onKeyDown={handleKeyPress}
+                  onChange={(e) => setGameId((_prevGameId) => e.target.value.replace(/\s/g, ''))}
+                  onKeyDown={handleKeyPress}
                 />
                 <Button onClick={handleLoginSubmit} fullWidth my="xl">
                   Login
                 </Button>
               </Stack>
-              <Link href="../../login/gameMaster" style={{ textDecoration: 'none' }} >
+              <Link href="../../login/gameMaster" style={{ textDecoration: 'none' }}>
                 <Container fz={14} c="darkgray" ta="right" mr={0} p={0} pt={20}>
-                  Dozenten-Login  <IconChevronRight size={16} style={{ verticalAlign: 'text-bottom' }}/>
+                  Dozenten-Login  <IconChevronRight size={16} style={{ verticalAlign: 'text-bottom' }} />
                 </Container>
               </Link>
             </Paper>

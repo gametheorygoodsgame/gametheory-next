@@ -2,7 +2,7 @@ import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
 import '../global.css';
 import React from 'react';
-import {AppShell, ColorSchemeScript, Combobox, MantineProvider} from '@mantine/core';
+import { AppShell, ColorSchemeScript, MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import { theme } from '@/utils/theme';
 
@@ -11,7 +11,7 @@ export const metadata = {
     description: 'I am using Mantine with Next.js!',
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }){
+export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
         <html lang="en-US">
             <head>
@@ -21,13 +21,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }){
             <body>
                 <MantineProvider theme={theme}>
                     <AppShell
-                        transitionDuration={500}
-                        transitionTimingFunction="ease"
-                        header={{ height: 90 }}
-                        padding="xs"
-                        withBorder={false}
+                      transitionDuration={500}
+                      transitionTimingFunction="ease"
+                      header={{ height: 90 }}
+                      padding="xs"
+                      withBorder={false}
                     >
-                        <Notifications position={"bottom-right"}/>
+                        <Notifications position="bottom-right" />
                         {children}
                     </AppShell>
                 </MantineProvider>

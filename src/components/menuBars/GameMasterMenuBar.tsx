@@ -30,7 +30,7 @@ function MenuDropdown({ auth }: { auth: any }) {
 
 export default function GameMasterMenuBar() {
   const auth = getAuth(firebase);
-  const { height: screenHeight, width: screenWidth } = useViewportSize();
+  const { width: screenWidth } = useViewportSize();
 
   return (
     <Container bg="brand.7" fluid px={40} p={10}>

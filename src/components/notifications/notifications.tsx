@@ -8,7 +8,7 @@ export const error = ({ title, message }: { title?: string; message?: string }) 
     title: title ? `Upps, ${title}.😵‍💫` : 'Upps😵‍💫',
     message: message || 'Ein Fehler ist aufgetreten!',
     icon: <IconExclamationCircle size="1rem" />,
-    autoClose: 3000
+    autoClose: 3000,
   });
 };
 
@@ -19,7 +19,7 @@ export const success = ({ title, message }: { title?: string; message?: string }
     title: title ? `Erfolg, ${title}!` : 'Erfolg!',
     message: message || 'Operation erfolgreich!',
     icon: <IconCheck size="1rem" />,
-    autoClose: 3000
+    autoClose: 3000,
   });
 };
 

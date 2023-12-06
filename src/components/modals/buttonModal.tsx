@@ -1,10 +1,5 @@
-import {Button, Center, Container, Group, Loader, Modal, Stack, Text} from "@mantine/core";
-import React from "react";
-
-interface ButtonProps {
-    text: string;
-    callback: () => void;
-}
+import { Button, Container, Group, Modal, Stack } from '@mantine/core';
+import React from 'react';
 
 interface ButtonModalProps {
     children?: React.ReactNode;
@@ -21,9 +16,17 @@ interface ButtonModalProps {
     }
 }
 
-export default function ButtonModal({children, opened, onClose, leftButton, rightButton, title}: ButtonModalProps) {
-    return(
-        <Modal opened={opened} onClose={onClose} centered withCloseButton={false} title={title} closeOnClickOutside={false}>
+export default function ButtonModal({ children, opened, onClose, leftButton, rightButton, title }:
+    ButtonModalProps) {
+    return (
+        <Modal
+          opened={opened}
+          onClose={onClose}
+          centered
+          withCloseButton={false}
+          title={title}
+          closeOnClickOutside={false}
+        >
             <Container>
                 <Stack fz={18} fw={700} p={40} className="lbl-round">
                     {children}
@@ -31,10 +34,10 @@ export default function ButtonModal({children, opened, onClose, leftButton, righ
                 <Group justify="end">
                     {leftButton ? (
                         <Button
-                            variant="outline"
-                            color="#cc4444"
-                            bg="white"
-                            onClick={leftButton.callback}
+                          variant="outline"
+                          color="#cc4444"
+                          bg="white"
+                          onClick={leftButton.callback}
                         >
                             {leftButton.text}
                         </Button>

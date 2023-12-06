@@ -1,8 +1,8 @@
 'use client';
 
-import React, {forwardRef, useEffect, useImperativeHandle, useState} from 'react';
+import React, { forwardRef, useEffect, useState } from 'react';
 import { Bar, CartesianGrid, ComposedChart, Legend, Line, Tooltip, XAxis, YAxis } from 'recharts';
-import { Game, GameApi } from '@gametheorygoodsgame/gametheory-openapi/api';
+import { Game } from '@gametheorygoodsgame/gametheory-openapi/api';
 import { logger } from '@/utils/logger';
 
 type PlotProps = {
@@ -42,10 +42,10 @@ const Plot = forwardRef<any, PlotProps>((props, ref) => {
 
     return (
         <ComposedChart
-            width={portWidth - 500}
-            height={portHeight - 300}
-            data={gameStatistic}
-            margin={{
+          width={portWidth - 500}
+          height={portHeight - 300}
+          data={gameStatistic}
+          margin={{
                 top: 0,
                 right: 0,
                 left: 0,
