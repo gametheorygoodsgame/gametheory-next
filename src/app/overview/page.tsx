@@ -205,7 +205,7 @@ export default function GamesOverview() {
           <Center px={120}>
             <Stack maw={1200} w={screenWidth - 120}>
               <Group justify="end">
-                <ActionIcon c="brand" size="lg" bg="transparent" onClick={openCreateModal}>
+                <ActionIcon c="brand" size="lg" bg="transparent" onClick={openCreateModal} title="Neues Spiel">
                   <IconSquarePlus />
                 </ActionIcon>
               </Group>
