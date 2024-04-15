@@ -33,7 +33,7 @@ export function OverviewTable({
 }: OverviewTableProps) {
   const tableHeaders = [
     { label: '', dataKey:''}, //empty header for first column
-    { label: 'Spiel-ID', dataKey: 'id' },
+    { label: 'Spiel-Titel', dataKey: 'id' },
     { label: 'Anzahl der Spieler', dataKey: 'players.length' },
     { label: 'Runden', dataKey: 'currentTurn' },
   ];
@@ -74,9 +74,11 @@ export function OverviewTable({
             {tableHeaders.map((header, index) => (
               index === 0 ? null : //skip first empty table entry
               <Table.Td key={header.dataKey}>
-                {header.dataKey === 'currentTurn'
-                  ? `${getNestedValue(game, 'currentTurn')} / ${getNestedValue(game, 'numTurns')}`
-                  : getNestedValue(game, header.dataKey)}
+                {header.dataKey === 'id' 
+                  ? game.name
+                  : header.dataKey === 'currentTurn'
+                    ? `${getNestedValue(game, 'currentTurn')} / ${getNestedValue(game, 'numTurns')}`
+                    : getNestedValue(game, header.dataKey)}
               </Table.Td>
             ))}
             <Table.Td className="mantine-icon">
