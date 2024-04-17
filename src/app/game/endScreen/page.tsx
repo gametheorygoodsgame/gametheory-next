@@ -18,7 +18,7 @@ export default function endScreen() {
     const [gameId, setGameId] = useState<string>('');
     //const [playerId, setPlayerId] = useState<string>('');
     const [game, setGame] = useState<Game>();
-    const [map, setMap] = useState<Map<string, number>>();
+    //const [map, setMap] = useState<Map<string, number>>();
 
     const init = async () => {
         if (gameId !== '') {
@@ -28,21 +28,23 @@ export default function endScreen() {
             }
         }
     };
-    function tableContent(): Map<string, number> {
-        const result = new Map();
-        game?.players.forEach((player) => {
-            console.log('String lauf');
-            result.set(player.name, player.score);
-        });
-        console.log(result);
-        return result;
+    function tableContent() {
+        const players = game?.players;
+        // eslint-disable-next-line array-callback-return
         // @ts-ignore
-        //return new Map([...result.entries()].sort((a, b) => b[1] - a[1]));
+        const sortedPlayers = players?.sort((a, b) => b.score - a.score);
+        const rows = sortedPlayers?.map((player) => (
+            <Table.Tr key={player.name}>
+                <Table.Td>{player.name}</Table.Td>
+                <Table.Td>{player.score}</Table.Td>
+            </Table.Tr>
+        ));
+        return rows;
     }
 
     useEffect(() => {
         setGameId(getCookie('gameID'));
-        init().then(() => { setMap(tableContent()); });
+        init();
     }, [gameId]);
 
     return (
@@ -56,17 +58,17 @@ export default function endScreen() {
               wrap="wrap"
             >
                 <Container>
-                    <Text>Test text lorum </Text>
+                    <Text>Spielende!</Text>
                 </Container>
                 <Container>
                     <Table>
                         <Table.Thead>
                             <Table.Tr>
                                 <Table.Th>Name</Table.Th>
-                                <Table.Td>{JSON.stringify(map)}</Table.Td>
-                                <Table.Th>Score</Table.Th>
+                                <Table.Th>Kontostand</Table.Th>
                             </Table.Tr>
                         </Table.Thead>
+                        <Table.Tbody>{tableContent()}</Table.Tbody>
                     </Table>
                 </Container>
                 <Container>
