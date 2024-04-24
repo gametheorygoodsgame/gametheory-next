@@ -2,6 +2,7 @@
 
 import React, { useRef, useState } from 'react';
 import {
+  Badge,
   Button,
   Center,
   Container,
@@ -18,6 +19,7 @@ import { useDisclosure, useViewportSize } from '@mantine/hooks';
 import { Game, GameApi } from '@gametheorygoodsgame/gametheory-openapi/api';
 import { useParams, useRouter } from 'next/navigation';
 import PlayerList from '@/components/playerList/playerList';
+import GameWinner from '@/components/gameWinner/gameWinner';
 import Plot from '@/components/plot/plot';
 import { useInterval } from '@/utils/hooks';
 import { logger } from '@/utils/logger';
@@ -131,6 +133,10 @@ export default function GameOverviewGameMaster() {
             <Grid.Col span={1}>
               <ScrollArea h={screenHeight - 220}>
                 <PlayerList game={game} />
+                <Badge
+                  color='white' 
+                 ></Badge>
+                <GameWinner game= {game} />
               </ScrollArea>
             </Grid.Col>
             <Grid.Col span={5}>

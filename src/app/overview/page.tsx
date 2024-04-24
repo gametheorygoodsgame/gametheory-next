@@ -11,6 +11,7 @@ import {
   Space,
   Stack,
   Text,
+  TextInput, 
   Loader } from '@mantine/core';
 import { useDisclosure, useViewportSize } from '@mantine/hooks';
 import { IconSquarePlus } from '@tabler/icons-react';
@@ -37,6 +38,7 @@ export default function GamesOverview() {
   const [loading, setLoading] = useState(true);
 
   const [games, setGames] = useState<Game[]>([]);
+  const [gameName, setGameName] = useState("");
   const [numTurns, setNumTurns] = useState<number>(10);
   const [clipboardClicked, setClipboardClicked] = useState(false);
   const [deleteGameId, setDeleteGameId] = useState<string | null>(null);
@@ -108,6 +110,7 @@ export default function GamesOverview() {
     try {
       const game: Game = {
         id: '',
+        name: gameName,
         numTurns,
         currentTurn: 0,
         players: [],
@@ -183,6 +186,7 @@ export default function GamesOverview() {
           opened={isCreateModalOpen}
           onClose={closeCreateModal}
           title="Neues Spiel"
+          leftButton={{ callback: closeCreateModal, text: 'Abbrechen' }}
           rightButton={{ callback: handleCreateGame, text: 'Starten' }}
         >
           <NumberInput
@@ -190,6 +194,12 @@ export default function GamesOverview() {
             label="Anzahl der Runden"
             value={numTurns}
             onChange={handleNumTurnsChange}
+          />
+          <TextInput
+            label="Name des Spiels"
+            description="Kursname zwecks Auswertung sinnvoll"
+            value={gameName}
+            onChange={(event) => setGameName(event.target.value)}
           />
         </ButtonModal>
         <Modal size={screenHeight * 0.8} opened={isQrModalOpen} onClose={closeQrModal} title="QR Code" closeOnClickOutside={false}>
