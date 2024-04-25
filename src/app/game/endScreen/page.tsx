@@ -1,5 +1,5 @@
 'use client';
-
+ 
 import { GameApi } from '@gametheorygoodsgame/gametheory-openapi/api';
 import {
     Button,
@@ -10,16 +10,18 @@ import {
     Text,
 } from '@mantine/core';
 import React, { useEffect, useState } from 'react';
+import { IconArrowLeft } from '@tabler/icons-react';
+import GameWinner from '@/components/gameWinner/gameWinner';
 import { Game } from '@gametheorygoodsgame/gametheory-openapi';
 import { getCookie } from '@/utils/getCookie';
-
+ 
 export default function endScreen() {
     const gameApi = new GameApi();
     const [gameId, setGameId] = useState<string>('');
     //const [playerId, setPlayerId] = useState<string>('');
     const [game, setGame] = useState<Game>();
     //const [map, setMap] = useState<Map<string, number>>();
-
+ 
     const init = async () => {
         if (gameId !== '') {
             const response = await gameApi.getGameById(gameId);
@@ -41,24 +43,27 @@ export default function endScreen() {
         ));
         return rows;
     }
-
+ 
     useEffect(() => {
         setGameId(getCookie('gameID'));
         init();
     }, [gameId]);
-
+ 
     return (
         <Center>
             <Flex
               mih={50}
-              gap="md"
+              gap="xl"
               justify="flex-end"
               align="flex-end"
               direction="column"
               wrap="wrap"
             >
                 <Container>
-                    <Text>Spielende!</Text>
+                    <Text style={{textAlign: 'center', fontSize: '48px'}} >Spielende!</Text>
+                </Container>
+                <Container>
+                <GameWinner game= {game} />
                 </Container>
                 <Container>
                     <Table>
@@ -72,7 +77,9 @@ export default function endScreen() {
                     </Table>
                 </Container>
                 <Container>
-                    <Button>Zurück zur Hauptseite</Button>
+                    <Button leftSection={<IconArrowLeft size={18}/>}
+                    >Zurück zur Hauptseite
+                    </Button>
                 </Container>
             </Flex>
         </Center>

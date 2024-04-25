@@ -133,10 +133,6 @@ export default function GameOverviewGameMaster() {
             <Grid.Col span={1}>
               <ScrollArea h={screenHeight - 220}>
                 <PlayerList game={game} />
-                <Badge
-                  color='white' 
-                 ></Badge>
-                <GameWinner game= {game} />
               </ScrollArea>
             </Grid.Col>
             <Grid.Col span={5}>
