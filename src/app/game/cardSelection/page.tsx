@@ -95,9 +95,9 @@ export default function CardSelection() {
         setPlayerScore(getPlayerScore(game, playerId));
         setRedCardHandValue(game.cardHandValue ? game.cardHandValue[currentTurn] : 1);
 
-        /*if (game.isFinished === true) {
-
-        }*/
+        if (game.isFinished === true) {
+          router.push('../../game/endScreen');
+        }
 
         if (newCurrentTurn === 0) {
           openWaitingForGameStartModal();

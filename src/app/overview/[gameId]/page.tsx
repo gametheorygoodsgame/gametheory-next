@@ -77,6 +77,22 @@ export default function GameOverviewGameMaster() {
     }
   };
 
+  const finishGame = async () => {
+    try {
+      if (!game) {
+        throw new Error('Game not found');
+      }
+      // @ts-ignore
+      const response = await gameApi.updateGameById(gameId, game);
+      setGame(response.data);
+      logger.info('Updated game data successfully.');
+      logger.debug(response.data);
+      closeTurnProgressionModal();
+    } catch (error) {
+      logger.error('Error updating data: ', error);
+    }
+  };
+
   /*
   useEffect(() => {
     fetchGame();
@@ -152,14 +168,26 @@ export default function GameOverviewGameMaster() {
                   <Button variant="outline" color="#cc4444" bg="white" onClick={() => router.push('/overview')}>
                     Übersicht
                   </Button>
-                  {game?.currentTurn === 0 ? (
-                      <Button bg="brand.0" onClick={openTurnProgressionModal}>
-                        Spiel Starten
+                  {game?.isFinished ? (
+                      <Button
+                        bg="brand.2"
+                        onClick={() => {
+                        router.push('/overview');
+                      }}
+                      >
+                        Zur Auswertung
                       </Button>
                   ) : (
-                      <Button onClick={openTurnProgressionModal}>
-                        Nächste Runde
-                      </Button>
+                      // eslint-disable-next-line no-unsafe-optional-chaining
+                      game?.currentTurn === (game ? game?.numTurns : -1) ? (
+                          <Button bg="brand.0" onClick={finishGame}>Spiel Beenden</Button>
+                      ) : (
+                          game?.currentTurn === 0 ? (
+                              <Button bg="brand.0" onClick={openTurnProgressionModal}>Spiel Starten</Button>
+                          ) : (
+                              <Button onClick={openTurnProgressionModal}>Nächste Runde</Button>
+                          )
+                      )
                   )}
                 </Group>
               </Stack>

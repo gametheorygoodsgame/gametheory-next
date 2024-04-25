@@ -11,7 +11,9 @@ import {
 } from '@mantine/core';
 import React, { useEffect, useState } from 'react';
 import { Game } from '@gametheorygoodsgame/gametheory-openapi';
+import { router } from 'next/client';
 import { getCookie } from '@/utils/getCookie';
+import {useRouter} from "next/navigation";
 
 export default function endScreen() {
     const gameApi = new GameApi();
@@ -19,6 +21,7 @@ export default function endScreen() {
     //const [playerId, setPlayerId] = useState<string>('');
     const [game, setGame] = useState<Game>();
     //const [map, setMap] = useState<Map<string, number>>();
+    const router = useRouter();
 
     const init = async () => {
         if (gameId !== '') {
@@ -72,7 +75,12 @@ export default function endScreen() {
                     </Table>
                 </Container>
                 <Container>
-                    <Button>Zurück zur Hauptseite</Button>
+                    <Button
+                      onClick={() => {
+                            router.push('/login/player');
+                        }}
+                    >Zurück zur Hauptseite
+                    </Button>
                 </Container>
             </Flex>
         </Center>
