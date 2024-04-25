@@ -19,6 +19,7 @@ import PlayCardGrid from '@/components/playCards/playCardGrid';
 import { useInterval } from '@/utils/hooks';
 import LoadModal from '@/components/modals/loadModal';
 import ButtonModal from '@/components/modals/buttonModal';
+import { getCookie } from '@/utils/getCookie';
 
 export default function CardSelection() {
   const [loading, setLoading] = useState(true);
@@ -83,18 +84,6 @@ export default function CardSelection() {
     });
   }, [currentTurn]);
 
-  const getCookie = (name: string) => {
-    const cookies = document.cookie.split(';');
-    // eslint-disable-next-line no-plusplus
-    for (let i = 0; i < cookies.length; i++) {
-      const cookie = cookies[i].trim();
-      if (cookie.startsWith(`${name}=`)) {
-        return cookie.substring(name.length + 1);
-      }
-    }
-    return null;
-  };
-
   const checkGameStatus = async () => {
     try {
       const response = await gameApi.getGameById(gameId);
@@ -105,6 +94,10 @@ export default function CardSelection() {
         setNumTurns(game.numTurns);
         setPlayerScore(getPlayerScore(game, playerId));
         setRedCardHandValue(game.cardHandValue ? game.cardHandValue[currentTurn] : 1);
+
+        /*if (game.isFinished === true) {
+
+        }*/
 
         if (newCurrentTurn === 0) {
           openWaitingForGameStartModal();
