@@ -3,9 +3,9 @@ import { ActionIcon, Group, Table } from '@mantine/core';
 import {
   IconClipboard,
   IconClipboardCheck,
-  IconDoorEnter,
   IconQrcode,
   IconTrash,
+  IconPlayerPlay,
 } from '@tabler/icons-react';
 import React from 'react';
 import classes from './overviewTable.module.css';
@@ -46,7 +46,7 @@ export function OverviewTable({
     if (clipboardClicked && gameId === clipboardGameID) {
       return <IconClipboardCheck className={`mantine-icon ${classes.green}`} />;
     }
-      return <IconClipboard className={`mantine-icon ${classes.brand}`} />;
+    return <IconClipboard className={`mantine-icon ${classes.brand}`} />;
   };
 
   return (
@@ -61,10 +61,14 @@ export function OverviewTable({
       </Table.Thead>
       <Table.Tbody>
         {games.map((game: Game) => (
-          <Table.Tr className={classes.noselect} key={game.id} onDoubleClick={(event) => handleRowClick(game.id, event)}>
+          <Table.Tr
+            className={classes.noselect}
+            key={game.id}
+            onDoubleClick={(event) => handleRowClick(game.id, event)}
+          >
             <Table.Td className="mantine-icon">
               <ActionIcon className="mantine-icon" variant="transparent">
-                <IconDoorEnter
+                <IconPlayerPlay
                   className={`mantine-icon ${classes.green}`}
                   onClick={() => handleOpenButtonClick(game.id)}
                 />
