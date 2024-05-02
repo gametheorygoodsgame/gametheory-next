@@ -56,9 +56,9 @@ const Plot = forwardRef<any, PlotProps>((props, ref) => {
             <XAxis dataKey="turn" />
             <Tooltip />
             <Legend />
-            <Bar dataKey="numOfRedCardsPlayed" name="Anzahl Roter Karten im Pot" fill="#334d80" />
-            <Line dataKey="redCardHandValue" name="Wert der Roten Karte" stroke="#cc4444" />
-            <YAxis />
+            <Bar dataKey="numOfRedCardsPlayed" name="Anzahl Roter Karten im Pot" fill="#334d80" barSize={60} />
+            <Line dataKey="redCardHandValue" name="Wert der Roten Karte" stroke="#cc4444" strokeWidth={3} />
+            <YAxis allowDecimals={false} />
         </ComposedChart>
     );
 });
