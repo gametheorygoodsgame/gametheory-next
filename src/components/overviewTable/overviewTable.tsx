@@ -32,7 +32,8 @@ export function OverviewTable({
   handleRowClick,
 }: OverviewTableProps) {
   const tableHeaders = [
-    { label: 'Spiel-ID', dataKey: 'id' },
+    { label: '', dataKey:''}, //empty header for first column
+    { label: 'Spiel-Titel', dataKey: 'name' },
     { label: 'Anzahl der Spieler', dataKey: 'players.length' },
     { label: 'Runden', dataKey: 'currentTurn' },
   ];
@@ -56,34 +57,31 @@ export function OverviewTable({
           {tableHeaders.map((header) => (
             <Table.Th key={header.label}>{header.label}</Table.Th>
           ))}
-          <Table.Th />
+          <Table.Th/>
         </Table.Tr>
       </Table.Thead>
       <Table.Tbody>
         {games.map((game: Game) => (
-          <Table.Tr
-            className={classes.noselect}
-            key={game.id}
-            onDoubleClick={(event) => handleRowClick(game.id, event)}
-          >
+          <Table.Tr className={classes.noselect} key={game.id} onDoubleClick={(event) => handleRowClick(game.id, event)}>
             <Table.Td className="mantine-icon">
-              <ActionIcon className="mantine-icon" variant="transparent">
+              <ActionIcon className="mantine-icon" variant="transparent" title="Spiel betreten">
                 <IconPlayerPlay
                   className={`mantine-icon ${classes.green}`}
                   onClick={() => handleOpenButtonClick(game.id)}
                 />
               </ActionIcon>
             </Table.Td>
-            {tableHeaders.map((header) => (
+            {tableHeaders.map((header, index) => (
+              index === 0 ? null : //skip first empty table entry
               <Table.Td key={header.dataKey}>
-                {header.dataKey === 'currentTurn'
-                  ? `${getNestedValue(game, 'currentTurn')} / ${getNestedValue(game, 'numTurns')}`
-                  : getNestedValue(game, header.dataKey)}
+                  {header.dataKey === 'currentTurn'
+                    ? `${getNestedValue(game, 'currentTurn')} / ${getNestedValue(game, 'numTurns')}`
+                    : getNestedValue(game, header.dataKey)}
               </Table.Td>
             ))}
             <Table.Td className="mantine-icon">
               <Group className="mantine-icon">
-                <ActionIcon className="mantine-icon" variant="transparent">
+                <ActionIcon className="mantine-icon" variant="transparent" title="Spiel löschen">
                   <IconTrash
                     className={`mantine-icon ${classes.red}`}
                     onClick={() => handleDeleteButtonClick(game.id)}
@@ -92,11 +90,12 @@ export function OverviewTable({
                 <ActionIcon
                   className="mantine-icon"
                   variant="transparent"
+                  title="Link kopieren"
                   onClick={(event) => handleClipboardButtonClick(event, game.id)}
                 >
                   {renderClipboardIcon(game.id)}
                 </ActionIcon>
-                <ActionIcon className="mantine-icon" variant="transparent">
+                <ActionIcon className="mantine-icon" variant="transparent" title="QR Code anzeigen">
                   <IconQrcode
                     className={`mantine-icon ${classes.brand}`}
                     onClick={() => handleQRButtonClick(game.id)}
