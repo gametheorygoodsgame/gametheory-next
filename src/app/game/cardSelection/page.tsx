@@ -5,7 +5,9 @@ import {
   Badge,
   Button,
   Center,
-  Container, Flex,
+  Container, 
+  Grid,
+  Flex,
   Group,
   Loader,
   Text,
@@ -28,6 +30,7 @@ export default function CardSelection() {
   const [currentTurn, setCurrentTurn] = useState(0);
   const [numTurns, setNumTurns] = useState(0);
   const [numRedCards, setNumRedCards] = useState(0);
+  const [potCards, setPotCards] = useState<number[]>([]);
   const [isWaitingForNextTurn, { open: openWaitingForNextTurnModal,
     close: closeWaitingForNextTurnModal }] = useDisclosure(false);
   const [hasError, { open: openErrorModal, close: closeErrorModal }] = useDisclosure(false);
@@ -92,6 +95,7 @@ export default function CardSelection() {
       if (response.status === 200 && game) {
         const newCurrentTurn = game.currentTurn;
         setNumTurns(game.numTurns);
+        setPotCards(game.potCards);
         setPlayerScore(getPlayerScore(game, playerId));
         setRedCardHandValue(game.cardHandValue ? game.cardHandValue[currentTurn] : 1);
 
@@ -222,8 +226,11 @@ export default function CardSelection() {
             wrap="wrap"
           >
             <Badge size="xl" color="#cc4444" w="100%">Roter Kartenwert: {redCardHandValue}</Badge>
-            <Badge size="xl" color="#334d80" w="100%">Konto: {playerScore} ct</Badge>
+            <Badge size="xl" color="#334d80" w="100%" >Konto: {playerScore} ct</Badge>
             <Badge size="xl" color="#334d80" w="100%">Runde: {currentTurn} / {numTurns}</Badge>
+            {currentTurn > 0 &&(
+              <Badge size="xl" color="#334d80" w="100%"> Anzahl Karten im Pot letzte Runde: {potCards[currentTurn - 1]}</Badge>
+            )}
           </Flex>
           <PlayCardGrid onChange={handleInputChangeCard} />
           <Center my="xl">
