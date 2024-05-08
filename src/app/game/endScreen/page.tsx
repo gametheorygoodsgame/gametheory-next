@@ -11,6 +11,8 @@ import {
 } from '@mantine/core';
 import React, { useEffect, useState } from 'react';
 import { Game } from '@gametheorygoodsgame/gametheory-openapi';
+import { IconArrowLeft } from '@tabler/icons-react';
+import GameWinner from '@/components/gameWinner/gameWinner';
 import { router } from 'next/client';
 import { getCookie } from '@/utils/getCookie';
 import {useRouter} from "next/navigation";
@@ -54,14 +56,17 @@ export default function endScreen() {
         <Center>
             <Flex
               mih={50}
-              gap="md"
+              gap="xl"
               justify="flex-end"
               align="flex-end"
               direction="column"
               wrap="wrap"
             >
                 <Container>
-                    <Text>Spielende!</Text>
+                    <Text style={{textAlign: 'center', fontSize: '48px'}} >Spielende!</Text>
+                </Container>
+                <Container>
+                    <GameWinner game= {game} />
                 </Container>
                 <Container>
                     <Table>
@@ -76,6 +81,7 @@ export default function endScreen() {
                 </Container>
                 <Container>
                     <Button
+                    leftSection={<IconArrowLeft size={18}/>}
                       onClick={() => {
                             router.push('/login/player');
                         }}
