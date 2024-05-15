@@ -94,7 +94,7 @@ export default function StudentLogin(props: StudentLoginProps) {
 
   useEffect(() => {
     setGameId(gameIdIn);
-  }, []);
+  }, [gameIdIn]);
 
   if (loading) {
     return (

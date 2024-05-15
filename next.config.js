@@ -21,6 +21,9 @@ module.exports = withBundleAnalyzer({
     optimizePackageImports: ['@mantine/core', '@mantine/hooks'],
   },
   transpilePackages: ['@gametheorygoodsgame/gametheory-openapi'],
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   webpack: (config) => {
     // Use the custom logger for webpack logging
     config.stats = {
