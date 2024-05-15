@@ -10,7 +10,7 @@ export interface PlayCardProps {
 }
 
 const PlayCard: React.FC<PlayCardProps> = React.memo(({ id, onChange, side }) => (
-        <div>
+        <div className="item">
             <label htmlFor={`playCard-${id}`} className={`playCard-label playCardBody-${side}`}>
                 {/* Added a class 'selected' when the card is checked */}
                 <input

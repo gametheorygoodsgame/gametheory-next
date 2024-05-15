@@ -1,0 +1,13 @@
+.wrapper {
+    width: 95%;
+    margin: 0 auto; /* Horizontally center the wrapper */
+    margin-top: 40px;
+    max-width: 1050px;
+}
+
+.container {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    box-sizing: border-box; /* Include padding in width calculation */
+}

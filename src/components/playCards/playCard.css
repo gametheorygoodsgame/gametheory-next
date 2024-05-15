@@ -1,17 +1,26 @@
 .playCardBody {
-    border-radius: 35px;
+    border-radius: 8%;
     box-shadow: 0 2px 4px 0 rgba(219, 215, 215, 0);
-    height: 345px;
-    width: 230px;
-    margin: 30px;
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    max-width: 230px;
+
+}
+
+.item {
+    width: 22%; /* Adjusted width with padding */
+    /* padding: 20px; */
+    box-sizing: border-box;
 }
 
 .playCardBody-left {
     background: #cc4444 url('../../../public/CardRed.png') no-repeat center center;
+    background-size: cover;
 }
 
 .playCardBody-right {
     background: #222530 url('../../../public/CardBlack.png') no-repeat center center;
+    background-size: cover;
 }
 
 .playCardBody:hover,
@@ -46,30 +55,5 @@
 }
 
 
-/* For screens wider than 768px */
-@media (min-width: 768px) {
-    .playCardBody-left,
-    .playCardBody-right {
-        max-height: 450px;
-        max-width: 300px;
-    }
-}
 
-/* For screens smaller than 768px */
-@media (max-width: 767px) {
-    .playCardBody-left,
-    .playCardBody-right {
-        max-height: 225px;
-        max-width: 150px;
-    }
-}
-
-/* For screens smaller than 404px */
-@media (max-width: 403px) {
-    .playCardBody-left,
-    .playCardBody-right {
-        max-height: 180px;
-        max-width: 120px;
-    }
-}
 
