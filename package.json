@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "prod_start": "NODE_ENV=production node server.js",
+    "prod_start": "NODE_ENV=production node app.js",
     "export": "next export",
     "analyze": "ANALYZE=true next build",
     "start": "next start",
