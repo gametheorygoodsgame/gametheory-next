@@ -41,18 +41,13 @@ export default function GameOverviewGameMaster() {
     close: closeTurnProgressionModal }] = useDisclosure(false);
 
   const gameApi = new GameApi();
-  const requestOptions = {
-    headers: {
-      Origin: 'https://gmt.atlasproject.de', // Set the 'Origin' header
-    },
-  };
 
   async function fetchGame() {
     try {
       if (!gameId) {
         throw new Error('No Game ID.');
       }
-      const response = await gameApi.getGameById(gameId, requestOptions);
+      const response = await gameApi.getGameById(gameId);
       setGame(response.data);
       logger.info('Fetched game data successfully.');
       logger.debug(response.data);
@@ -72,7 +67,7 @@ export default function GameOverviewGameMaster() {
       }
       game.cardHandValue.push(typeof redCardHandValue === 'number' ? redCardHandValue : parseInt(redCardHandValue, 10));
       // @ts-ignore
-      const response = await gameApi.updateGameById(gameId, game, requestOptions);
+      const response = await gameApi.updateGameById(gameId, game);
       setGame(response.data);
       logger.info('Updated game data successfully.');
       logger.debug(response.data);
@@ -88,7 +83,7 @@ export default function GameOverviewGameMaster() {
         throw new Error('Game not found');
       }
       // @ts-ignore
-      const response = await gameApi.updateGameById(gameId, game, requestOptions);
+      const response = await gameApi.updateGameById(gameId, game);
       setGame(response.data);
       logger.info('Updated game data successfully.');
       logger.debug(response.data);

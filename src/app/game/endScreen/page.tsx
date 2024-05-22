@@ -25,15 +25,9 @@ export default function endScreen() {
     //const [map, setMap] = useState<Map<string, number>>();
     const router = useRouter();
 
-    const requestOptions = {
-        headers: {
-            Origin: 'https://gmt.atlasproject.de', // Set the 'Origin' header
-        },
-    };
-
     const init = async () => {
         if (gameId !== '') {
-            const response = await gameApi.getGameById(gameId, requestOptions);
+            const response = await gameApi.getGameById(gameId);
             if (response.status === 200 && response.data) {
                 setGame(response.data);
             }

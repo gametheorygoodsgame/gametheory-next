@@ -45,15 +45,9 @@ export default function GamesOverview() {
   const [clipboardGameId, setClipboardGameId] = useState<string | null>(null);
   const [qrGameID, setQRGameId] = useState<string | null>(null);
 
-  const requestOptions = {
-    headers: {
-      Origin: 'https://gmt.atlasproject.de', // Set the 'Origin' header
-    },
-  };
-
   async function fetchGameList() {
     try {
-      const response = await gameApi.getAllGames(requestOptions);
+      const response = await gameApi.getAllGames();
       setGames(response.data);
       logger.info('Fetched game data successfully.');
       logger.debug(response.data);
@@ -124,7 +118,7 @@ export default function GamesOverview() {
         cardPotValue: [0],
         potCards: [0],
       };
-      await gameApi.createGame(game, requestOptions);
+      await gameApi.createGame(game);
       closeCreateModal();
       fetchGameList();
       logger.debug(game);
@@ -138,7 +132,7 @@ export default function GamesOverview() {
   const handleDeleteGame = async () => {
     if (deleteGameId !== null) {
       try {
-        await gameApi.deleteGameById(deleteGameId, requestOptions);
+        await gameApi.deleteGameById(deleteGameId);
         await fetchGameList();
         closeDeleteModal();
         logger.debug('Delete modal closed.');
