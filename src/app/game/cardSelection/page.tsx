@@ -11,6 +11,7 @@ import {
   Group,
   Loader,
   Text,
+  ColorInput,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useRouter } from 'next/navigation';
@@ -217,21 +218,25 @@ export default function CardSelection() {
               justifyContent: 'center',
             }}
         >
-          <Flex
+         <Flex
             mih={50}
             gap="md"
-            justify="flex-end"
-            align="flex-end"
-            direction="column"
-            wrap="wrap"
+            justify="space-between"
+            align="center"
+            direction="row"
+            w="100%"
           >
-            <Badge size="xl" color="#cc4444" w="100%">Roter Kartenwert: {redCardHandValue}</Badge>
-            <Badge size="xl" color="#334d80" w="100%" >Konto: {playerScore} ct</Badge>
-            <Badge size="xl" color="#334d80" w="100%">Runde: {currentTurn} / {numTurns}</Badge>
-            {currentTurn > 0 &&(
-              <Badge size="xl" color="#334d80" w="100%"> Anzahl Karten im Pot letzte Runde: {potCards[currentTurn - 1]}</Badge>
-            )}
+            <Text size="xl" c={'#334d80'} fw ={900} >Runde: {currentTurn} / {numTurns}</Text>
+            <Badge size="xl" color="#334d80">Roter Kartenwert der aktuellen Runde: {redCardHandValue}</Badge>
+            <Text size="xl" c={"#334d80"} fw={900} >Konto: {playerScore} ct</Text>
           </Flex>
+          {currentTurn > 0 && (
+            <Center>
+              <Badge size="xl" color="#334d80" w="100%">
+                Anzahl der roten Karten im Pot der letzten Runde: {potCards[currentTurn - 1]}
+              </Badge>
+            </Center>
+          )}
           <PlayCardGrid onChange={handleInputChangeCard} />
           <Center my="xl">
             <Button
