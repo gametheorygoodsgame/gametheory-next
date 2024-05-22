@@ -1,5 +1,5 @@
 import { Game } from '@gametheorygoodsgame/gametheory-openapi';
-import { ActionIcon, Group, Table } from '@mantine/core';
+import { ActionIcon, Group, Table, Tooltip } from '@mantine/core';
 import {
   IconClipboard,
   IconClipboardCheck,
@@ -47,7 +47,7 @@ export function OverviewTable({
     if (clipboardClicked && gameId === clipboardGameID) {
       return <IconClipboardCheck className={`mantine-icon ${classes.green}`} />;
     }
-    return <IconClipboard className={`mantine-icon ${classes.brand}`} />;
+    return <Tooltip label = "Link kopieren"><IconClipboard className={`mantine-icon ${classes.brand}`} /></Tooltip>;
   };
 
   return (
@@ -64,11 +64,13 @@ export function OverviewTable({
         {games.map((game: Game) => (
           <Table.Tr className={classes.noselect} key={game.id} onDoubleClick={(event) => handleRowClick(game.id, event)}>
             <Table.Td className="mantine-icon">
-              <ActionIcon className="mantine-icon" variant="transparent" title="Spiel betreten">
+              <ActionIcon className="mantine-icon" variant="transparent">
+                <Tooltip label="Spiel betreten">
                 <IconPlayerPlay
                   className={`mantine-icon ${classes.green}`}
                   onClick={() => handleOpenButtonClick(game.id)}
                 />
+                </Tooltip>
               </ActionIcon>
             </Table.Td>
             {tableHeaders.map((header, index) => (
@@ -81,25 +83,28 @@ export function OverviewTable({
             ))}
             <Table.Td className="mantine-icon">
               <Group className="mantine-icon">
-                <ActionIcon className="mantine-icon" variant="transparent" title="Spiel löschen">
+                <ActionIcon className="mantine-icon" variant="transparent">
+                  <Tooltip label="Spiel löschen">
                   <IconTrash
                     className={`mantine-icon ${classes.red}`}
                     onClick={() => handleDeleteButtonClick(game.id)}
                   />
+                  </Tooltip>
                 </ActionIcon>
                 <ActionIcon
                   className="mantine-icon"
                   variant="transparent"
-                  title="Link kopieren"
                   onClick={(event) => handleClipboardButtonClick(event, game.id)}
                 >
                   {renderClipboardIcon(game.id)}
                 </ActionIcon>
-                <ActionIcon className="mantine-icon" variant="transparent" title="QR Code anzeigen">
+                <ActionIcon className="mantine-icon" variant="transparent">
+                  <Tooltip label="QR Code anzeigen">
                   <IconQrcode
                     className={`mantine-icon ${classes.brand}`}
                     onClick={() => handleQRButtonClick(game.id)}
                   />
+                  </Tooltip>
                 </ActionIcon>
               </Group>
             </Table.Td>

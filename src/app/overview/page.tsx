@@ -12,6 +12,7 @@ import {
   Stack,
   Text,
   TextInput,
+  Tooltip,
   Loader } from '@mantine/core';
 import { useDisclosure, useViewportSize } from '@mantine/hooks';
 import { IconSquarePlus } from '@tabler/icons-react';
@@ -215,9 +216,11 @@ export default function GamesOverview() {
           <Center px={120}>
             <Stack maw={1200} w={screenWidth - 120}>
               <Group justify="end">
+                <Tooltip label ="Neues Spiel erstellen">
                 <ActionIcon c="brand" size="lg" bg="transparent" onClick={openCreateModal}>
                   <IconSquarePlus />
                 </ActionIcon>
+                </Tooltip>
               </Group>
               <OverviewTable
                 games={games}
