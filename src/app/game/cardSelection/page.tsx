@@ -13,6 +13,14 @@ import {
   Text,
   Tooltip,
 } from '@mantine/core';
+import {
+ IconHistory,
+ IconCards, 
+ IconPigMoney,
+ IconStack,
+ IconPlayCard,
+ IconRoad
+} from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import { useRouter } from 'next/navigation';
 import { Game, GameApi, GamePlayerMoveApi, Move } from '@gametheorygoodsgame/gametheory-openapi/api';
@@ -226,15 +234,36 @@ export default function CardSelection() {
             direction="row"
             w="100%"
           >
-            <Text size="xl" c={'#334d80'} fw ={900} >Runde: {currentTurn} / {numTurns}</Text>
-            <Badge size="xl" color="#334d80">Roter Kartenwert der aktuellen Runde: {redCardHandValue}</Badge>
-            <Text size="xl" c={"#334d80"} fw={900} >Konto: {playerScore} ct</Text>
+            <Tooltip label="Gespielte Runden" events={{hover:true, focus:true, touch:true}}>
+              <Flex align={Center}>
+                <IconRoad size={50} color='#334d80'/>
+                <Text size="xl" c={'#334d80'} fw ={900} ml={10}>  {currentTurn} / {numTurns} </Text>
+            </Flex>
+            </Tooltip>
+            <Tooltip label="Aktueller roter Kartenwert" events={{hover:true, focus:true, touch:true}}>
+              <Flex>
+                <IconPlayCard color='#cc4444' size={45}/>
+              <Text size="xl" c={"#334d80"} fw ={900} ta={Center}> -Wert:  {redCardHandValue}</Text>
+              </Flex>
+           
+            </Tooltip>
+            <Tooltip label="Kontostand" events={{hover:true, focus:true, touch:true}}>
+              <Flex align={Center}>
+            <Text size="xl" c={"#334d80"} fw={900} ml={10} > {playerScore} ct </Text>
+            <IconPigMoney size={50}/>
+            </Flex>
+            </Tooltip>
           </Flex>
           {currentTurn > 0 && (
             <Center>
-              <Badge size="xl" color="#334d80" w="100%">
-                Anzahl der roten Karten im Pot der letzten Runde: {potCards[currentTurn - 1]}
-              </Badge>
+              <Tooltip label="Anzahl roter Karten im Pot der letzten Runde" events={{hover:true, focus:true, touch:true}}>
+                <Flex align={Center}>
+                <IconCards size={45} color='#334d80'/>
+                <Text size="xl" c={"#334d80"} w="100%" fw={900} ml={10}> - Pot: {potCards[currentTurn - 1]}
+                </Text>
+              </Flex>
+              </Tooltip>
+              
             </Center>
           )}
           <PlayCardGrid onChange={handleInputChangeCard} />
