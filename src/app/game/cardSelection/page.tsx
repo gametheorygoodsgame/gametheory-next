@@ -5,7 +5,7 @@ import {
   Badge,
   Button,
   Center,
-  Container, 
+  Container,
   Grid,
   Flex,
   Group,
@@ -46,6 +46,12 @@ export default function CardSelection() {
   const gameApi = new GameApi();
   const gamePlayerMoveApi = new GamePlayerMoveApi();
   const router = useRouter();
+
+  const requestOptions = {
+    headers: {
+      Origin: 'https://gmt.atlasproject.de', // Set the 'Origin' header
+    },
+  };
 
   const handleInputChangeCard = (event: React.ChangeEvent<HTMLInputElement>, side: string) => {
     const target = event.target as HTMLInputElement;
@@ -89,7 +95,7 @@ export default function CardSelection() {
 
   const checkGameStatus = async () => {
     try {
-      const response = await gameApi.getGameById(gameId);
+      const response = await gameApi.getGameById(gameId, requestOptions);
       const game: Game = response.data;
 
       if (response.status === 200 && game) {
@@ -226,9 +232,9 @@ export default function CardSelection() {
             wrap="wrap"
           >
             <Badge size="xl" color="#cc4444" w="100%">Roter Kartenwert: {redCardHandValue}</Badge>
-            <Badge size="xl" color="#334d80" w="100%" >Konto: {playerScore} ct</Badge>
+            <Badge size="xl" color="#334d80" w="100%">Konto: {playerScore} ct</Badge>
             <Badge size="xl" color="#334d80" w="100%">Runde: {currentTurn} / {numTurns}</Badge>
-            {currentTurn > 0 &&(
+            {currentTurn > 0 && (
               <Badge size="xl" color="#334d80" w="100%"> Anzahl Karten im Pot letzte Runde: {potCards[currentTurn - 1]}</Badge>
             )}
           </Flex>

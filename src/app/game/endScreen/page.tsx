@@ -12,10 +12,10 @@ import {
 import React, { useEffect, useState } from 'react';
 import { Game } from '@gametheorygoodsgame/gametheory-openapi';
 import { IconArrowLeft } from '@tabler/icons-react';
-import GameWinner from '@/components/gameWinner/gameWinner';
 import { router } from 'next/client';
+import { useRouter } from 'next/navigation';
+import GameWinner from '@/components/gameWinner/gameWinner';
 import { getCookie } from '@/utils/getCookie';
-import {useRouter} from "next/navigation";
 
 export default function endScreen() {
     const gameApi = new GameApi();
@@ -25,9 +25,15 @@ export default function endScreen() {
     //const [map, setMap] = useState<Map<string, number>>();
     const router = useRouter();
 
+    const requestOptions = {
+        headers: {
+            Origin: 'https://gmt.atlasproject.de', // Set the 'Origin' header
+        },
+    };
+
     const init = async () => {
         if (gameId !== '') {
-            const response = await gameApi.getGameById(gameId);
+            const response = await gameApi.getGameById(gameId, requestOptions);
             if (response.status === 200 && response.data) {
                 setGame(response.data);
             }
@@ -63,10 +69,10 @@ export default function endScreen() {
               wrap="wrap"
             >
                 <Container>
-                    <Text style={{textAlign: 'center', fontSize: '48px'}} >Spielende!</Text>
+                    <Text style={{ textAlign: 'center', fontSize: '48px' }}>Spielende!</Text>
                 </Container>
                 <Container>
-                    <GameWinner game= {game} />
+                    <GameWinner game={game} />
                 </Container>
                 <Container>
                     <Table>
@@ -81,7 +87,7 @@ export default function endScreen() {
                 </Container>
                 <Container>
                     <Button
-                    leftSection={<IconArrowLeft size={18}/>}
+                      leftSection={<IconArrowLeft size={18} />}
                       onClick={() => {
                             router.push('/login/player');
                         }}

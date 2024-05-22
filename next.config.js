@@ -24,6 +24,7 @@ module.exports = withBundleAnalyzer({
   typescript: {
     ignoreBuildErrors: true,
   },
+  distDir: 'build',
   webpack: (config) => {
     // Use the custom logger for webpack logging
     config.stats = {
