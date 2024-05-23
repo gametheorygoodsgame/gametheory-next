@@ -19,8 +19,10 @@ import {
  IconPigMoney,
  IconStack,
  IconPlayCard,
- IconRoad
+ IconRoad,
+ IconRotateClockwise
 } from '@tabler/icons-react';
+import { GiClockwork } from 'react-icons/gi'
 import { useDisclosure } from '@mantine/hooks';
 import { useRouter } from 'next/navigation';
 import { Game, GameApi, GamePlayerMoveApi, Move } from '@gametheorygoodsgame/gametheory-openapi/api';
@@ -236,7 +238,7 @@ export default function CardSelection() {
           >
             <Tooltip label="Gespielte Runden" events={{hover:true, focus:true, touch:true}}>
               <Flex align={Center}>
-                <IconRoad size={50} color='#334d80'/>
+                <IconRotateClockwise size={50} color='#334d80'/>
                 <Text size="xl" c={'#334d80'} fw ={900} ml={10}>  {currentTurn} / {numTurns} </Text>
             </Flex>
             </Tooltip>
@@ -250,7 +252,7 @@ export default function CardSelection() {
             <Tooltip label="Kontostand" events={{hover:true, focus:true, touch:true}}>
               <Flex align={Center}>
             <Text size="xl" c={"#334d80"} fw={900} ml={10} > {playerScore} ct </Text>
-            <IconPigMoney size={50}/>
+            <IconPigMoney size={50} color='#334d80'/>
             </Flex>
             </Tooltip>
           </Flex>
@@ -278,6 +280,9 @@ export default function CardSelection() {
               {selectedCount !== 2 ? 'Bitte zwei Karten auswählen' : 'Auswahl bestätigen'}
             </Button>
           </Center>
+        </Container>
+        <Container style={{position:'fixed', bottom: 0, left: 0 }}>
+                <Button color='#334d80' > Anleitung öffnen </Button>
         </Container>
       </>
   );
