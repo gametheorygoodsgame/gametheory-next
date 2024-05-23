@@ -1,5 +1,5 @@
 .playCardBody {
-    border-radius: 8%;
+    border-radius: 7%;
     box-shadow: 0 2px 4px 0 rgba(219, 215, 215, 0);
     width: 100%;
     aspect-ratio: 2 / 3;
@@ -8,8 +8,7 @@
 }
 
 .item {
-    width: 22%; /* Adjusted width with padding */
-    /* padding: 20px; */
+    width: 22%;
     box-sizing: border-box;
 }
 
@@ -54,6 +53,10 @@
     animation: none; /* Disable the shake animation when the checkbox is checked */
 }
 
-
-
+@media (max-width: 430px) {
+    .item {
+        width: 46%;
+        margin-top: 30px;
+    }
+}
 

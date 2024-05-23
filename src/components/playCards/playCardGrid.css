@@ -1,6 +1,6 @@
 .wrapper {
     width: 95%;
-    margin: 0 auto; /* Horizontally center the wrapper */
+    margin: 0 auto;
     margin-top: 40px;
     max-width: 1050px;
 }
@@ -9,5 +9,13 @@
     width: 100%;
     display: flex;
     justify-content: space-between;
-    box-sizing: border-box; /* Include padding in width calculation */
+    box-sizing: border-box;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 430px) {
+    .wrapper {
+        width: 90%;
+        margin-top: 0;
+    }
 }

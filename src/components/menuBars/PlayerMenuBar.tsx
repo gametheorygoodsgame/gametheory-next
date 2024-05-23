@@ -15,7 +15,7 @@ export default function PlayerMenuBar() {
     <Container bg="brand.7" fluid px={40} p={10}>
         <Flex align="center">
             <Image src={gameTheoryLogo} height={70} alt="." />
-            {screenWidth > 980 ? (
+            {screenWidth > 439 ? (
                 <Title style={theme.components?.Title?.styles.left}>Game Theory</Title>
             ) : (
                 <></>
