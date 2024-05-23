@@ -1,0 +1,19 @@
+.instructionInfo {
+    border-radius: 8%;
+    box-shadow: 0 2px 4px 0 rgba(219, 215, 215, 0);
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    max-width: 230px;
+
+}
+
+.item {
+    width: 22%; /* Adjusted width with padding */
+    /* padding: 20px; */
+    box-sizing: border-box;
+}
+
+.instructionBody {
+    background: url('../../../public/instructionSheet.png') no-repeat center center;
+    background-size: cover;
+}
