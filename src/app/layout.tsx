@@ -16,7 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <html lang="en-US">
             <head>
                 <ColorSchemeScript />
-                <title>metadata.title</title>
+                <title>Game Theory - Public Goods Game</title>
             </head>
             <body>
                 <MantineProvider theme={theme}>
