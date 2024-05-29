@@ -11,25 +11,26 @@ import {
   Group,
   Loader,
   Text,
+  Image,
   Tooltip,
+  ActionIcon,
 } from '@mantine/core';
-import {
- IconHistory,
- IconCards, 
- IconPigMoney,
- IconStack,
- IconPlayCard,
- IconRoad
-} from '@tabler/icons-react';
+import NextImage from 'next/image';
+import instructionSheet from '../../../../public/instructionSheet.png';
+import { IconPigMoney} from '@tabler/icons-react';
+import { IoInformationCircle} from 'react-icons/io5'
+import { GiClockwork, GiCardAceHearts, GiCardPlay, GiStack } from 'react-icons/gi'
 import { useDisclosure } from '@mantine/hooks';
 import { useRouter } from 'next/navigation';
 import { Game, GameApi, GamePlayerMoveApi, Move } from '@gametheorygoodsgame/gametheory-openapi/api';
 import { logger } from '@/utils/logger';
 import { getMoveNumRedCardEnumValue } from '@/utils/helpers';
 import PlayCardGrid from '@/components/playCards/playCardGrid';
+import instruction from '@/components/instruction/instruction';
 import { useInterval } from '@/utils/hooks';
 import LoadModal from '@/components/modals/loadModal';
 import ButtonModal from '@/components/modals/buttonModal';
+import InstructionsModal from '@/components/modals/instructionsModal';
 import { getCookie } from '@/utils/getCookie';
 
 export default function CardSelection() {
@@ -51,6 +52,8 @@ export default function CardSelection() {
   const [redCardHandValue, setRedCardHandValue] = useState(0);
 
   const [errorDescription, setErrorDescription] = useState('');
+
+  const[isInstructionsModalOpen, { open: openInstructionsModal, close: closeInstructionsModal }] = useDisclosure();
 
   const gameApi = new GameApi();
   const gamePlayerMoveApi = new GamePlayerMoveApi();
@@ -236,13 +239,13 @@ export default function CardSelection() {
           >
             <Tooltip label="Gespielte Runden" events={{hover:true, focus:true, touch:true}}>
               <Flex align={Center}>
-                <IconRoad size={50} color='#334d80'/>
+                <GiClockwork size={50} color='#334d80'/>
                 <Text size="xl" c={'#334d80'} fw ={900} ml={10}>  {currentTurn} / {numTurns} </Text>
             </Flex>
             </Tooltip>
             <Tooltip label="Aktueller roter Kartenwert" events={{hover:true, focus:true, touch:true}}>
               <Flex>
-                <IconPlayCard color='#cc4444' size={45}/>
+                <GiCardAceHearts color='#cc4444' size={45}/>
               <Text size="xl" c={"#334d80"} fw ={900} ta={Center}> -Wert:  {redCardHandValue}</Text>
               </Flex>
            
@@ -250,7 +253,7 @@ export default function CardSelection() {
             <Tooltip label="Kontostand" events={{hover:true, focus:true, touch:true}}>
               <Flex align={Center}>
             <Text size="xl" c={"#334d80"} fw={900} ml={10} > {playerScore} ct </Text>
-            <IconPigMoney size={50}/>
+            <IconPigMoney size={50} color='#334d80'/>
             </Flex>
             </Tooltip>
           </Flex>
@@ -258,7 +261,8 @@ export default function CardSelection() {
             <Center>
               <Tooltip label="Anzahl roter Karten im Pot der letzten Runde" events={{hover:true, focus:true, touch:true}}>
                 <Flex align={Center}>
-                <IconCards size={45} color='#334d80'/>
+                <GiStack size={45} color='#cc4444'/>
+                <GiCardPlay size={45} color='#334d80'/>
                 <Text size="xl" c={"#334d80"} w="100%" fw={900} ml={10}> - Pot: {potCards[currentTurn - 1]}
                 </Text>
               </Flex>
@@ -279,6 +283,17 @@ export default function CardSelection() {
             </Button>
           </Center>
         </Container>
+        <Container style={{position:'fixed', bottom: 0, left: 0 }}>
+                <ActionIcon onClick={openInstructionsModal}>
+                  <IoInformationCircle size={45}/>
+                </ActionIcon>
+        </Container>
+        
+        <InstructionsModal
+        opened={isInstructionsModalOpen}
+        onClose={closeInstructionsModal}
+        rightButton={{callback: closeInstructionsModal, text: 'Schließen'}}>
+        </InstructionsModal>
       </>
   );
 }
