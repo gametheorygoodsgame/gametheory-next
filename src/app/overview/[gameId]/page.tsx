@@ -73,7 +73,7 @@ export default function GameOverviewGameMaster() {
       logger.debug(response.data);
       closeTurnProgressionModal();
     } catch (error) {
-      logger.error('Error updating data: ', error);
+        logger.error('Error updating data: ', error);
     }
   };
 

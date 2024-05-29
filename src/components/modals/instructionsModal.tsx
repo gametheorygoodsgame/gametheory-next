@@ -28,7 +28,7 @@ export default function InstructionsModal({ children, opened, onClose, rightButt
                 <Stack fz={18} fw={70} p={40} className="lbl-round">
                     {children}
                 </Stack>
-                <Image src={instructionSheet} component={NextImage} alt='Anleitung zum Spiel' style={{width:'120%'}}/>
+                <Image src={instructionSheet} component={NextImage} alt='Anleitung zum Spiel' style={{width:'100%', height:'auto'}}/>
                 <Group justify="end">
                     <Button onClick={rightButton.callback}>{rightButton.text}</Button>
                 </Group>
