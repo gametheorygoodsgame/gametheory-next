@@ -47,7 +47,11 @@ export default function CardSelection() {
 
   const [errorDescription, setErrorDescription] = useState('');
 
-  const [isInstructionsModalOpen, { open: openInstructionsModal, close: closeInstructionsModal }] = useDisclosure();
+  const [
+      isInstructionsModalOpen, {
+      open: openInstructionsModal,
+      close: closeInstructionsModal },
+  ] = useDisclosure();
 
   const gameApi = new GameApi();
   const gamePlayerMoveApi = new GamePlayerMoveApi();
