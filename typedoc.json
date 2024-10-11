@@ -1,0 +1,6 @@
+{
+  "entryPoints": ["./src/app/layout.tsx"],
+  "out": "./docs",
+  "readme": "README.md",
+  "exclude": ["node_modules/**/*"]
+}
