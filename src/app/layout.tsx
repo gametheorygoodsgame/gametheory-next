@@ -11,10 +11,14 @@ export const metadata = {
     description: 'I am using Mantine with Next.js!',
 };
 
-
+/**
+ * Test Comment
+ *
+ * @param children Components
+ * @returns basic HTML structure
+*/
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
-        /** Test */
         <html lang="en-US">
             <head>
                 <ColorSchemeScript />
