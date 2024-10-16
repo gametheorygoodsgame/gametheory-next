@@ -11,6 +11,7 @@ export const metadata = {
     description: 'I am using Mantine with Next.js!',
 };
 
+/** Test */
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
         <html lang="en-US">
