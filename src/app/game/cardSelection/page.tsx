@@ -142,7 +142,7 @@ export default function CardSelection() {
           closeWaitingForNextTurnModal();
         }
         //folgendes funktioniert solange jeder spieler pro Runde einen Zug macht
-        if (getPlayerMoveCount(game, playerId) - 1 === game.currentTurn) {
+        if (getPlayerMoveCount(game, playerId) - 1 === game.currentTurn && game.currentTurn !== 0) {
           setNumRedCards(getPlayerRedCards(game, playerId))
           openWaitingForNextTurnModal();
         }
