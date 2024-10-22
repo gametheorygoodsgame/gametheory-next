@@ -36,7 +36,7 @@ export default function CardSelection() {
   const [numRedCards, setNumRedCards] = useState(0);
   const [potCards, setPotCards] = useState<number[]>([]);
   const [isWaitingForNextTurn, { open: openWaitingForNextTurnModal,
-    close: closeWaitingForNextTurnModal }] = useDisclosure(false);
+    close: closeWaitingForNextTurnModal }] = useDisclosure(true);
   const [hasError, { open: openErrorModal, close: closeErrorModal }] = useDisclosure(false);
   const [isWaitingForGameStart, { open: openWaitingForGameStartModal,
     close: closeWaitingForGameStartModal }] = useDisclosure(true);
@@ -87,6 +87,22 @@ export default function CardSelection() {
     return player ? player.score : 0;
   };
 
+  const getPlayerMoveCount = (aGame: Game, aPlayerId: string): number => {
+    let player = null;
+    if (aGame.players) {
+      player = aGame.players.find((p) => p.id === aPlayerId);
+    }
+    return player ? player.moves.length : 0;
+  };
+
+  const getPlayerRedCards = (aGame: Game, aPlayerId: string): number => {
+    let player = null;
+    if (aGame.players) {
+      player = aGame.players.find((p) => p.id === aPlayerId);
+    }
+    return player ? player.moves[player.moves.length - 1].numRedCards : 0;
+  };
+
   useEffect(() => {
     const playCardIds = ['1', '2', '3', '4'];
     playCardIds.forEach((cardId) => {
@@ -124,6 +140,11 @@ export default function CardSelection() {
           setCurrentTurn(newCurrentTurn);
           resetSelection();
           closeWaitingForNextTurnModal();
+        }
+        //folgendes funktioniert solange jeder spieler pro Runde einen Zug macht
+        if (getPlayerMoveCount(game, playerId) - 1 === game.currentTurn) {
+          setNumRedCards(getPlayerRedCards(game, playerId))
+          openWaitingForNextTurnModal();
         }
       }
     } catch (error) {
