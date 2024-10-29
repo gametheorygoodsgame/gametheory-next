@@ -19,10 +19,12 @@ import { IconSquarePlus } from '@tabler/icons-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { useRouter } from 'next/navigation';
 import { Game, GameApi } from '@gametheorygoodsgame/gametheory-openapi/api';
+import { Player, Move } from '@gametheorygoodsgame/gametheory-openapi/api';
 import { logger } from '@/utils/logger';
 import { OverviewTable } from '@/components/overviewTable/overviewTable';
 import { useInterval } from '@/utils/hooks';
 import ButtonModal from '@/components/modals/buttonModal';
+import * as XLSX from 'xlsx';
 
 export default function GamesOverview() {
   const { height: screenHeight, width: screenWidth } = useViewportSize();
@@ -146,6 +148,103 @@ export default function GamesOverview() {
     }
   };
 
+  const exportToExcel = (game: Game) => {
+
+
+    const calculateColumnWidths = (data: { [key: string]: any }[]) => {
+        const colWidths: number[] = [];
+
+        if (data.length > 0) {
+            Object.keys(data[0]).forEach((col, i) => {
+                colWidths[i] = col.length;
+            });
+        }
+        data.forEach(row => {
+            Object.keys(row).forEach((col, i) => {
+                const value = row[col] ? row[col].toString() : ""; 
+                const length = value.length;
+
+                if (length > colWidths[i]) {
+                    colWidths[i] = length;
+                }
+            });
+        });
+        return colWidths.map(w => ({
+            wch: Math.max(w, 14)
+        }));
+    };
+
+    
+    const wb = XLSX.utils.book_new();
+    const generalData: { [key: string]: any }[] = [];
+    const playerBalances: { name: string, balance: number, data: { [key: string]: any }[] }[] = [];
+
+    game.players.forEach((player: Player) => {
+        let balance = 0;
+        const playerData: { [key: string]: any }[] = [];
+
+        for (let turn = 1; turn <= game.numTurns; turn++) {
+
+            const cardValue = game.cardHandValue[turn];
+            let numRedCards = 0;
+            let potRedCards = 0;
+
+            const move = player.moves.find((m: Move) => m.numTurn === turn);
+            if (move) {
+                numRedCards = move.numRedCards;
+            }
+            game.players.forEach(p => {
+                const pMove = p.moves.find((m: Move) => m.numTurn === turn);
+                if (pMove) {
+                    potRedCards += pMove.numRedCards;
+                }
+            });
+            const remainingRedCards = 2 - numRedCards;
+            balance += (remainingRedCards * cardValue) + potRedCards;
+
+            const rowData: { [key: string]: any } = {
+                "Runde": turn,
+                "Kartenwert": cardValue,
+                "Rote Karten im Pot": potRedCards,
+                "abgegebene Rote Karten": numRedCards,
+                "Kontostand": balance
+            };
+
+            playerData.push(rowData);
+        }
+        playerBalances.push({ name: player.name, balance, data: playerData });
+    });
+    playerBalances.sort((a, b) => b.balance - a.balance);
+
+    generalData.push({
+        "Spiel-Titel": game.name,
+        "Anzahl der Runden": game.numTurns,
+        "Anzahl der Spieler": game.players.length,
+        "": "",
+        "Spielername": "",
+        "Kontostand": "",
+    });
+    playerBalances.forEach(pb => {
+        generalData.push({
+            "Spielername": pb.name,
+            "Kontostand": pb.balance
+        });
+    });
+    const generalSheet = XLSX.utils.json_to_sheet(generalData);
+    generalSheet['!cols'] = calculateColumnWidths(generalData);
+
+    XLSX.utils.book_append_sheet(wb, generalSheet, "Spiel-Info");
+
+    playerBalances.forEach(pb => {
+      const playerSheet = XLSX.utils.json_to_sheet(pb.data);
+      playerSheet['!cols'] = calculateColumnWidths(pb.data); 
+
+      XLSX.utils.book_append_sheet(wb, playerSheet, pb.name);
+    });
+
+    XLSX.writeFile(wb, game.name + ".xlsx");
+};
+
   /*
   useEffect(() => {
     fetchGameList();
@@ -231,6 +330,7 @@ export default function GamesOverview() {
                 clipboardGameID={clipboardGameId}
                 handleQRButtonClick={handleQrButtonClick}
                 handleRowClick={handleRowClick}
+                exportToExcel={exportToExcel} 
               />
             </Stack>
           </Center>
