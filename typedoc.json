@@ -1,7 +1,6 @@
 {
   "entryPoints": [
     "./src/app/layout.tsx",
-    "./src/components/gameWinner/gameWinner.tsx"
 ],
   "out": "./docs",
   "readme": "README.md",
