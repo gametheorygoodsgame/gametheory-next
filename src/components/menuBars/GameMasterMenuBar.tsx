@@ -10,6 +10,13 @@ import gameTheoryLogo from 'public/GameTheory_Header.png';
 import { firebase } from '@/utils/firebaseApp';
 import { theme } from '@/utils/theme';
 
+/**
+ * A dropdown menu component for settings.
+ * 
+ * @param {Object} props - The component props.
+ * @param {any} props.auth - The authentication object used for logging out the user.
+ * @returns {JSX.Element} The menu component as a dropdown.
+ */
 function MenuDropdown({ auth }: { auth: any }) {
   return (
     <Menu>
@@ -27,7 +34,11 @@ function MenuDropdown({ auth }: { auth: any }) {
     </Menu>
   );
 }
-
+/**
+ * A navigation bar for the Game Master interface.
+ * 
+ * @returns {JSX.Element} Game Master navigation bar.
+ */
 export default function GameMasterMenuBar() {
   const auth = getAuth(firebase);
   const { width: screenWidth } = useViewportSize();

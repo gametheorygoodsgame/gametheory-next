@@ -27,6 +27,10 @@ import ButtonModal from '@/components/modals/buttonModal';
 import InstructionsModal from '@/components/modals/instructionsModal';
 import { getCookie } from '@/utils/getCookie';
 
+/**
+ * Component for handling a player's interaction with the game state by selecting cards. Including the effect the card selection of a player has on the game state.
+ *
+ */
 export default function CardSelection() {
   const [loading, setLoading] = useState(true);
 
@@ -79,6 +83,12 @@ export default function CardSelection() {
     setNumRedCards(0);
   };
 
+  /**
+   * Retrieves the score of a player by parameters currentGameObject and ID of the player.
+   * @param {Game} aGame - The game object.
+   * @param {string} aPlayerId - The ID of the player.
+   * @returns {number} - The score of the player.
+   */
   const getPlayerScore = (aGame: Game, aPlayerId: string): number => {
     let player = null;
     if (aGame.players) {
@@ -87,6 +97,12 @@ export default function CardSelection() {
     return player ? player.score : 0;
   };
 
+   /**
+   * Retrieves the number of moves made by a player. Parameters currentGameObject and PlayerId are needed.
+   * @param {Game} aGame - The current game object.
+   * @param {string} aPlayerId - The ID of the player.
+   * @returns {number} - The number of moves by the player.
+   */
   const getPlayerMoveCount = (aGame: Game, aPlayerId: string): number => {
     let player = null;
     if (aGame.players) {
@@ -95,6 +111,12 @@ export default function CardSelection() {
     return player ? player.moves.length : 0;
   };
 
+  /**
+   * Retrieves the number of red cards from the last card selection.
+   * @param {Game} aGame - The game object.
+   * @param {string} aPlayerId - The ID of the player.
+   * @returns {number} - The number of red cards in the last move.
+   */
   const getPlayerRedCards = (aGame: Game, aPlayerId: string): number => {
     let player = null;
     if (aGame.players) {
@@ -156,6 +178,10 @@ export default function CardSelection() {
     }
   };
 
+   /**
+   * Makes a move for the current player.
+   * Updates the game state through the API.
+   */
   const handleMakeMove = async () => {
     try {
       if (!gameId || !playerId) {
@@ -186,6 +212,9 @@ export default function CardSelection() {
     }
   };
 
+  /**
+   * Fetches game data periodically using a 10-second interval.
+   */
   function fetchData() {
     if (!gameId || gameId === '') {
       setGameId(getCookie('gameID') || '');

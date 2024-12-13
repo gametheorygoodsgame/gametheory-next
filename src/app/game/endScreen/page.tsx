@@ -25,6 +25,10 @@ export default function endScreen() {
     //const [map, setMap] = useState<Map<string, number>>();
     const router = useRouter();
 
+    /**
+   * Initializes the game data by fetching details based on the current GameID.
+   * Updates the Game state with the retrieved data.
+   */
     const init = async () => {
         if (gameId !== '') {
             const response = await gameApi.getGameById(gameId);
@@ -33,11 +37,18 @@ export default function endScreen() {
             }
         }
     };
+    /**
+   * Generates table rows for the player score display.
+   * Sorts players by score in descending order.
+   * 
+   * @returns {JSX.Element[] | undefined} Rows of player data for the score table.
+   */
     function tableContent() {
         const players = game?.players;
         // eslint-disable-next-line array-callback-return
         // @ts-ignore
         const sortedPlayers = players?.sort((a, b) => b.score - a.score);
+        // Generate table rows for each player includung their Id and score.
         const rows = sortedPlayers?.map((player) => (
             <Table.Tr key={player.name}>
                 <Table.Td>{player.name}</Table.Td>

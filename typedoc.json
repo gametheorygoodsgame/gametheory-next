@@ -1,6 +1,7 @@
 {
   "entryPoints": [
     "./src/app/layout.tsx",
+    "./src/app/game/cardSelection/page.tsx"
 ],
   "out": "./docs",
   "readme": "README.md",

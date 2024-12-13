@@ -5,15 +5,15 @@ import React from 'react';
 import PlayerMenuBar from '../../components/menuBars/PlayerMenuBar';
 
 /**
- * This function defines a layout component for student pages in a TypeScript React application.
- * @param  - The `StudentLayout` function is a React component that serves as a layout for
- * student-related pages. It takes a `children` prop, which represents the content that will be
- * rendered within the layout. The layout consists of an `AppShell` component with a header containing
- * a `PlayerMenuBar` component
- * @returns The `StudentLayout` function is returning a JSX structure that includes an `AppShell`
- * component with a `Header` and a `Main` component. Inside the `Header`, a `PlayerMenuBar` component
- * is rendered. The `Main` component has a background color set to white and renders the `children`
- * passed to the `StudentLayout` component.
+ * Layout component for student/player pages.
+ * 
+ * This layout includes a header with the player menu bar
+ * and a main content area for rendering child components.
+ * 
+ * @component
+ * @param {Object} props - Component props.
+ * @param {React.ReactNode} props.children - The content to display within the layout.
+ * @returns {JSX.Element} The complete layout component.
  */
 export default function StudentLayout({ children }: { children: React.ReactNode }) {
   return (
