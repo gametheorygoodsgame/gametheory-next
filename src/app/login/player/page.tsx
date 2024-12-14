@@ -16,6 +16,17 @@ interface StudentLoginProps {
   gameIdIn: string;
 }
 
+/**
+ * Component for student login to join a game.
+ *
+ * Allows students to enter their name and a game ID to join an ongoing game.
+ * Handles form submission and integrates with the API to add players to a game.
+ * Displays modals and notifications for errors or successful actions.
+ *
+ * @param {StudentLoginProps} props - The component props.
+ * @param {string} props.gameIdIn - The initial game ID passed into the component, typically from the URL.
+ * @returns {JSX.Element} The rendered student login component.
+ */
 export default function StudentLogin(props: StudentLoginProps) {
   const { gameIdIn } = props;
   const [playerName, setPlayerName] = useState('');
@@ -26,6 +37,12 @@ export default function StudentLogin(props: StudentLoginProps) {
   const router = useRouter();
   const gamePlayerApi = new GamePlayerApi();
 
+  /**
+  * Handles form submission for logging in.
+  * Validates input, adds the player to the game via API, and redirects on success.
+  *
+  * @param {MouseEvent<HTMLButtonElement> | KeyboardEvent<HTMLInputElement>} e - The event triggered on button click or Enter key press.
+  */
   // @ts-ignore
   // eslint-disable-next-line max-len
   const handleLoginSubmit = async (e: MouseEvent<HTMLButtonElement> | KeyboardEvent<HTMLInputElement>) => {
@@ -83,7 +100,7 @@ export default function StudentLogin(props: StudentLoginProps) {
     setPlayerName('');
   };
 
-  // Absenden des Formulars mit drücken der Enter-Taste ermöglichen
+  // Allows form submission by pressing enter key
   // @ts-ignore
   // eslint-disable-next-line max-len
   const handleKeyPress: KeyboardEventHandler<HTMLInputElement> = (e: KeyboardEvent<HTMLInputElement>) => {

@@ -10,7 +10,7 @@ import PlayerMenuBar from '../../components/menuBars/PlayerMenuBar';
  * This layout includes a header with the player menu bar
  * and a main content area for rendering child components.
  * 
- * @component
+ * 
  * @param {Object} props - Component props.
  * @param {React.ReactNode} props.children - The content to display within the layout.
  * @returns {JSX.Element} The complete layout component.

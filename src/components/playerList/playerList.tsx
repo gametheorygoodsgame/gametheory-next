@@ -12,11 +12,26 @@ export interface DataCollectionItem {
   isMoveMade: boolean;
 }
 
+/**
+ * A component that displays a list of players in the game and their current turn status.
+ * The list shows the number of players who have finished their move and updates the status for each player.
+ *
+ * @param {Object} props - The component props.
+ * @param {Game | undefined} props.game - The game object that contains player data and game state.
+ * 
+ * @returns {JSX.Element} A list of players with their respective move status.
+ *
+ */
 export default function PlayerList({ game }: { game: Game | undefined; }) {
   const icon = <IconCards />;
   const waiting = <IconClockHour3 />;
   const success = <IconCircleCheck />;
 
+  /**
+   * Returns the number of players who have finished their moves for the current turn.
+   * 
+   * @returns {number} The count of players who have made their move for the current turn.
+   */
   function getNumFinishedPlayers() {
     let count = 0;
     game?.players.forEach((player) => {

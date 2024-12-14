@@ -6,29 +6,14 @@ import { IconTrophy } from '@tabler/icons-react';
 import { Game } from '@gametheorygoodsgame/gametheory-openapi';
 
 /**
- * Komponente PlayerList
+ * A component that displays the list of players in a game and randomly selects a winner.
+ * The winner's name is displayed with a trophy icon. If no players are present, "Niemand" is shown.
  * 
- * Diese Komponente zeigt die Liste der Spieler eines Spiels an und wählt zufällig einen Gewinner aus. 
- * Der Gewinner wird zusammen mit einer Trophäe in einem Badge angezeigt.
+ * @param {Object} props - The props for the PlayerList component.
+ * @param {Game | undefined} props.game - The game object containing the list of players. If undefined, no winner can be selected.
  * 
- * @param {Object} props - Eigenschaften der Komponente.
- * @param {Game | undefined} props.game - Das Spielobjekt, das die Spieler enthält. Kann undefined sein, falls kein Spiel verfügbar ist.
+ * @returns {JSX.Element} A component that shows the winner's name and a trophy icon or "Niemand" if no players are present.
  * 
- * @returns {JSX.Element} Ein Stack-Element, das den Gewinner des Spiels in einem Badge anzeigt. 
- * Wenn keine Spieler vorhanden sind, wird "Niemand" als Gewinner angezeigt.
- * 
- * ## Funktionen:
- * 
- * - `getRandomNumber(min: number, max: number): number`:
- *    - Generiert eine zufällige Ganzzahl im Bereich `[min, max]`.
- * 
- * - `getWinnerFromPlayers(): Player | null`:
- *    - Wählt zufällig einen Gewinner aus der Liste der Spieler aus.
- *    - Gibt `null` zurück, wenn keine Spieler verfügbar sind.
- * 
- * ## Abhängigkeiten:
- * - Verwendet die `IconTrophy`-Komponente für die Darstellung der Trophäe.
- * - Nutzt die Komponenten `Stack`, `Text` und `Badge` für das Layout und Styling.
  */
 export default function PlayerList({ game }: { game: Game | undefined; }) {
     

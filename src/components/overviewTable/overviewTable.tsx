@@ -23,6 +23,26 @@ type OverviewTableProps = {
   exportToExcel: (game: Game) => void;
 };
 
+/**
+ * A component that renders a table displaying an overview of multiple games.
+ * The table includes actions such as opening a game, deleting a game, copying the game link to the clipboard,
+ * and generating a QR code for a game. It also supports exporting game data to Excel.
+ *
+ * @component
+ * 
+ * @param {OverviewTableProps} props - The props for the OverviewTable component.
+ * @param {Game[]} props.games - An array of game objects to display in the table.
+ * @param {Function} props.handleOpenButtonClick - A function to handle the opening of a game when the corresponding button is clicked.
+ * @param {Function} props.handleDeleteButtonClick - A function to handle the deletion of a game when the corresponding button is clicked.
+ * @param {Function} props.handleClipboardButtonClick - A function to handle copying the game link to the clipboard.
+ * @param {boolean} props.clipboardClicked - A flag indicating whether the clipboard has been clicked for a specific game.
+ * @param {string} props.clipboardGameID - The ID of the game that has been copied to the clipboard.
+ * @param {Function} props.handleQRButtonClick - A function to handle the generation of a QR code for a specific game.
+ * @param {Function} props.handleRowClick - A function to handle row click events, typically for navigating to a game.
+ * @param {Function} props.exportToExcel - A function to export the table data to an Excel file.
+ * 
+ * @returns {JSX.Element} A table rendering game overview with action buttons and clipboard functionality.
+ */
 export function OverviewTable({
   games,
   handleOpenButtonClick,

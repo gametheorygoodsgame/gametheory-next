@@ -26,6 +26,20 @@ import { useInterval } from '@/utils/hooks';
 import ButtonModal from '@/components/modals/buttonModal';
 import * as XLSX from 'xlsx';
 
+
+/**
+ * Displays an overview of all games and provides actions to manage games.
+ *
+ * The `GamesOverview` component fetches and lists all games, allowing the gameMaster to:
+ * - Create a new game
+ * - View game details
+ * - Export game data to Excel
+ * - Copy game invite links to the clipboard
+ * - View game-specific QR codes
+ * - Delete games
+ *
+ * @returns {JSX.Element} The rendered Games Overview component.
+ */
 export default function GamesOverview() {
   const { height: screenHeight, width: screenWidth } = useViewportSize();
   const { push } = useRouter();
@@ -63,13 +77,19 @@ export default function GamesOverview() {
     }
   }
 
+   /**
+   * Handles row clicks in the game table and navigates to the game..
+   *
+   * @param {string} gameId - The ID of the clicked game.
+   * @param {React.MouseEvent} event - The mouse event triggered by the click.
+   */
   const handleRowClick = (gameId: string, event: React.MouseEvent) => {
     const targetElement = event.target as HTMLElement;
     if (targetElement.classList.contains('mantine-icon')) {
       event.stopPropagation();
       return;
     }
-    push(`/overview/${gameId}`); // Weiterleitung zur Detailansicht des ausgewählten Spiels
+    push(`/overview/${gameId}`); // Navigating to selected game.
   };
 
   const handleNumTurnsChange = (value: string | number) => {
@@ -77,6 +97,11 @@ export default function GamesOverview() {
     setNumTurns(parsedValue);
   };
 
+   /**
+   * Opens the delete modal and sets the game ID for deletion.
+   *
+   * @param {string} gameId - The ID of the game to delete.
+   */
   const handleDeleteButtonClick = (gameId: string) => {
     openDeleteModal();
     logger.debug('Delete modal opened.');
@@ -84,6 +109,11 @@ export default function GamesOverview() {
     logger.debug(`DeleteGameId set to ${gameId}.`);
   };
 
+   /**
+   * Opens the QR code modal and sets the game ID for QR code generation.
+   *
+   * @param {string} gameId - The ID of the game to generate a QR code for.
+   */
   const handleQrButtonClick = (gameId: string) => {
     openQrModal();
     logger.debug('QR modal opened.');
@@ -91,6 +121,12 @@ export default function GamesOverview() {
     logger.debug(`QRGameId set to ${gameId}.`);
   };
 
+  /**
+   * Copies the game invite URL to the clipboard and shows a success message.
+   *
+   * @param {React.MouseEvent<HTMLElement>} event - The click event.
+   * @param {string} gameId - The ID of the game.
+   */
   function handleClipboardButtonClick(event: React.MouseEvent<HTMLElement>, gameId: string) {
     const clipboardURL = `${window.location.protocol}//${window.location.host}/login/player/${gameId}`;
     navigator.clipboard.writeText(clipboardURL);
@@ -109,6 +145,12 @@ export default function GamesOverview() {
     push(`/overview/${gameId}`);
   };
 
+  /**
+   * Creates a new game with the specified name and number of turns.
+   *
+   * @async
+   * @function
+   */
   const handleCreateGame = async () => {
     try {
       const game: Game = {

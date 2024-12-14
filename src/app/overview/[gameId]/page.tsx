@@ -23,6 +23,14 @@ import { useInterval } from '@/utils/hooks';
 import { logger } from '@/utils/logger';
 import ButtonModal from '@/components/modals/buttonModal';
 
+/**
+ * Component for managing the game overview as a game master.
+ *
+ * Displays the current game state, allows progression through turns, and provides functionality
+ * to start, end, or update the game. The component auto-refreshes game data periodically.
+ *
+ * @returns {JSX.Element} The rendered game overview for the game master.
+ */
 export default function GameOverviewGameMaster() {
   const router = useRouter();
   const plotRef = useRef();
@@ -42,6 +50,10 @@ export default function GameOverviewGameMaster() {
 
   const gameApi = new GameApi();
 
+   /**
+   * Fetches the game data from the API.
+   * Handles errors and updates the `game` state with the fetched data.
+   */
   async function fetchGame() {
     try {
       if (!gameId) {
@@ -60,6 +72,10 @@ export default function GameOverviewGameMaster() {
     }
   }
 
+   /**
+   * Handles progressing to the next turn in the game.
+   * Updates the game state with the new red card hand value.
+   */
   const handleNextTurn = async () => {
     try {
       if (!game) {
@@ -77,6 +93,10 @@ export default function GameOverviewGameMaster() {
     }
   };
 
+  /**
+   * Handles finishing the game.
+   * Sends the final game state to the API and closes the turn progression modal.
+   */
   const finishGame = async () => {
     try {
       if (!game) {
@@ -93,13 +113,7 @@ export default function GameOverviewGameMaster() {
     }
   };
 
-  /*
-  useEffect(() => {
-    fetchGame();
-  }, [game]);
-
-   */
-
+// Auto-refresh the game data every 10 seconds.
   useInterval(fetchGame, 10000);
 
   if (loading) {

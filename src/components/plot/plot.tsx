@@ -11,6 +11,26 @@ type PlotProps = {
   portWidth: number;
 };
 
+/**
+ * A component that displays a composed chart for a game’s statistics.
+ *
+ * The chart includes a bar graph for the number of red cards played and a line graph for the red card hand value across game turns.
+ * 
+ * @param {PlotProps} props - The props for the Plot component.
+ * @param {Game | undefined} props.game - The game object containing the game statistics.
+ * @param {number} props.portHeight - The height of the port (container) for the chart.
+ * @param {number} props.portWidth - The width of the port (container) for the chart.
+ * 
+ * @returns {JSX.Element} A composed chart rendered using the provided game data.
+ * 
+ * @example
+ * const game = {
+ *   currentTurn: 5,
+ *   cardHandValue: [0, 2, 4, 6, 8, 10],
+ *   potCards: [0, 1, 2, 3, 4, 5]
+ * };
+ * <Plot game={game} portHeight={500} portWidth={800} />
+ */
 const Plot = forwardRef<any, PlotProps>((props, ref) => {
     const { portHeight, portWidth } = props;
     const [gameStatistic, setGameStatistic] = useState<any[]>([]);

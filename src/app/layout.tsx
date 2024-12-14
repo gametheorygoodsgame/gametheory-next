@@ -12,12 +12,16 @@ export const metadata = {
 };
 
 /**
- * Test Comment
- * ein zweiter TestComment
- *
- * @param children Components
- * @returns basic HTML structure
-*/
+ * The root layout component that wraps the entire application.
+ * It sets up the HTML structure, including the `<head>` and `<body>` elements,
+ * and provides a layout container using `AppShell` from Mantine.
+ * The layout also integrates the `MantineProvider` for theming and `Notifications` for global notifications.
+
+ * @param {Object} props - The props for the RootLayout component.
+ * @param {React.ReactNode} props.children - The child components or content that will be rendered within the layout.
+ * 
+ * @returns {JSX.Element} The root layout of the application with applied theme, notifications, and children.
+ */
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
         <html lang="en-US">

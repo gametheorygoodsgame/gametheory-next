@@ -23,6 +23,15 @@ import * as notifications from '@/components/notifications/login/loginNotificati
 import { logger } from '@/utils/logger';
 import ButtonModal from '@/components/modals/buttonModal';
 
+/**
+ * Component for the login page of gameMaster/Dozent
+ *
+ * Handles email and password authentication for the gameMaster using Firebase.
+ * Displays a loading spinner during authentication or redirects to the overview page if already logged in.
+ * Includes error handling with notifications and modals for login issues.
+ * 
+ * @returns {JSX.Element} The rendered instructor login page.
+ */
 export default function DozentLogin() {
   const emailInputRef = useRef(null);
   const auth = getAuth(firebase);
@@ -59,7 +68,7 @@ export default function DozentLogin() {
     }
   };
 
-  // Absenden des Formulars mit drücken der Enter-Taste ermöglichen
+  // Using Enter Key to submit form.
   // @ts-ignore
   // eslint-disable-next-line max-len
   const handleKeyPress: KeyboardEventHandler<HTMLInputElement> = (e: KeyboardEvent<HTMLInputElement>) => {
