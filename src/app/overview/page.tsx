@@ -333,6 +333,7 @@ export default function GamesOverview() {
         >
           <NumberInput
             min={1}
+            max={100}
             label="Anzahl der Runden"
             value={numTurns}
             onChange={handleNumTurnsChange}
