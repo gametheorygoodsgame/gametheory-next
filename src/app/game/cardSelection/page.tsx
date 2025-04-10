@@ -309,9 +309,9 @@ export default function CardSelection() {
             <Center>
               <Tooltip label="Anzahl roter Karten im Pot der letzten Runde" events={{ hover: true, focus: true, touch: true }}>
                 <Flex align={Center}>
-                <GiStack size={45} color="#cc4444" />
+                <GiStack size={45} color="#334d80" />
                 <GiCardPlay size={45} color="#334d80" />
-                <Text size="xl" c="#334d80" w="100%" fw={900} ml={10}> - Pot: {potCards[currentTurn - 1]}
+                <Text size="xl" c="#334d80" w="100%" fw={900} ml={10}> - Pot letzter Runde: {potCards[currentTurn - 1]}
                 </Text>
                 </Flex>
               </Tooltip>
