@@ -178,31 +178,21 @@ export default function GameOverviewGameMaster() {
                     ref={plotRef}
                   />
                 </Center>
-                <Group align="right" gap="xl">
-                  <Button variant="outline" color="#cc4444" bg="white" onClick={() => router.push('/overview')}>
+                <Group gap="xl">
+                  <Button variant="outline" color="#cc4444" bg="white" onClick={() => router.push('/overview')} ml = '360px'>
                     Übersicht
                   </Button>
-                  {game?.isFinished ? (
-                      <Button
-                        bg="brand.2"
-                        onClick={() => {
-                        router.push('/overview');
-                      }}
-                      >
-                        Zur Auswertung
-                      </Button>
-                  ) : (
-                      // eslint-disable-next-line no-unsafe-optional-chaining
-                      game?.currentTurn === (game ? game?.numTurns : -1) ? (
-                          <Button bg="brand.0" onClick={finishGame}>Spiel Beenden</Button>
-                      ) : (
-                          game?.currentTurn === 0 ? (
-                              <Button bg="brand.0" onClick={openTurnProgressionModal}>Spiel Starten</Button>
-                          ) : (
-                              <Button onClick={openTurnProgressionModal}>Nächste Runde</Button>
-                          )
-                      )
-                  )}
+                  {!game?.isFinished && (
+                  game?.currentTurn === (game ? game?.numTurns : -1) ? (
+                  <Button bg="brand.0" onClick={finishGame}>Spiel Beenden</Button>
+                ) : (
+                  game?.currentTurn === 0 ? (
+                  <Button bg="brand.0" onClick={openTurnProgressionModal}>Spiel Starten</Button>
+                ) : (
+                      <Button onClick={openTurnProgressionModal}>Nächste Runde</Button>
+                    )
+                  )
+                )}
                 </Group>
               </Stack>
             </Grid.Col>
