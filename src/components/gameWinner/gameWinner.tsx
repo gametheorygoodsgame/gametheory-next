@@ -3,7 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import { Badge, Stack, Text, Loader } from '@mantine/core';
 import { IconTrophy } from '@tabler/icons-react';
-import { Game, Player } from '@gametheorygoodsgame/gametheory-openapi';
+import { Game } from '@gametheorygoodsgame/gametheory-openapi';
+import { GameApi } from '@gametheorygoodsgame/gametheory-openapi/api';
 
 export default function PlayerList({ game }: { game: Game | undefined }) {
   const [winner, setWinner] = useState<String | null>(null);
@@ -19,25 +20,22 @@ export default function PlayerList({ game }: { game: Game | undefined }) {
         setLoading(false);
         return;
       }
-
+  
       try {
-        const response = await fetch(`http://localhost:30167/games/${game.id}/winner`);
-        if (response.ok) {
-          const data = await response.json();
-          console.log('Gewinner vom Backend:', data);
-          setWinner(data.winner || null); // Backend sollte { winner: { id, name, ... } } zurückgeben
-        } else {
-          setError(`Fehler beim Abrufen des Gewinners: ${response.statusText}`);
-        }
+        const gameApi = new GameApi();
+        const response = await gameApi.getWinner(game.id);
+        console.log('Gewinner vom Backend:', response.data.winner.name);
+        setWinner(response.data?.winner.name || null);
       } catch (err) {
         setError(`Fehler beim Abrufen: ${(err as Error).message}`);
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchWinner();
   }, [game]);
+  
 
   if (loading) {
     return (
@@ -66,7 +64,7 @@ export default function PlayerList({ game }: { game: Game | undefined }) {
         color="#334d80"
         size="xl"
       >
-        {winner || 'Niemand'}
+        {winner || 'Niemand1'}
       </Badge>
     </Stack>
   );
