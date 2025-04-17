@@ -1,55 +1,71 @@
 'use client';
 
-import React from 'react';
-import { Badge, Stack, Text, px } from '@mantine/core';
+import React, { useEffect, useState } from 'react';
+import { Badge, Stack, Text, Loader } from '@mantine/core';
 import { IconTrophy } from '@tabler/icons-react';
 import { Game } from '@gametheorygoodsgame/gametheory-openapi';
+import { GameApi } from '@gametheorygoodsgame/gametheory-openapi/api';
 
-/**
- * A component that displays the list of players in a game and randomly selects a winner.
- * The winner's name is displayed with a trophy icon. If no players are present, "Niemand" is shown.
- * 
- * @param {Object} props - The props for the PlayerList component.
- * @param {Game | undefined} props.game - The game object containing the list of players. If undefined, no winner can be selected.
- * 
- * @returns {JSX.Element} A component that shows the winner's name and a trophy icon or "Niemand" if no players are present.
- * 
- */
-export default function PlayerList({ game }: { game: Game | undefined; }) {
-    
-    const trophy = <IconTrophy color='gold' size={32}/>;
+export default function PlayerList({ game }: { game: Game | undefined }) {
+  const [winner, setWinner] = useState<String | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const trophy = <IconTrophy color="gold" size={32} />;
+
+  useEffect(() => {
+    const fetchWinner = async () => {
+      if (!game?.id) {
+        setWinner(null);
+        setLoading(false);
+        return;
+      }
   
-    const allPlayers = game?.players
-    console.log(allPlayers)
-    const getRandomNumber = (min: number, max: number) =>{
-        return Math.floor(Math.random()*(max-min+1)) + min;
-    }
+      try {
+        const gameApi = new GameApi();
+        const response = await gameApi.getWinner(game.id);
+        console.log('Gewinner vom Backend:', response.data.winner.name);
+        setWinner(response.data?.winner.name || null);
+      } catch (err) {
+        setError(`Fehler beim Abrufen: ${(err as Error).message}`);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    fetchWinner();
+  }, [game]);
+  
 
-    function getWinnerFromPlayers(){
-        if(allPlayers && allPlayers.length > 0){
-            const winner = allPlayers[getRandomNumber(0, allPlayers.length - 1)]
-            return winner;
-        }else{
-            return null;
-        }
-    }
+  if (loading) {
+    return (
+      <Stack align="center">
+        <Text>Wird geladen...</Text>
+        <Loader />
+      </Stack>
+    );
+  }
 
-    const winner = getWinnerFromPlayers();
-    
-    return(
-        <Stack>
-            <Text style={{textAlign:'center'}}>
-                Gewinner des Spiels : 
-            </Text>
-            <Badge
-                fullWidth
-                leftSection = {trophy}
-                rightSection = {trophy}
-                color='#334d80'
-                size='xl'
-                >
-                {winner ? winner.name : 'Niemand'}
-            </Badge>
-        </Stack>
-    ); 
+  if (error) {
+    return (
+      <Stack align="center">
+        <Text color="red">Fehler: {error}</Text>
+      </Stack>
+    );
+  }
+
+  return (
+    <Stack>
+      <Text style={{ textAlign: 'center' }}>Gewinner des Spiels:</Text>
+      <Badge
+        fullWidth
+        leftSection={trophy}
+        rightSection={trophy}
+        color="#334d80"
+        size="xl"
+      >
+        {winner || 'Niemand1'}
+      </Badge>
+    </Stack>
+  );
 }
