@@ -1,14 +1,14 @@
 'use client';
 
 import React, { forwardRef, useEffect, useState } from 'react';
-import { Bar, CartesianGrid, ComposedChart, Legend, Line, Tooltip, XAxis, YAxis } from 'recharts';
+import { Bar, LabelList, CartesianGrid, ComposedChart, Legend, Line, Tooltip, XAxis, YAxis } from 'recharts';
 import { Game } from '@gametheorygoodsgame/gametheory-openapi/api';
 import { logger } from '@/utils/logger';
 
 type PlotProps = {
-  game: Game | undefined;
-  portHeight: number;
-  portWidth: number;
+    game: Game | undefined;
+    portHeight: number;
+    portWidth: number;
 };
 
 /**
@@ -62,24 +62,88 @@ const Plot = forwardRef<any, PlotProps>((props, ref) => {
 
     return (
         <ComposedChart
-          width={portWidth - 500}
-          height={portHeight - 300}
-          data={gameStatistic}
-          margin={{
-                top: 0,
-                right: 0,
-                left: 0,
-                bottom: 0,
-            }}
-        >
-            <CartesianGrid />
-            <XAxis dataKey="turn" />
-            <Tooltip />
-            <Legend />
-            <Bar dataKey="numOfRedCardsPlayed" name="Anzahl Roter Karten im Pot" fill="#334d80" barSize={60} />
-            <Line dataKey="redCardHandValue" name="Wert der Roten Karte" stroke="#cc4444" strokeWidth={3} />
-            <YAxis allowDecimals={false} />
-        </ComposedChart>
+  width={portWidth - 500}
+  height={portHeight - 300}
+  data={gameStatistic}
+  margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
+>
+  <CartesianGrid />
+  <XAxis dataKey="turn" />
+  <Tooltip />
+  <Legend />
+
+  {/* Sichtbare Y-Achse für Balken */}
+  <YAxis yAxisId="left" allowDecimals={false} />
+
+  {/* Unsichtbare Y-Achse für die Linie */}
+  <YAxis yAxisId="right" hide />
+
+  {/* Balken für rote Karten */}
+  <Bar
+    dataKey="numOfRedCardsPlayed"
+    name="Anzahl Roter Karten im Pot"
+    fill="#334d80"
+    barSize={60}
+    yAxisId="left"
+  >
+    <LabelList
+      dataKey="redCardHandValue"
+      position="top"
+      content={({ x, y, value, width }) => {
+        const radius = 16;
+
+        // Typensicherheit und sinnvolle Sichtbarkeit prüfen
+        const numValue = Number(value);
+        const posX = Number(x);
+        const posY = Number(y);
+        const barWidth = Number(width);
+
+        if (
+          isNaN(numValue) ||
+          isNaN(posX) ||
+          isNaN(posY) ||
+          isNaN(barWidth) ||
+          posY < 0
+        ) {
+          return null;
+        }
+
+        const centerX = posX + barWidth / 2;
+        const centerY = posY - radius - 2; // nie zu weit oben
+
+        return (
+          <g transform={`translate(${centerX}, ${centerY})`}>
+            <circle r={radius} stroke="#cc4444" fill="none" />
+            <text
+              x={0}
+              y={7}
+              textAnchor="middle"
+              fill="#cc4444"
+              fontSize={18}
+              fontWeight="bold"
+            >
+              {numValue}
+            </text>
+          </g>
+        );
+      }}
+    />
+  </Bar>
+
+  {/* Unsichtbare Linie – beeinflusst die Y-Achse nicht */}
+  <Line
+    dataKey="redCardHandValue"
+    name="Wert der Roten Karte"
+    stroke="#cc4444"
+    strokeWidth={0}
+    strokeOpacity={0}
+    dot={false}
+    activeDot={false}
+    yAxisId="right"
+  />
+</ComposedChart>
+
+      
     );
 });
 

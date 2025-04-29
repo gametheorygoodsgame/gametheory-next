@@ -327,7 +327,7 @@ export default function CardSelection() {
                   handleMakeMove();
                 }}
             >
-              {selectedCount !== 2 ? 'Bitte zwei Karten auswählen' : 'Auswahl abgeben'}
+              {selectedCount !== 2 ? 'Bitte zwei Karten auswählen' : 'Auswahl in den Pot'}
             </Button>
           </Center>
         </Container>

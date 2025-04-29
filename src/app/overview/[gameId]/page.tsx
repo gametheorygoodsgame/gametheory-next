@@ -22,6 +22,7 @@ import Plot from '@/components/plot/plot';
 import { useInterval } from '@/utils/hooks';
 import { logger } from '@/utils/logger';
 import ButtonModal from '@/components/modals/buttonModal';
+import RankingModal from '@/components/modals/rankingModal';
 
 /**
  * Component for managing the game overview as a game master.
@@ -44,16 +45,18 @@ export default function GameOverviewGameMaster() {
   const [hasError, { open: openErrorModal, close: closeErrorModal }] = useDisclosure(false);
   const [errorDescription, setErrorDescription] = useState('');
 
+  const [rankingModalOpened, { open: openRankingModal, close: closeRankingModal }] = useDisclosure(false);
+
   const [isTurnProgressionModalOpen, {
     open: openTurnProgressionModal,
     close: closeTurnProgressionModal }] = useDisclosure(false);
 
   const gameApi = new GameApi();
 
-   /**
-   * Fetches the game data from the API.
-   * Handles errors and updates the `game` state with the fetched data.
-   */
+  /**
+  * Fetches the game data from the API.
+  * Handles errors and updates the `game` state with the fetched data.
+  */
   async function fetchGame() {
     try {
       if (!gameId) {
@@ -72,10 +75,10 @@ export default function GameOverviewGameMaster() {
     }
   }
 
-   /**
-   * Handles progressing to the next turn in the game.
-   * Updates the game state with the new red card hand value.
-   */
+  /**
+  * Handles progressing to the next turn in the game.
+  * Updates the game state with the new red card hand value.
+  */
   const handleNextTurn = async () => {
     try {
       if (!game) {
@@ -89,7 +92,7 @@ export default function GameOverviewGameMaster() {
       logger.debug(response.data);
       closeTurnProgressionModal();
     } catch (error) {
-        logger.error('Error updating data: ', error);
+      logger.error('Error updating data: ', error);
     }
   };
 
@@ -113,91 +116,104 @@ export default function GameOverviewGameMaster() {
     }
   };
 
-// Auto-refresh the game data every 10 seconds.
+  // Auto-refresh the game data every 10 seconds.
   useInterval(fetchGame, 10000);
 
   if (loading) {
     return (
-        <Center>
-          <Loader />
-        </Center>
+      <Center>
+        <Loader />
+      </Center>
     );
   }
 
   return (
-      <>
-        <ButtonModal
-          opened={hasError}
-          onClose={closeErrorModal}
-          title="Fehler"
-          rightButton={{ callback: closeErrorModal, text: 'Schließen' }}
-        >
-          <Text>{errorDescription}</Text>
-        </ButtonModal>
-        <Modal
-          opened={isTurnProgressionModalOpen}
-          onClose={closeTurnProgressionModal}
-          title={game?.currentTurn === 0 ? 'Spiel Starten' : 'Nächste Runde'}
-          closeOnClickOutside={false}
-        >
-          <Stack gap="xl">
-            <NumberInput
-              type="text"
-              label="Roter Kartenwert"
-              value={redCardHandValue}
-              onChange={setRedCardHandValue}
-            />
-            <Group align="right">
-              {game?.currentTurn === 0 ? (
-                  <Button bg="brand.0" onClick={handleNextTurn}>Spiel Starten</Button>
-              ) : (
-                  <Button onClick={handleNextTurn}>Nächste Runde</Button>
-              )}
-            </Group>
-          </Stack>
-        </Modal>
-        <Container p={60} pb={0} fluid>
-          <Grid grow justify="space-around" h={screenHeight - 200}>
-            <Grid.Col span={1}>
-              <ScrollArea h={screenHeight - 220}>
-                <PlayerList game={game} />
-              </ScrollArea>
-            </Grid.Col>
-            <Grid.Col span={5}>
-              <Stack justify="space-between" h={screenHeight - 200}>
-                <Group align="right" px={90}>
-                  <Text fw={700}>
-                    Runde: {game?.currentTurn || 0} / {game?.numTurns || 0}
-                  </Text>
-                </Group>
-                <Center>
-                  <Plot
-                    game={game}
-                    portHeight={screenHeight}
-                    portWidth={screenWidth}
-                    ref={plotRef}
-                  />
-                </Center>
-                <Group gap="xl">
-                  <Button variant="outline" color="#cc4444" bg="white" onClick={() => router.push('/overview')} ml = '360px'>
-                    Übersicht
-                  </Button>
-                  {!game?.isFinished && (
+    <>
+      <ButtonModal
+        opened={hasError}
+        onClose={closeErrorModal}
+        title="Fehler"
+        rightButton={{ callback: closeErrorModal, text: 'Schließen' }}
+      >
+        <Text>{errorDescription}</Text>
+      </ButtonModal>
+      <Modal
+        opened={isTurnProgressionModalOpen}
+        onClose={closeTurnProgressionModal}
+        title={game?.currentTurn === 0 ? 'Spiel Starten' : 'Nächste Runde'}
+        closeOnClickOutside={false}
+      >
+        <Stack gap="xl">
+          <NumberInput
+            type="text"
+            label="Roter Kartenwert"
+            value={redCardHandValue}
+            onChange={setRedCardHandValue}
+          />
+          <Group align="right">
+            {game?.currentTurn === 0 ? (
+              <Button bg="brand.0" onClick={handleNextTurn}>Spiel Starten</Button>
+            ) : (
+              <Button onClick={handleNextTurn}>Nächste Runde</Button>
+            )}
+          </Group>
+        </Stack>
+      </Modal>
+      <RankingModal opened={rankingModalOpened} onClose={closeRankingModal} />
+      <Container p={60} pb={0} fluid>
+        <Grid grow justify="space-around" h={screenHeight - 200}>
+          <Grid.Col span={1}>
+            <ScrollArea h={screenHeight - 220}>
+              <PlayerList game={game} />
+            </ScrollArea>
+          </Grid.Col>
+          <Grid.Col span={5}>
+            <Stack justify="space-between" h={screenHeight - 200}>
+              <Group align="right" px={90}>
+                <Text fw={700}>
+                  Runde: {game?.currentTurn || 0} / {game?.numTurns || 0}
+                </Text>
+              </Group>
+              <Center>
+                <Plot
+                  game={game}
+                  portHeight={screenHeight}
+                  portWidth={screenWidth}
+                  ref={plotRef}
+                />
+              </Center>
+              <Group gap="xl">
+                <Button variant="outline" color="#cc4444" bg="white" onClick={() => router.push('/overview')} ml='290px'>
+                  Übersicht
+                </Button>
+                {!game?.isFinished && (
                   game?.currentTurn === (game ? game?.numTurns : -1) ? (
-                  <Button bg="brand.0" onClick={finishGame}>Spiel Beenden</Button>
-                ) : (
-                  game?.currentTurn === 0 ? (
-                  <Button bg="brand.0" onClick={openTurnProgressionModal}>Spiel Starten</Button>
-                ) : (
+                    <Button bg="brand.0" onClick={finishGame}>Spiel Beenden</Button>
+
+                  ) : (
+                    game?.currentTurn === 0 ? (
+                      <Button bg="brand.0" onClick={openTurnProgressionModal}>Spiel Starten</Button>
+
+                    ) : (
                       <Button onClick={openTurnProgressionModal}>Nächste Runde</Button>
                     )
                   )
                 )}
-                </Group>
-              </Stack>
-            </Grid.Col>
-          </Grid>
-        </Container>
-      </>
+                {game?.isFinished && (
+                  <Button
+                    variant="light"
+                    color="red"
+                    onClick={openRankingModal}
+                  >
+                    Spielergebnisse
+                  </Button>
+                )}
+
+              </Group>
+            </Stack>
+          </Grid.Col>
+        </Grid>
+      </Container>
+    </>
   );
 }
