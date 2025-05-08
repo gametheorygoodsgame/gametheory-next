@@ -19,7 +19,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { useRouter } from 'next/navigation';
 import { Game, GameApi, GamePlayerMoveApi, Move } from '@gametheorygoodsgame/gametheory-openapi/api';
 import { logger } from '@/utils/logger';
-import { getMoveNumRedCardEnumValue } from '@/utils/helpers';
+import { MoveNumRedCardsEnum } from '@gametheorygoodsgame/gametheory-openapi';
 import PlayCardGrid from '@/components/playCards/playCardGrid';
 import { useInterval } from '@/utils/hooks';
 import LoadModal from '@/components/modals/loadModal';
@@ -48,8 +48,10 @@ export default function CardSelection() {
   const [playerId, setPlayerId] = useState('');
   const [playerScore, setPlayerScore] = useState(0);
   const [redCardHandValue, setRedCardHandValue] = useState(0);
+  const [game, setGame] = useState<Game | null>(null);
 
-  const [errorDescription, setErrorDescription] = useState('');
+
+    const [errorDescription, setErrorDescription] = useState('');
 
   const [
       isInstructionsModalOpen, {
@@ -135,84 +137,115 @@ export default function CardSelection() {
     });
   }, [currentTurn]);
 
-  const checkGameStatus = async () => {
-    try {
-      const response = await gameApi.getGameById(gameId);
-      const game: Game = response.data;
+    const hasPlayerMovedThisRound = (game: Game | undefined, playerId: string): boolean => {
+        if (!game || !game.players) return false;
 
-      if (response.status === 200 && game) {
-        const newCurrentTurn = game.currentTurn;
-        setNumTurns(game.numTurns);
-        setPotCards(game.potCards);
-        setPlayerScore(getPlayerScore(game, playerId));
-        setRedCardHandValue(game.cardHandValue ? game.cardHandValue[currentTurn] : 1);
+        const player = game.players.find(p => p.id === playerId);
+        if (!player) return false;
 
-        if (game.isFinished === true) {
-          router.push('../../game/endScreen');
+        const isInactive = typeof player.inactiveSinceTurn === 'number' && game.currentTurn >= player.inactiveSinceTurn;
+        const moveThisTurn = player.moves.find(m => m.numTurn === game.currentTurn);
+
+        return !isInactive && !!moveThisTurn;
+    };
+
+    const checkGameStatus = async () => {
+        try {
+            const response = await gameApi.getGameById(gameId);
+            const game: Game = response.data;
+
+            if (response.status === 200 && game) {
+                const newCurrentTurn = game.currentTurn;
+
+                // 📦 Setze Spielstatus
+                setNumTurns(game.numTurns);
+                setPotCards(game.potCards);
+                setPlayerScore(getPlayerScore(game, playerId));
+                setRedCardHandValue(game.cardHandValue ? game.cardHandValue[newCurrentTurn] : 1);
+
+                // 🧼 Immer beide Modals schließen – nur eines wird im Anschluss geöffnet
+                closeWaitingForGameStartModal();
+                closeWaitingForNextTurnModal();
+
+                // 🛑 Falls das Spiel beendet ist → Endscreen
+                if (game.isFinished === true) {
+                    router.push('../../game/endScreen');
+                    return;
+                }
+
+                // ⏳ Warte auf Spielstart (nur bei Turn 0)
+                if (newCurrentTurn === 0) {
+                    openWaitingForGameStartModal();
+                }
+
+                // 🔄 Setze Turnwechsel
+                if (newCurrentTurn !== currentTurn) {
+                    setCurrentTurn(newCurrentTurn);
+                    resetSelection();
+                }
+
+                // ✅ Spieler identifizieren
+                const player = Array.isArray(game.players)
+                    ? game.players.find(p => p.id === playerId)
+                    : undefined;
+
+                // 🚫 Spieler inaktiv?
+                const isInactive = typeof player.inactiveSinceTurn === 'number'
+                    && newCurrentTurn >= player.inactiveSinceTurn;
+
+                // ✅ Spieler hat bereits Karte abgegeben?
+                const move = player.moves.find(m => m?.numTurn === newCurrentTurn);
+
+                if (!isInactive && move && newCurrentTurn !== 0) {
+                    setNumRedCards(move.numRedCards);
+                    openWaitingForNextTurnModal();
+                }
+            }
+        } catch (error) {
+            logger.error(error);
+            const message =
+                (error as any)?.response?.data?.message || error.message || 'Unbekannter Fehler';
+            setErrorDescription(message);
+            openErrorModal();
+        } finally {
+            setLoading(false);
         }
+    };
 
-        if (newCurrentTurn === 0) {
-          openWaitingForGameStartModal();
-          closeWaitingForNextTurnModal();
-        } else {
-          closeWaitingForGameStartModal();
-        }
 
-        if (newCurrentTurn !== currentTurn) {
-          setCurrentTurn(newCurrentTurn);
-          resetSelection();
-          closeWaitingForNextTurnModal();
-        }
-        //folgendes funktioniert solange jeder spieler pro Runde einen Zug macht
-        if (getPlayerMoveCount(game, playerId) - 1 === game.currentTurn && game.currentTurn !== 0) {
-          setNumRedCards(getPlayerRedCards(game, playerId))
-          openWaitingForNextTurnModal();
-        }
-      }
-    } catch (error) {
-      logger.error(error);
-      setErrorDescription(`${(error as Error).name}: ${(error as Error).cause}; ${(error as Error).stack}`);
-      openErrorModal();
-    } finally {
-      setLoading(false);
-    }
-  };
 
-   /**
+    /**
    * Makes a move for the current player.
    * Updates the game state through the API.
    */
-  const handleMakeMove = async () => {
-    try {
-      if (!gameId || !playerId) {
-        throw new Error();
-      }
+    const handleMakeMove = async () => {
+        try {
+            if (!gameId || !playerId) return;
 
-      const move: Move = {
-        numTurn: currentTurn,
-        numRedCards: getMoveNumRedCardEnumValue(numRedCards),
-      };
+            const move = {
+                numRedCards: numRedCards as MoveNumRedCardsEnum,
+                numTurn: currentTurn,
+            };
 
-      logger.debug(move);
+            const moveApi = new GamePlayerMoveApi(); // erzeugt die API-Instanz
+            const response = await moveApi.createMoveForPlayerInGame(gameId, playerId, move);
 
-      const response = await gamePlayerMoveApi.createMoveForPlayerInGame(gameId, playerId, move);
+            if (response.status === 200) {
+                closeErrorModal();
+                await checkGameStatus(); // öffnet Modal nur, wenn Spieler aktiv ist
+            } else {
+                openErrorModal();
+            }
+        } catch (error: unknown) {
+            const err = error as Error;
+            logger.error(err);
+            const message = (err as any)?.response?.data?.message || err.message || 'Unbekannter Fehler';
+            setErrorDescription(message);
+            openErrorModal();
+        }
+    };
 
-      if (response.status !== 200) {
-        openErrorModal();
-      } else {
-        closeErrorModal();
-      }
-
-      await checkGameStatus();
-      openWaitingForNextTurnModal();
-    } catch (error) {
-      logger.error(error);
-      setErrorDescription(`${(error as Error).name}: ${(error as Error).cause}; ${(error as Error).stack}`);
-      openErrorModal();
-    }
-  };
-
-  /**
+    /**
    * Fetches game data periodically using a 10-second interval.
    */
   function fetchData() {
@@ -258,15 +291,26 @@ export default function CardSelection() {
               Warten auf den Start des Spiels durch den Spielleiter...
             </Text>
         </LoadModal>
-        <ButtonModal
-          opened={hasError}
-          onClose={closeErrorModal}
-          title="Fehler"
-          leftButton={{ callback: () => router.push('/login/player'), text: 'Zurück zum Login' }}
-          rightButton={{ callback: () => { closeErrorModal(); handleMakeMove(); }, text: 'Erneut senden' }}
-        >
-            <Text>{errorDescription}</Text>
-        </ButtonModal>
+          <ButtonModal
+            opened={hasError}
+            onClose={closeErrorModal}
+            title="Fehler"
+            leftButton={{
+                  text: 'Zurück zum Login',
+                  callback: () => router.push('/login/player'),
+              }}
+            {...(!errorDescription?.includes('inaktiv') && {
+                  rightButton: {
+                      text: 'Erneut senden',
+                      callback: () => {
+                          closeErrorModal();
+                          handleMakeMove();
+                      },
+                  },
+              })}
+          >
+              <Text>{errorDescription}</Text>
+          </ButtonModal>
         <Container
           fluid
           p={0}
@@ -323,7 +367,6 @@ export default function CardSelection() {
             <Button
               disabled={selectedCount !== 2}
               onClick={() => {
-                  openWaitingForNextTurnModal();
                   handleMakeMove();
                 }}
             >
