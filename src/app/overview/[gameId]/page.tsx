@@ -22,38 +22,16 @@ import Plot from '@/components/plot/plot';
 import { useInterval } from '@/utils/hooks';
 import { logger } from '@/utils/logger';
 import ButtonModal from '@/components/modals/buttonModal';
+import RankingModal from '@/components/modals/buttonModal';
 
-type ExtendedPlayer = Player & { inactiveSinceTurn?: number };
-
-const cleanPlayers = (players: ExtendedPlayer[]): Player[] => {
-  return players.map(player => ({
-    id: player.id,
-    name: player.name || '',
-    score: player.score ?? 0,
-    moves: Array.isArray(player.moves)
-        ? player.moves.map(m => ({
-          numTurn: m?.numTurn ?? 0,
-          numRedCards: m?.numRedCards ?? 0
-        }))
-        : [],
-    ...(typeof player.inactiveSinceTurn === 'number' && {
-      inactiveSinceTurn: player.inactiveSinceTurn
-    })
-  }));
-};
-
-const createValidGamePayload = (game: Game): Game => ({
-  id: game.id,
-  name: game.name || '',
-  numTurns: game.numTurns || 5,
-  currentTurn: game.currentTurn ?? 0,
-  cardHandValue: game.cardHandValue.map(Number),
-  cardPotValue: game.cardPotValue.map(Number),
-  potCards: game.potCards.map(Number),
-  isFinished: game.isFinished ?? false,
-  players: cleanPlayers(game.players as ExtendedPlayer[])
-});
-
+/**
+ * Component for managing the game overview as a game master.
+ *
+ * Displays the current game state, allows progression through turns, and provides functionality
+ * to start, end, or update the game. The component auto-refreshes game data periodically.
+ *
+ * @returns {JSX.Element} The rendered game overview for the game master.
+ */
 export default function GameOverviewGameMaster() {
   const router = useRouter();
   const plotRef = useRef();
@@ -63,25 +41,32 @@ export default function GameOverviewGameMaster() {
   const { gameId } = useParams<{ gameId?: string }>();
   const [redCardHandValue, setRedCardHandValue] = useState<number | string>(1);
   const [game, setGame] = useState<Game>();
-  const [playersToSkip, setPlayersToSkip] = useState<ExtendedPlayer[]>([]);
 
   const [hasError, { open: openErrorModal, close: closeErrorModal }] = useDisclosure(false);
   const [errorDescription, setErrorDescription] = useState('');
+
+  const [isSkipModalOpen, { open: openSkipModal, close: closeSkipModal }] = useDisclosure(false);
+  const [rankingModalOpened, { open: openRankingModal, close: closeRankingModal }] = useDisclosure(false);
 
   const [isTurnProgressionModalOpen, {
     open: openTurnProgressionModal,
     close: closeTurnProgressionModal }] = useDisclosure(false);
 
-  const [isSkipModalOpen, { open: openSkipModal, close: closeSkipModal }] = useDisclosure(false);
-
   const gameApi = new GameApi();
 
+  /**
+  * Fetches the game data from the API.
+  * Handles errors and updates the `game` state with the fetched data.
+  */
   async function fetchGame() {
     try {
-      if (!gameId) throw new Error('Missing gameId');
+      if (!gameId) {
+        throw new Error('No Game ID.');
+      }
       const response = await gameApi.getGameById(gameId);
       setGame(response.data);
       logger.info('Fetched game data successfully.');
+      logger.debug(response.data);
     } catch (error) {
       setErrorDescription(`${(error as Error).name}: ${(error as Error).cause}; ${(error as Error).stack}`);
       openErrorModal();
@@ -91,191 +76,196 @@ export default function GameOverviewGameMaster() {
     }
   }
 
-  const proceedToNextTurn = async () => {
+  /**
+     * Sets inactive Status for unfinished Players by parameters currentGameObject and ID of the player.
+     * @param {Game} aGame - The game object.
+     */
+      const SkipUnfinishedPlayers = async () => {
+        try{
+          fetchGame();
+          if (!game) {
+            throw new Error('Game not found');
+          }
+          game.players.forEach((player:Player) => {
+          if(player.moves.length <= game.currentTurn){
+            player.inactiveSinceTurn = game.currentTurn
+          }
+        });
+        const response = await gameApi.updateGameById(gameId, game);
+        setGame(response.data);
+        logger.info('Updated game data successfully.');
+        logger.debug(response.data);
+        closeSkipModal();
+        closeTurnProgressionModal();
+        } catch (error) {
+            logger.error('Error updating data: ', error);
+          }
+        }
+
+  function determineInactive(player:Player):boolean{
+    return player.moves.length <= game.currentTurn && player.inactiveSinceTurn === -1;
+  }
+      
+
+  /**
+  * Handles progressing to the next turn in the game.
+  * Updates the game state with the new red card hand value.
+  */
+  const handleNextTurn = async () => {
     try {
-      if (!game || !gameId) return;
-
-      game.cardHandValue.push(
-          typeof redCardHandValue === 'number'
-              ? redCardHandValue
-              : parseInt(redCardHandValue, 10)
-      );
-
-      const payload = createValidGamePayload(game);
+      if (!game) {
+        throw new Error('Game not found');
+      }
+      if (game.players.some(determineInactive)){
+        openSkipModal();
+      }
+      else{
+      game.cardHandValue.push(typeof redCardHandValue === 'number' ? redCardHandValue : parseInt(redCardHandValue, 10));
+      // @ts-ignore
       const response = await gameApi.updateGameById(gameId, game);
       setGame(response.data);
+      logger.info('Updated game data successfully.');
+      logger.debug(response.data);
+      closeTurnProgressionModal();
+      }
+      
+    } catch (error) {
+      logger.error('Error updating data: ', error);
+    }
+  };
+
+  /**
+   * Handles finishing the game.
+   * Sends the final game state to the API and closes the turn progression modal.
+   */
+  const finishGame = async () => {
+    try {
+      if (!game) {
+        throw new Error('Game not found');
+      }
+      // @ts-ignore
+      const response = await gameApi.updateGameById(gameId, game);
+      setGame(response.data);
+      logger.info('Updated game data successfully.');
+      logger.debug(response.data);
       closeTurnProgressionModal();
     } catch (error) {
       logger.error('Error updating data: ', error);
     }
   };
 
-  // 🔧 Patch für handleSkipAndContinue in page.tsx – final mit sauberem Reload
-
-  const handleSkipAndContinue = async () => {
-    try {
-      if (!game || !gameId) return;
-
-      // 🛡️ Setze inactiveSinceTurn statt Spieler zu löschen
-      (game.players as ExtendedPlayer[]).forEach(player => {
-        if (playersToSkip.some(skip => skip.id === player.id)) {
-          player.inactiveSinceTurn = game.currentTurn;
-        }
-      });
-
-      // Füge Kartenwert hinzu
-      game.cardHandValue.push(
-          typeof redCardHandValue === 'number'
-              ? redCardHandValue
-              : parseInt(redCardHandValue, 10)
-      );
-
-      const payload = createValidGamePayload(game);
-      console.log('🛰️ Sende Payload an API (Spieler überspringen):', JSON.stringify(payload, null, 2));
-
-      const response = await gameApi.updateGameById(gameId, game);
-      setGame({ ...response.data }); // 🧠 React-Update forcieren
-
-      closeSkipModal();
-      closeTurnProgressionModal();
-    } catch (error) {
-      logger.error('Error skipping players: ', error);
-    }
-  };
-
-
-  const handleNextTurn = async () => {
-    if (!game) return;
-
-    const inactivePlayers = (game.players as ExtendedPlayer[]).filter(
-        p =>
-            p.inactiveSinceTurn === undefined &&
-            !p.moves?.some?.(m => m?.numTurn === game.currentTurn)
-    );
-
-    if (inactivePlayers.length > 0) {
-      setPlayersToSkip(inactivePlayers);
-      openSkipModal();
-      return;
-    }
-
-    await proceedToNextTurn();
-  };
-
-  const finishGame = async () => {
-    try {
-      if (!game || !gameId) return;
-
-      const payload = createValidGamePayload(game);
-      const response = await gameApi.updateGameById(gameId, game); // ✅ FIXED
-      setGame(response.data);
-      closeTurnProgressionModal();
-    } catch (error) {
-      logger.error('Error finishing game: ', error);
-    }
-  };
-
+  // Auto-refresh the game data every 10 seconds.
   useInterval(fetchGame, 10000);
 
   if (loading) {
     return (
-        <Center>
-          <Loader />
-        </Center>
+      <Center>
+        <Loader />
+      </Center>
     );
   }
 
   return (
-      <>
-        <ButtonModal
-          opened={hasError}
-          onClose={closeErrorModal}
-          title="Fehler"
-          rightButton={{ callback: closeErrorModal, text: 'Schließen' }}
-        >
-          <Text>{errorDescription}</Text>
-        </ButtonModal>
-
-        <Modal
-          opened={isTurnProgressionModalOpen}
-          onClose={closeTurnProgressionModal}
-          title={game?.currentTurn === 0 ? 'Spiel Starten' : 'Nächste Runde'}
-          closeOnClickOutside={false}
-        >
-          <Stack gap="xl">
-            <NumberInput
-              type="text"
-              label="Roter Kartenwert"
-              value={redCardHandValue}
-              onChange={setRedCardHandValue}
-            />
-            <Group align="right">
-              {game?.currentTurn === 0 ? (
-                  <Button bg="brand.0" onClick={handleNextTurn}>Spiel Starten</Button>
-              ) : (
-                  <Button onClick={handleNextTurn}>Nächste Runde</Button>
-              )}
-            </Group>
-          </Stack>
-        </Modal>
-
-        <Modal
+    <>
+      <ButtonModal
+        opened={hasError}
+        onClose={closeErrorModal}
+        title="Fehler"
+        rightButton={{ callback: closeErrorModal, text: 'Schließen' }}
+      >
+        <Text>{errorDescription}</Text>
+      </ButtonModal>
+      <Modal
+        opened={isTurnProgressionModalOpen}
+        onClose={closeTurnProgressionModal}
+        title={game?.currentTurn === 0 ? 'Spiel Starten' : 'Nächste Runde'}
+        closeOnClickOutside={false}
+      >
+        <Stack gap="xl">
+          <NumberInput
+            type="text"
+            label="Roter Kartenwert"
+            value={redCardHandValue}
+            onChange={setRedCardHandValue}
+          />
+          <Group align="right">
+            {game?.currentTurn === 0 ? (
+              <Button bg="brand.0" onClick={handleNextTurn}>Spiel Starten</Button>
+            ) : (
+              <Button onClick={handleNextTurn}>Nächste Runde</Button>
+            )}
+          </Group>
+        </Stack>
+      </Modal>
+      <Modal
           opened={isSkipModalOpen}
           onClose={closeSkipModal}
           title="Spieler überspringen?"
           closeOnClickOutside={false}
         >
-          <Text>{playersToSkip.length} Spieler haben ihren Zug nicht abgegeben. Möchten Sie sie entfernen und zur nächsten Runde fortfahren?</Text>
+          <Text> Spieler haben ihren Zug nicht abgegeben. Möchten Sie sie entfernen und zur nächsten Runde fortfahren?</Text>
           <Stack mt="md">
             <Group justify="flex-end">
               <Button variant="default" onClick={closeSkipModal}>Abbrechen</Button>
-              <Button color="red" onClick={handleSkipAndContinue}>Entfernen & Fortfahren</Button>
+              <Button color="red" onClick={SkipUnfinishedPlayers}>Entfernen & Fortfahren</Button>
             </Group>
           </Stack>
         </Modal>
+      <RankingModal opened={rankingModalOpened} onClose={closeRankingModal} />
+      <Container p={60} pb={0} fluid>
+        <Grid grow justify="space-around" h={screenHeight - 200}>
+          <Grid.Col span={1}>
+            <ScrollArea h={screenHeight - 220}>
+              <PlayerList game={game} />
+            </ScrollArea>
+          </Grid.Col>
+          <Grid.Col span={5}>
+            <Stack justify="space-between" h={screenHeight - 200}>
+              <Group align="right" px={90}>
+                <Text fw={700}>
+                  Runde: {game?.currentTurn || 0} / {game?.numTurns || 0}
+                </Text>
+              </Group>
+              <Center>
+                <Plot
+                  game={game}
+                  portHeight={screenHeight}
+                  portWidth={screenWidth}
+                  ref={plotRef}
+                />
+              </Center>
+              <Group gap="xl">
+                <Button variant="outline" color="#cc4444" bg="white" onClick={() => router.push('/overview')} ml='290px'>
+                  Übersicht
+                </Button>
+                {!game?.isFinished && (
+                  game?.currentTurn === (game ? game?.numTurns : -1) ? (
+                    <Button bg="brand.0" onClick={finishGame}>Spiel Beenden</Button>
 
-        <Container p={60} pb={0} fluid>
-          <Grid grow justify="space-around" h={screenHeight - 200}>
-            <Grid.Col span={1}>
-              <ScrollArea h={screenHeight - 220}>
-                <PlayerList game={game as Game} />
-              </ScrollArea>
-            </Grid.Col>
-            <Grid.Col span={5}>
-              <Stack justify="space-between" h={screenHeight - 200}>
-                <Group align="right" px={90}>
-                  <Text fw={700}>
-                    Runde: {game?.currentTurn || 0} / {game?.numTurns || 0}
-                  </Text>
-                </Group>
-                <Center>
-                  <Plot
-                    game={game as Game}
-                    portHeight={screenHeight}
-                    portWidth={screenWidth}
-                    ref={plotRef}
-                  />
-                </Center>
-                <Group gap="xl">
-                  <Button variant="outline" color="#cc4444" bg="white" onClick={() => router.push('/overview')} ml="360px">
-                    Übersicht
+                  ) : (
+                    game?.currentTurn === 0 ? (
+                      <Button bg="brand.0" onClick={openTurnProgressionModal}>Spiel Starten</Button>
+
+                    ) : (
+                      <Button onClick={openTurnProgressionModal}>Nächste Runde</Button>
+                    )
+                  )
+                )}
+                {game?.isFinished && (
+                  <Button
+                    variant="light"
+                    color="red"
+                    onClick={openRankingModal}
+                  >
+                    Spielergebnisse
                   </Button>
-                  {!game?.isFinished && (
-                      game?.currentTurn === game?.numTurns ? (
-                          <Button bg="brand.0" onClick={finishGame}>Spiel Beenden</Button>
-                      ) : (
-                          game?.currentTurn === 0 ? (
-                              <Button bg="brand.0" onClick={openTurnProgressionModal}>Spiel Starten</Button>
-                          ) : (
-                              <Button onClick={openTurnProgressionModal}>Nächste Runde</Button>
-                          )
-                      )
-                  )}
-                </Group>
-              </Stack>
-            </Grid.Col>
-          </Grid>
-        </Container>
-      </>
+                )}
+
+              </Group>
+            </Stack>
+          </Grid.Col>
+        </Grid>
+      </Container>
+    </>
   );
 }
