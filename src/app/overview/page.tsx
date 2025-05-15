@@ -42,6 +42,11 @@ import * as XLSX from 'xlsx';
  */
 export default function GamesOverview() {
   const { height: screenHeight, width: screenWidth } = useViewportSize();
+
+  const shortestDimension = shortestOf( screenHeight, screenWidth);
+
+
+  
   const { push } = useRouter();
   const gameApi = new GameApi();
 
@@ -345,11 +350,11 @@ export default function GamesOverview() {
             onChange={(event) => setGameName(event.target.value)}
           />
         </ButtonModal>
-        <Modal size={screenHeight * 0.8} opened={isQrModalOpen} onClose={closeQrModal} title="QR Code" closeOnClickOutside={false}>
+        <Modal size={shortestDimension * 0.8} opened={isQrModalOpen} onClose={closeQrModal} title="QR Code" closeOnClickOutside={false}>
           <Center>
             <Stack gap="xl">
               <Text>Scanne den Code zum Beitreten.</Text>
-              <QRCodeSVG value={`${window.location.host}/login/player/${qrGameID}`} size={screenHeight * 0.6} />
+              <QRCodeSVG value={`${window.location.host}/login/player/${qrGameID}`} size={shortestDimension * 0.6} />
             </Stack>
           </Center>
           <Space h="lg" />
@@ -381,3 +386,12 @@ export default function GamesOverview() {
       </>
   );
 }
+function shortestOf(screenHeight: number, screenWidth: number) {
+  if (screenHeight > screenWidth){
+    return screenWidth
+  }
+  else{
+    return screenHeight
+  }
+}
+

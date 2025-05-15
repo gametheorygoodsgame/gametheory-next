@@ -22,7 +22,7 @@ import Plot from '@/components/plot/plot';
 import { useInterval } from '@/utils/hooks';
 import { logger } from '@/utils/logger';
 import ButtonModal from '@/components/modals/buttonModal';
-import RankingModal from '@/components/modals/buttonModal';
+import RankingModal from '@/components/modals/rankingModal';
 
 /**
  * Component for managing the game overview as a game master.
@@ -44,7 +44,6 @@ export default function GameOverviewGameMaster() {
 
   const [hasError, { open: openErrorModal, close: closeErrorModal }] = useDisclosure(false);
   const [errorDescription, setErrorDescription] = useState('');
-
   const [isSkipModalOpen, { open: openSkipModal, close: closeSkipModal }] = useDisclosure(false);
   const [rankingModalOpened, { open: openRankingModal, close: closeRankingModal }] = useDisclosure(false);
 
@@ -76,7 +75,7 @@ export default function GameOverviewGameMaster() {
     }
   }
 
-  /**
+  /*
      * Sets inactive Status for unfinished Players by parameters currentGameObject and ID of the player.
      * @param {Game} aGame - The game object.
      */
