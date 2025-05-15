@@ -10,7 +10,7 @@ interface ButtonModalProps {
         text: string;
         callback: () => void;
     }
-    rightButton: {
+    rightButton?: {
         text: string;
         callback: () => void;
     }
@@ -18,11 +18,11 @@ interface ButtonModalProps {
 
 /**
  * A modal component that displays customizable content and two buttons (left and right).
- * The modal has an optional left button and a required right button with customizable 
- * text and callback actions. It also includes a customizable title and prevents closing 
+ * The modal has an optional left button and a required right button with customizable
+ * text and callback actions. It also includes a customizable title and prevents closing
  * when clicking outside the modal.
- * 
- * 
+ *
+ *
  * @param {ButtonModalProps} props - The props for the ButtonModal component.
  * @param {React.ReactNode} props.children - The content to be rendered inside the modal.
  * @param {boolean} props.opened - A boolean that controls whether the modal is open or closed.
@@ -34,7 +34,7 @@ interface ButtonModalProps {
  * @param {string} props.rightButton.text - The text displayed on the right button.
  * @param {Function} props.rightButton.callback - The callback function executed when the right button is clicked.
  * @param {string} [props.title] - An optional title displayed at the top of the modal.
- * 
+ *
  * @returns {JSX.Element} A modal with customizable content and two buttons, with optional left and right actions.
  */
 
@@ -64,7 +64,11 @@ export default function ButtonModal({ children, opened, onClose, leftButton, rig
                             {leftButton.text}
                         </Button>
                     ) : null}
-                    <Button onClick={rightButton.callback}>{rightButton.text}</Button>
+                    {rightButton && (
+                        <Button onClick={rightButton.callback}>
+                            {rightButton.text}
+                        </Button>
+                    )}
                 </Group>
             </Container>
         </Modal>

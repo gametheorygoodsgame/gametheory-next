@@ -44,6 +44,8 @@ export default function CardSelection() {
   const [hasError, { open: openErrorModal, close: closeErrorModal }] = useDisclosure(false);
   const [isWaitingForGameStart, { open: openWaitingForGameStartModal,
     close: closeWaitingForGameStartModal }] = useDisclosure(true);
+  const [isInactive, { open: openInactiveModal,
+    close: closeInactiveModal }] = useDisclosure(true);
   const [gameId, setGameId] = useState('');
   const [playerId, setPlayerId] = useState('');
   const [playerScore, setPlayerScore] = useState(0);
@@ -125,6 +127,20 @@ export default function CardSelection() {
     return player ? player.moves[player.moves.length - 1].numRedCards : 0;
   };
 
+    /**
+   * Retrieves since when the Player was inactive for a player by parameters currentGameObject and ID of the player.
+   * @param {Game} aGame - The game object.
+   * @param {string} aPlayerId - The ID of the player.
+   * @returns {number} - The Turn the player was skipped.
+   */
+    const getPlayerInactiveSinceTurn = (aGame: Game, aPlayerId: string): number => {
+      let player = null;
+      if (aGame.players) {
+        player = aGame.players.find((p) => p.id === aPlayerId);
+      }
+      return player ? player.inactiveSinceTurn : 0;
+    };
+
   useEffect(() => {
     const playCardIds = ['1', '2', '3', '4'];
     playCardIds.forEach((cardId) => {
@@ -149,6 +165,11 @@ export default function CardSelection() {
 
         if (game.isFinished === true) {
           router.push('../../game/endScreen');
+        }
+        closeInactiveModal();
+
+        if (getPlayerInactiveSinceTurn(game, playerId) !== -1){
+          openInactiveModal();
         }
 
         if (newCurrentTurn === 0) {
@@ -256,6 +277,11 @@ export default function CardSelection() {
         <LoadModal opened={isWaitingForGameStart} onClose={closeWaitingForGameStartModal}>
             <Text>
               Warten auf den Start des Spiels durch den Spielleiter...
+            </Text>
+        </LoadModal>
+        <LoadModal opened={isInactive} onClose={closeInactiveModal}>
+            <Text>
+              Du wurdest vom Spielleiter übersprungen und kannst nicht mehr mitspielen.
             </Text>
         </LoadModal>
         <ButtonModal
