@@ -15,7 +15,7 @@ import {
   Text,
 } from '@mantine/core';
 import { useDisclosure, useViewportSize } from '@mantine/hooks';
-import { Game, GameApi } from '@gametheorygoodsgame/gametheory-openapi/api';
+import { Game, GameApi, Player } from '@gametheorygoodsgame/gametheory-openapi/api';
 import { useParams, useRouter } from 'next/navigation';
 import PlayerList from '@/components/playerList/playerList';
 import Plot from '@/components/plot/plot';
@@ -44,7 +44,7 @@ export default function GameOverviewGameMaster() {
 
   const [hasError, { open: openErrorModal, close: closeErrorModal }] = useDisclosure(false);
   const [errorDescription, setErrorDescription] = useState('');
-
+  const [isSkipModalOpen, { open: openSkipModal, close: closeSkipModal }] = useDisclosure(false);
   const [rankingModalOpened, { open: openRankingModal, close: closeRankingModal }] = useDisclosure(false);
 
   const [isTurnProgressionModalOpen, {
@@ -75,6 +75,37 @@ export default function GameOverviewGameMaster() {
     }
   }
 
+  /*
+     * Sets inactive Status for unfinished Players by parameters currentGameObject and ID of the player.
+     * @param {Game} aGame - The game object.
+     */
+      const SkipUnfinishedPlayers = async () => {
+        try{
+          fetchGame();
+          if (!game) {
+            throw new Error('Game not found');
+          }
+          game.players.forEach((player:Player) => {
+          if(player.moves.length <= game.currentTurn){
+            player.inactiveSinceTurn = game.currentTurn
+          }
+        });
+        const response = await gameApi.updateGameById(gameId, game);
+        setGame(response.data);
+        logger.info('Updated game data successfully.');
+        logger.debug(response.data);
+        closeSkipModal();
+        closeTurnProgressionModal();
+        } catch (error) {
+            logger.error('Error updating data: ', error);
+          }
+        }
+
+  function determineInactive(player:Player):boolean{
+    return player.moves.length <= game.currentTurn && player.inactiveSinceTurn === -1;
+  }
+      
+
   /**
   * Handles progressing to the next turn in the game.
   * Updates the game state with the new red card hand value.
@@ -84,6 +115,10 @@ export default function GameOverviewGameMaster() {
       if (!game) {
         throw new Error('Game not found');
       }
+      if (game.players.some(determineInactive)){
+        openSkipModal();
+      }
+      else{
       game.cardHandValue.push(typeof redCardHandValue === 'number' ? redCardHandValue : parseInt(redCardHandValue, 10));
       // @ts-ignore
       const response = await gameApi.updateGameById(gameId, game);
@@ -91,6 +126,8 @@ export default function GameOverviewGameMaster() {
       logger.info('Updated game data successfully.');
       logger.debug(response.data);
       closeTurnProgressionModal();
+      }
+      
     } catch (error) {
       logger.error('Error updating data: ', error);
     }
@@ -159,6 +196,20 @@ export default function GameOverviewGameMaster() {
           </Group>
         </Stack>
       </Modal>
+      <Modal
+          opened={isSkipModalOpen}
+          onClose={closeSkipModal}
+          title="Spieler überspringen?"
+          closeOnClickOutside={false}
+        >
+          <Text> Spieler haben ihren Zug nicht abgegeben. Möchten Sie sie entfernen und zur nächsten Runde fortfahren?</Text>
+          <Stack mt="md">
+            <Group justify="flex-end">
+              <Button variant="default" onClick={closeSkipModal}>Abbrechen</Button>
+              <Button color="red" onClick={SkipUnfinishedPlayers}>Entfernen & Fortfahren</Button>
+            </Group>
+          </Stack>
+        </Modal>
       <RankingModal opened={rankingModalOpened} onClose={closeRankingModal} />
       <Container p={60} pb={0} fluid>
         <Grid grow justify="space-around" h={screenHeight - 200}>
