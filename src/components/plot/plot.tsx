@@ -73,7 +73,7 @@ const Plot = forwardRef<any, PlotProps>((props, ref) => {
   <Legend />
 
   {/* Sichtbare Y-Achse für Balken */}
-  <YAxis yAxisId="left" allowDecimals={false} />
+  <YAxis yAxisId="left" allowDecimals={false}  domain={[0, (dataMax: number) => Math.ceil(dataMax * 1.5)]} />
 
   {/* Unsichtbare Y-Achse für die Linie */}
   <YAxis yAxisId="right" hide />
