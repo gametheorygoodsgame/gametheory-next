@@ -195,102 +195,102 @@ export default function GamesOverview() {
     }
   };
 
-  const exportToExcel = (game: Game) => {
-
-
-    const calculateColumnWidths = (data: { [key: string]: any }[]) => {
-        const colWidths: number[] = [];
-
-        if (data.length > 0) {
-            Object.keys(data[0]).forEach((col, i) => {
-                colWidths[i] = col.length;
-            });
-        }
-        data.forEach(row => {
-            Object.keys(row).forEach((col, i) => {
-                const value = row[col] ? row[col].toString() : ""; 
-                const length = value.length;
-
-                if (length > colWidths[i]) {
-                    colWidths[i] = length;
-                }
-            });
-        });
-        return colWidths.map(w => ({
-            wch: Math.max(w, 14)
-        }));
-    };
-
-    
-    const wb = XLSX.utils.book_new();
-    const generalData: { [key: string]: any }[] = [];
-    const playerBalances: { name: string, balance: number, data: { [key: string]: any }[] }[] = [];
-
-    game.players.forEach((player: Player) => {
-        let balance = 0;
-        const playerData: { [key: string]: any }[] = [];
-
-        for (let turn = 1; turn <= game.numTurns; turn++) {
-
-            const cardValue = game.cardHandValue[turn];
-            let numRedCards = 0;
-            let potRedCards = 0;
-
-            const move = player.moves.find((m: Move) => m.numTurn === turn);
-            if (move) {
-                numRedCards = move.numRedCards;
-            }
-            game.players.forEach(p => {
-                const pMove = p.moves.find((m: Move) => m.numTurn === turn);
-                if (pMove) {
-                    potRedCards += pMove.numRedCards;
-                }
-            });
-            const remainingRedCards = 2 - numRedCards;
-            balance += (remainingRedCards * cardValue) + potRedCards;
-
-            const rowData: { [key: string]: any } = {
-                "Runde": turn,
-                "Kartenwert": cardValue,
-                "Rote Karten im Pot": potRedCards,
-                "abgegebene Rote Karten": numRedCards,
-                "Kontostand": balance
-            };
-
-            playerData.push(rowData);
-        }
-        playerBalances.push({ name: player.name, balance, data: playerData });
+const exportToExcel = (game: Game) => {
+  const calculateColumnWidths = (data: { [key: string]: any }[]) => {
+    const colWidths: number[] = [];
+    if (data.length > 0) {
+      Object.keys(data[0]).forEach((col, i) => (colWidths[i] = col.length));
+    }
+    data.forEach(row => {
+      Object.keys(row).forEach((col, i) => {
+        const len = (row[col] ?? "").toString().length;
+        if (len > colWidths[i]) colWidths[i] = len;
+      });
     });
-    playerBalances.sort((a, b) => b.balance - a.balance);
+    return colWidths.map(w => ({ wch: Math.max(w, 14) }));
+  };
 
-    generalData.push({
-        "Spiel-Titel": game.name,
-        "Anzahl der Runden": game.numTurns,
-        "Anzahl der Spieler": game.players.length,
-        "": "",
-        "Spielername": "",
-        "Kontostand": "",
-    });
-    playerBalances.forEach(pb => {
-        generalData.push({
-            "Spielername": pb.name,
-            "Kontostand": pb.balance
-        });
-    });
-    const generalSheet = XLSX.utils.json_to_sheet(generalData);
-    generalSheet['!cols'] = calculateColumnWidths(generalData);
+  const asNumber = (v: unknown) => (typeof v === "number" ? v : Number(v));
+  // Nur wer exakt -1 hat, gilt als aktiv. Alles andere → ausschließen.
+  const isEligible = (p: Player) => asNumber(p.inactiveSinceTurn) === -1;
 
-    XLSX.utils.book_append_sheet(wb, generalSheet, "Spiel-Info");
+  const wb = XLSX.utils.book_new();
+  const generalData: { [key: string]: any }[] = [];
+  const playerBalances: { name: string; balance: number; data: { [key: string]: any }[] }[] = [];
 
-    playerBalances.forEach(pb => {
-      const playerSheet = XLSX.utils.json_to_sheet(pb.data);
-      playerSheet['!cols'] = calculateColumnWidths(pb.data); 
+  // Nur aktive Spieler (strict)
+  const eligiblePlayers = game.players.filter(isEligible);
 
-      XLSX.utils.book_append_sheet(wb, playerSheet, pb.name);
-    });
+  // 🔹 Pot: nur aktive Spieler zählen
+  const potRedCardsByTurn: Record<number, number> = {};
+  for (let turn = 1; turn <= game.numTurns; turn++) {
+    let pot = 0;
+    for (const p of eligiblePlayers) {
+      const mv = p.moves.find((m: Move) => m.numTurn === turn);
+      pot += mv ? Math.max(0, Math.min(2, mv.numRedCards)) : 0;
+    }
+    potRedCardsByTurn[turn] = pot;
+  }
 
-    XLSX.writeFile(wb, game.name + ".xlsx");
+  // 🔹 Spielerberechnung: nur aktive, über alle Runden (da immer aktiv)
+  for (const player of eligiblePlayers) {
+    let balance = 0;
+    const playerData: { [key: string]: any }[] = [];
+
+    for (let turn = 1; turn <= game.numTurns; turn++) {
+      const cardValue = Number(game.cardHandValue[turn] ?? 0);
+      const mv = player.moves.find((m: Move) => m.numTurn === turn);
+      const numRedCards = mv ? Math.max(0, Math.min(2, mv.numRedCards)) : 0;
+
+      const keptRedCards = Math.max(0, 2 - numRedCards);
+      const potValue = potRedCardsByTurn[turn] ?? 0;
+
+      balance += keptRedCards * cardValue + potValue;
+
+      playerData.push({
+        "Runde": turn,
+        "Kartenwert": cardValue,
+        "Rote Karten im Pot": potValue,
+        "abgegebene Rote Karten": numRedCards,
+        "behaltene Rote Karten": keptRedCards,
+        "Kontostand": balance,
+      });
+    }
+
+    playerBalances.push({ name: player.name, balance, data: playerData });
+  }
+
+  // 🔹 Ranking
+  playerBalances.sort((a, b) => b.balance - a.balance);
+
+  // 🔹 Allgemeines Blatt (nur aktive zählen)
+  generalData.push({
+    "Spiel-Titel": game.name,
+    "Anzahl der Runden": game.numTurns,
+    "Anzahl der Spieler": playerBalances.length,
+    "": "",
+    "Spielername": "",
+    "Kontostand": "",
+  });
+  for (const pb of playerBalances) {
+    generalData.push({ "Spielername": pb.name, "Kontostand": pb.balance });
+  }
+
+  const generalSheet = XLSX.utils.json_to_sheet(generalData);
+  generalSheet["!cols"] = calculateColumnWidths(generalData);
+  XLSX.utils.book_append_sheet(wb, generalSheet, "Spiel-Info");
+
+  // 🔹 Ein Blatt je aktivem Spieler
+  for (const pb of playerBalances) {
+    const playerSheet = XLSX.utils.json_to_sheet(pb.data);
+    playerSheet["!cols"] = calculateColumnWidths(pb.data);
+    XLSX.utils.book_append_sheet(wb, playerSheet, pb.name);
+  }
+
+  XLSX.writeFile(wb, game.name + ".xlsx");
 };
+
+
 
   /*
   useEffect(() => {
